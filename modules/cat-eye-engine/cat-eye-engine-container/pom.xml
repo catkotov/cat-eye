@@ -4,17 +4,13 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <parent>
-        <artifactId>cat-eye</artifactId>
-        <groupId>org.cat.eye</groupId>
+        <artifactId>cat-eye-engine</artifactId>
+        <groupId>org.cat.eye.engine</groupId>
         <version>0.1-SNAPSHOT</version>
-        <relativePath>../../pom.xml</relativePath>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.cat.eye.common</groupId>
-    <artifactId>cat-eye-common</artifactId>
-    <version>0.1-SNAPSHOT</version>
-
+    <artifactId>cat-eye-engine-container</artifactId>
 
 </project>
