@@ -14,7 +14,12 @@
 
     <groupId>org.cat.eye.common</groupId>
     <artifactId>cat-eye-common</artifactId>
+    <packaging>pom</packaging>
     <version>0.1-SNAPSHOT</version>
+
+    <modules>
+        <module>cat-eye-common-context</module>
+    </modules>
 
 
 </project>

@@ -15,6 +15,7 @@
     <groupId>org.cat.eye.engine</groupId>
     <artifactId>cat-eye-engine</artifactId>
     <packaging>pom</packaging>
+
     <modules>
         <module>cat-eye-engine-container</module>
     </modules>
