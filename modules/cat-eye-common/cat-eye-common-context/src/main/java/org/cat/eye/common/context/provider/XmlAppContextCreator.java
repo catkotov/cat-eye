@@ -5,7 +5,7 @@ import java.io.IOException;
 
 public interface XmlAppContextCreator extends AppContextCreator {
 
-    void addConfigLocation(String configClass) throws IOException;
+    void addConfigLocation(String ... configClass) throws IOException;
 
     void addConfigLocation(Resource resource) throws IOException;
 

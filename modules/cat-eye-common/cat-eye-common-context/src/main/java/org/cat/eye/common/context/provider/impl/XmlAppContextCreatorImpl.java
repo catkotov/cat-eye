@@ -5,7 +5,6 @@ import org.cat.eye.common.context.provider.XmlAppContextCreator;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,10 +18,13 @@ public class XmlAppContextCreatorImpl implements XmlAppContextCreator {
     private List<Resource> configResources = new ArrayList<>();
 
     @Override
-    public void addConfigLocation(String configPath) throws IOException {
-        Resource[] resources = new PathMatchingResourcePatternResolver().getResources(configPath);
-        for (Resource resource : resources) {
-            addConfigLocation(resource);
+    public void addConfigLocation(String ... configPaths) throws IOException {
+
+        for (String configPath : configPaths) {
+            Resource[] resources = new PathMatchingResourcePatternResolver().getResources(configPath);
+            for (Resource resource : resources) {
+                addConfigLocation(resource);
+            }
         }
     }
 

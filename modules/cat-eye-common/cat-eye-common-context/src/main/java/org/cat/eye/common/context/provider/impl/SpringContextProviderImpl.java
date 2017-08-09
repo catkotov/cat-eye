@@ -41,7 +41,7 @@ public class SpringContextProviderImpl implements SpringContextProvider {
         }
     }
 
-    static void start(String config) {
+    public static void start(String ... config) {
 
         try {
             final SpringContextProvider context = createContext(config);
@@ -70,19 +70,20 @@ public class SpringContextProviderImpl implements SpringContextProvider {
         }
     }
 
-    private static SpringContextProvider createContext(String config) throws Exception {
+    private static SpringContextProvider createContext(String ... config) throws Exception {
 
-        AppContextCreator creator;
+        AppContextCreator creator = null;
 
-        if (config.endsWith(".xml")) {
+        if (config[0].endsWith(".xml")) {
             creator = new XmlAppContextCreatorImpl();
             ((XmlAppContextCreator) creator).addConfigLocation(config);
-        } else if (config.endsWith(".class")) {
-            String configClassName = config.substring(0, config.indexOf(".class"));
-            Class<?> clazz = Class.forName(configClassName);
-            creator = new AnnotationAppContextCreatorImpl();
-            ((AnnotationAppContextCreator) creator).addConfigLocation(clazz);
-            return null;
+        } else if (config[0].endsWith(".class")) {
+            for (String classConfig : config) {
+                String configClassName = classConfig.substring(0, classConfig.indexOf(".class"));
+                Class<?> clazz = Class.forName(configClassName);
+                creator = new AnnotationAppContextCreatorImpl();
+                ((AnnotationAppContextCreator) creator).addConfigLocation(clazz);
+            }
         } else {
             throw new Exception("SpringContextProviderImpl.createContext - cannot create application container.");
         }
