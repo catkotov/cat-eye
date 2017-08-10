@@ -4,6 +4,8 @@ import org.cat.eye.common.context.provider.msg.MessageServiceMock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
+
 
 /**
  *
@@ -17,23 +19,29 @@ public class TestBean implements Runnable {
     @Autowired
     TestBean(MessageServiceMock service) {
         this.service = service;
-        init();
     }
 
+    @PostConstruct
     private void init() {
-        new Thread(this).start();
+        Thread t = new Thread(this);
+        t.start();
     }
 
     private void printMsg() {
-        System.out.println(this.service.getMessage());
+        System.out.print(this.service.getMessage());
     }
 
     @Override
     public void run() {
+
+        int i = 1;
+
         while (true) {
             this.printMsg();
+            System.out.println(" " + i);
+            i++;
             try {
-                Thread.sleep(5000);
+                Thread.sleep(3000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

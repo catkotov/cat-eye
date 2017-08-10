@@ -31,8 +31,6 @@ public class AnnotationAppContextCreatorImpl implements AnnotationAppContextCrea
             applicationContext.setClassLoader(this.classLoader);
         }
 
-//        applicationContext.refresh();
-
         return new SpringContextProviderImpl(applicationContext);
     }
 }
