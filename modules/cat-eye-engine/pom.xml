@@ -16,6 +16,16 @@
     <artifactId>cat-eye-engine</artifactId>
     <packaging>pom</packaging>
 
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.cat.eye.common</groupId>
+                <artifactId>cat-eye-common-context</artifactId>
+                <version>${cat.eye.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <modules>
         <module>cat-eye-engine-container</module>
     </modules>

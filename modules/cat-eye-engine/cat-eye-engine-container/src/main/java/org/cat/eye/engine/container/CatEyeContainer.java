@@ -1,6 +1,6 @@
 package org.cat.eye.engine.container;
 
-public interface Container {
+public interface CatEyeContainer {
 
     String getName();
 

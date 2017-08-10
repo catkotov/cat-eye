@@ -10,6 +10,7 @@
     <packaging>pom</packaging>
 
     <properties>
+        <cat.eye.version>0.1-SNAPSHOT</cat.eye.version>
         <spring.version>4.3.10.RELEASE</spring.version>
         <slf4j.version>1.7.21</slf4j.version>
         <logback.version>1.1.7</logback.version>

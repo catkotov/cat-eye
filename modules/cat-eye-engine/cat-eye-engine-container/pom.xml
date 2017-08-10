@@ -13,4 +13,11 @@
 
     <artifactId>cat-eye-engine-container</artifactId>
 
+    <dependencies>
+        <dependency>
+            <groupId>org.cat.eye.common</groupId>
+            <artifactId>cat-eye-common-context</artifactId>
+        </dependency>
+    </dependencies>
+
 </project>
