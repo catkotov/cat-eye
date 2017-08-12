@@ -5,7 +5,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-//@Ignore // This is test for manual start
+@Ignore // This is test for manual start
 public class SpringContextProviderImplITManual {
 
     @Test

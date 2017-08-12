@@ -1,6 +1,13 @@
 package org.cat.eye.engine.container.impl;
 
 import org.cat.eye.engine.container.CatEyeContainer;
+import org.cat.eye.engine.container.discovery.NeighboursDiscoveryLeadingLight;
+import org.cat.eye.engine.container.discovery.NeighboursDiscoveryReceiver;
+import sun.java2d.loops.GraphicsPrimitive;
+
+import javax.annotation.PostConstruct;
+import java.net.NetworkInterface;
+import java.util.List;
 
 public class CatEyeContainerImpl implements CatEyeContainer {
 
@@ -16,6 +23,7 @@ public class CatEyeContainerImpl implements CatEyeContainer {
 
     }
 
+    @PostConstruct
     private void initialize() {
         // start discovery process
         startDiscovery();
@@ -28,6 +36,11 @@ public class CatEyeContainerImpl implements CatEyeContainer {
         // find multicast network interface
 
         // start discovery process on interface
+        Thread signalReceiver = new Thread(new NeighboursDiscoveryReceiver());
+        signalReceiver.start();
+
+        Thread signalSender = new Thread(new NeighboursDiscoveryLeadingLight());
+        signalSender.start();
 
     }
 }
