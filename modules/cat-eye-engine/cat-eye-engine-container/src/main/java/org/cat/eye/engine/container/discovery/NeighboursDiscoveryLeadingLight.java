@@ -2,10 +2,7 @@ package org.cat.eye.engine.container.discovery;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.io.IOException;
-import java.net.*;
 import java.nio.ByteBuffer;
-import java.nio.channels.DatagramChannel;
 import java.util.Date;
 
 /**
@@ -14,47 +11,33 @@ import java.util.Date;
  */
 public class NeighboursDiscoveryLeadingLight implements Runnable {
 
-    Logger LOGGER = LoggerFactory.getLogger(NeighboursDiscoveryLeadingLight.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(NeighboursDiscoveryLeadingLight.class);
 
-    private final static int DEFAULT_PORT = 5555;
+    private DatagramSender datagramSender;
 
-    private final static String GROUP = "233.252.20.20";
-
-    ByteBuffer buffer;
+    private ByteBuffer buffer;
 
     @Override
     public void run() {
 
-        try (DatagramChannel datagramChannel = DatagramChannel.open(StandardProtocolFamily.INET)) {
+        while (true) {
+            LOGGER.info("run - Sending signal.");
 
-            if (datagramChannel.isOpen()) {
+            buffer = ByteBuffer.wrap(("Container 1 - " + new Date().toString()).getBytes());
 
-                NetworkInterface networkInterface = NetworkInterface.getByName("wlan0");
+            datagramSender.addDatagram(buffer);
 
-                datagramChannel.setOption(StandardSocketOptions.IP_MULTICAST_IF, networkInterface);
-                datagramChannel.setOption(StandardSocketOptions.SO_REUSEADDR, true);
+            LOGGER.info("run - Signal was sent.");
 
-                datagramChannel.bind(new InetSocketAddress(DEFAULT_PORT));
-
-                while (true) {
-                    LOGGER.info("run - Sending signal.");
-
-                    buffer = ByteBuffer.wrap(("Container 1 - " + new Date().toString()).getBytes());
-
-                    datagramChannel.send(buffer, new InetSocketAddress(InetAddress.getByName(GROUP), DEFAULT_PORT));
-
-                    buffer.flip();
-                    LOGGER.info("run - Signal was sent.");
-
-                    try {
-                        Thread.sleep(3000);
-                    } catch (InterruptedException e) {
-                        LOGGER.error("run - error: " + e.getMessage(), e);
-                    }
-                }
+            try {
+                Thread.sleep(3000);
+            } catch (InterruptedException e) {
+                LOGGER.error("run - error: " + e.getMessage(), e);
             }
-        } catch (IOException e) {
-            LOGGER.error("run - error open of datagram channel.", e);
         }
+    }
+
+    public void setDatagramSender(DatagramSender datagramSender) {
+        this.datagramSender = datagramSender;
     }
 }

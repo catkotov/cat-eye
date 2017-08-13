@@ -2,13 +2,8 @@ package org.cat.eye.engine.container.discovery;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.net.*;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
-import java.nio.channels.DatagramChannel;
-import java.nio.channels.MembershipKey;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 
@@ -17,50 +12,30 @@ import java.nio.charset.CharsetDecoder;
  */
 public class NeighboursDiscoveryReceiver implements Runnable {
 
-    Logger LOGGER = LoggerFactory.getLogger(NeighboursDiscoveryReceiver.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(NeighboursDiscoveryReceiver.class);
 
-    private final static int DEFAULT_PORT = 5555;
-    private final static String GROUP = "233.252.20.20";
-    private final int MAX_PACKET_SIZE = 65507;
+    private DatagramReceiver datagramReceiver;
 
-    CharBuffer charBuffer = null;
-    Charset charset = Charset.defaultCharset();
-    CharsetDecoder decoder = charset.newDecoder();
-    ByteBuffer buffer = ByteBuffer.allocateDirect(MAX_PACKET_SIZE);
+    private Charset charset = Charset.defaultCharset();
+    private CharsetDecoder decoder = charset.newDecoder();
+
 
     @Override
     public void run() {
-        try (DatagramChannel datagramChannel = DatagramChannel.open(StandardProtocolFamily.INET)) {
 
-            InetAddress group = InetAddress.getByName(GROUP);
-
-            if (group.isMulticastAddress()) {
-
-                if (datagramChannel.isOpen()) {
-                    NetworkInterface networkInterface = NetworkInterface.getByName("wlan0");
-
-                    datagramChannel.setOption(StandardSocketOptions.SO_REUSEADDR, true);
-
-                    datagramChannel.bind(new InetSocketAddress(DEFAULT_PORT));
-
-                    MembershipKey key = datagramChannel.join(group, networkInterface);
-
-                    while (true) {
-                        if (key.isValid()) {
-                            datagramChannel.receive(buffer);
-                            buffer.flip();
-                            charBuffer = decoder.decode(buffer);
-                            LOGGER.info("run - message was received: " + charBuffer.toString());
-                            buffer.clear();
-                        } else {
-                            LOGGER.info("run - membership key isn't valid.");
-                            break;
-                        }
-                    }
-                }
+        while (true) {
+            try {
+                ByteBuffer buffer = this.datagramReceiver.getDatagram();
+                CharBuffer charBuffer = decoder.decode(buffer);
+                LOGGER.info("run - message was received: " + charBuffer.toString());
+                charBuffer.clear();
+            } catch (Exception e) {
+                LOGGER.error("run - error during receive and decode datagram: " + e.getMessage(), e);
             }
-        } catch (IOException e) {
-            LOGGER.error("run - error open of datagram channel.", e);
         }
+    }
+
+    public void setDatagramReceiver(DatagramReceiver datagramReceiver) {
+        this.datagramReceiver = datagramReceiver;
     }
 }
