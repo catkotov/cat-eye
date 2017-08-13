@@ -1,11 +1,12 @@
 package org.cat.eye.engine.container.impl;
 
 import org.cat.eye.engine.container.CatEyeContainer;
-import org.cat.eye.engine.container.discovery.DatagramReceiver;
-import org.cat.eye.engine.container.discovery.DatagramSender;
-import org.cat.eye.engine.container.discovery.NeighboursDiscoveryLeadingLight;
-import org.cat.eye.engine.container.discovery.NeighboursDiscoveryReceiver;
+import org.cat.eye.engine.container.discovery.*;
+
 import javax.annotation.PostConstruct;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.util.List;
 
 public class CatEyeContainerImpl implements CatEyeContainer {
 
@@ -40,19 +41,32 @@ public class CatEyeContainerImpl implements CatEyeContainer {
 
     private void startDiscovery() {
         // find multicast network interface
+        MulticastNetworkInterfaceFinder interfaceFinder = new MulticastNetworkInterfaceFinder();
+        List<NetworkInterface> networkInterfaces = null;
+        try {
+            networkInterfaces = interfaceFinder.getMulticastInterfaces();
+        } catch (SocketException e) {
+            e.printStackTrace();
+        }
 
-        // start discovery process on interface
-        Thread signalReceiverThread = new Thread(this.neighbourDiscoveryReceiver);
-        signalReceiverThread.start();
+        if (networkInterfaces != null && !networkInterfaces.isEmpty()) {
 
-        Thread datagramReceiverThread = new Thread(this.datagramReceiver);
-        datagramReceiverThread.start();
+            this.datagramReceiver.setNetworkInterfaceName(networkInterfaces.get(0).getName());
+            this.datagramSender.setNetworkInterfaceName(networkInterfaces.get(0).getName());
 
-        Thread datagramSenderThread = new Thread(this.datagramSender);
-        datagramSenderThread.start();
+            // start discovery process on interface
+            Thread signalReceiverThread = new Thread(this.neighbourDiscoveryReceiver);
+            signalReceiverThread.start();
 
-        Thread signalSenderThread = new Thread(this.leadingLight);
-        signalSenderThread.start();
+            Thread datagramReceiverThread = new Thread(this.datagramReceiver);
+            datagramReceiverThread.start();
+
+            Thread datagramSenderThread = new Thread(this.datagramSender);
+            datagramSenderThread.start();
+
+            Thread signalSenderThread = new Thread(this.leadingLight);
+            signalSenderThread.start();
+        }
 
     }
 

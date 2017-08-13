@@ -15,6 +15,8 @@ public class DatagramReceiver extends AbstractDatagramStore implements Runnable 
 
     private final static Logger LOGGER = LoggerFactory.getLogger(DatagramReceiver.class);
 
+    private String networkInterfaceName;
+
     public DatagramReceiver(int datagramStoreCapacity) {
         super(datagramStoreCapacity);
     }
@@ -28,7 +30,7 @@ public class DatagramReceiver extends AbstractDatagramStore implements Runnable 
             if (group.isMulticastAddress()) {
 
                 if (datagramChannel.isOpen()) {
-                    NetworkInterface networkInterface = NetworkInterface.getByName("wlan0");
+                    NetworkInterface networkInterface = NetworkInterface.getByName(networkInterfaceName);
 
                     datagramChannel.setOption(StandardSocketOptions.SO_REUSEADDR, true);
 
@@ -55,5 +57,9 @@ public class DatagramReceiver extends AbstractDatagramStore implements Runnable 
         } catch (IOException e) {
             LOGGER.error("run - error open of datagram channel.", e);
         }
+    }
+
+    public void setNetworkInterfaceName(String networkInterfaceName) {
+        this.networkInterfaceName = networkInterfaceName;
     }
 }
