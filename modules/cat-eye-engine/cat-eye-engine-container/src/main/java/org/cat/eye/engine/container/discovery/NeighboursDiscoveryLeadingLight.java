@@ -7,7 +7,7 @@ import java.util.Date;
 
 /**
  *
- * Created by Kotov at 12.08.2017
+ * Created by Kotov on 12.08.2017.
  */
 public class NeighboursDiscoveryLeadingLight implements Runnable {
 
