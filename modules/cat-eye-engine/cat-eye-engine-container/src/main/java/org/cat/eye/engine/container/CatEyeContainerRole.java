@@ -1,4 +1,4 @@
-package org.cat.eye.engine.container.discovery.protocol;
+package org.cat.eye.engine.container;
 
 public enum CatEyeContainerRole {
     MASTER,

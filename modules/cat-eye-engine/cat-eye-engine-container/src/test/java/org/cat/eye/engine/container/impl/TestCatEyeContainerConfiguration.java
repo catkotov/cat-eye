@@ -1,8 +1,8 @@
 package org.cat.eye.engine.container.impl;
 
 import org.cat.eye.engine.container.CatEyeContainer;
-import org.cat.eye.engine.container.discovery.DatagramReceiver;
-import org.cat.eye.engine.container.discovery.DatagramSender;
+import org.cat.eye.engine.container.datagram.DatagramReceiver;
+import org.cat.eye.engine.container.datagram.DatagramSender;
 import org.cat.eye.engine.container.discovery.NeighboursDiscoveryLeadingLight;
 import org.cat.eye.engine.container.discovery.NeighboursDiscoveryReceiver;
 import org.springframework.context.annotation.Bean;
@@ -18,6 +18,7 @@ public class TestCatEyeContainerConfiguration {
     @Bean
     CatEyeContainer getCatEyeContainer() {
         CatEyeContainerImpl container = new CatEyeContainerImpl();
+        container.setName(System.getProperty("cat.eye.container.name"));
         container.setLeadingLight(getLeaderLight());
         container.setDatagramSender(getDatagramSender());
         container.setDatagramReceiver(getDatagramReceiver());

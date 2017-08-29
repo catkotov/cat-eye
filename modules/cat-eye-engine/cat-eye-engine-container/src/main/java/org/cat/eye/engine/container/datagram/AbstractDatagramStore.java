@@ -1,4 +1,4 @@
-package org.cat.eye.engine.container.discovery;
+package org.cat.eye.engine.container.datagram;
 
 import java.nio.ByteBuffer;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -20,8 +20,8 @@ public class AbstractDatagramStore {
         this.datagramStore = new LinkedBlockingQueue<>(datagramStoreCapacity);
     }
 
-    public boolean addDatagram(ByteBuffer buffer) {
-        return this.datagramStore.offer(buffer);
+    public void addDatagram(ByteBuffer buffer) {
+        this.datagramStore.offer(buffer);
     }
 
     public ByteBuffer getDatagram() throws InterruptedException {
