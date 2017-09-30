@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>cat-eye</artifactId>
+        <groupId>org.cat.eye</groupId>
+        <version>0.1-SNAPSHOT</version>
+        <relativePath>../../pom.xml</relativePath>
+    </parent>
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.cat.eye.bundle</groupId>
+    <artifactId>cat-eye-test-bundle</artifactId>
+    <packaging>pom</packaging>
+    <modules>
+        <module>cat-eye-test-bungle-simple</module>
+    </modules>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.cat.eye.engine</groupId>
+            <artifactId>cat-eye-engine-model</artifactId>
+            <version>${cat.eye.version}</version>
+        </dependency>
+    </dependencies>
+</project>

@@ -18,6 +18,7 @@
     <modules>
         <module>modules/cat-eye-common</module>
         <module>modules/cat-eye-engine</module>
+        <module>modules/cat-eye-test-bundle</module>
     </modules>
 
 </project>
