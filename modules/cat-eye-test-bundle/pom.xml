@@ -18,11 +18,36 @@
         <module>cat-eye-test-bungle-simple</module>
     </modules>
 
-    <dependencies>
-        <dependency>
-            <groupId>org.cat.eye.engine</groupId>
-            <artifactId>cat-eye-engine-model</artifactId>
-            <version>${cat.eye.version}</version>
-        </dependency>
-    </dependencies>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.cat.eye.engine</groupId>
+                <artifactId>cat-eye-engine-model</artifactId>
+                <version>${cat.eye.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>jcl-over-slf4j</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-classic</artifactId>
+                <version>${logback.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-core</artifactId>
+                <version>${logback.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 </project>

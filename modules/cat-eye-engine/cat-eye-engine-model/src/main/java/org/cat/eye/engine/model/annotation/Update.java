@@ -5,12 +5,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-/**
- * Created by Kotov on 15.09.2017.
- */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
-public @interface Compute {
-
-    int step() default 1;
+public @interface Update {
+    String[] fieldNames();
 }

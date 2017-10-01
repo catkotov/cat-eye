@@ -35,9 +35,9 @@ public class ComputationResolver {
             if (!methodLst.isEmpty()) {
                 methodLst.sort((m1, m2) -> {
                     Compute a1 = m1.getAnnotation(Compute.class);
-                    int order1 = a1.orderNumber();
+                    int order1 = a1.step();
                     Compute a2 = m2.getAnnotation(Compute.class);
-                    int order2 = a2.orderNumber();
+                    int order2 = a2.step();
                     return Integer.compare(order1, order2);
                 });
 
