@@ -40,7 +40,7 @@ public class FileCounterComputer {
     }
 
     @Compute(step = 1)
-    public List<FileCounterComputer> getDirectoriesAndFileCounte() {
+    public List<FileCounterComputer> getDirectoriesAndFileCounter() {
 
         int fileCount = 0;
 
@@ -52,6 +52,8 @@ public class FileCounterComputer {
                 for (File file : files) {
                     if (file.isDirectory()) {
                         computers.add(new FileCounterComputer(file.getAbsolutePath()));
+                        LOGGER.info("FileCounterComputer.getDirectoriesAndFileCounter - " +
+                                "Computation with path [{}} was created.", file.getAbsolutePath());
                     } else {
                         fileCount++;
                     }
@@ -74,10 +76,16 @@ public class FileCounterComputer {
         if (!this.computers.isEmpty()) {
             for (FileCounterComputer computer : computers) {
                 counter =+ computer.getNumberLocalFiles();
+
+                LOGGER.info("FileCounterComputer.countFilesInSubdirectories - " +
+                        "Directory [{0}] contains [{1}] files.", computer.getPath(), computer.getNumberLocalFiles());
             }
         }
 
         numberSubdirectoryFiles = counter;
+
+        LOGGER.info("FileCounterComputer.countFilesInSubdirectories - " +
+                "There are [{}] in subdirectories of directory [{}].", counter, path);
 
         return Collections.EMPTY_LIST;
     }
@@ -88,6 +96,8 @@ public class FileCounterComputer {
         long counter = 0;
         counter = numberLocalFiles + numberSubdirectoryFiles;
         numberFiles = counter;
+
+        LOGGER.info("FileCounterComputer.countFiles - Full quantity files in directory [{0}] is [{1}]", path, counter);
 
         return Collections.EMPTY_LIST;
     }
