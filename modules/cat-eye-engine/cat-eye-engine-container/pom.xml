@@ -12,6 +12,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>cat-eye-engine-container</artifactId>
+    <version>0.1-SNAPSHOT</version>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
 
     <dependencies>
         <dependency>
@@ -22,7 +27,7 @@
         <dependency>
             <groupId>org.cat.eye.engine</groupId>
             <artifactId>cat-eye-engine-model</artifactId>
-            <version>${parent.version}</version>
+            <version>${project.parent.version}</version>
         </dependency>
 
         <dependency>
@@ -77,6 +82,7 @@
                     <source>1.8</source>
                     <target>1.8</target>
                 </configuration>
+                <version>${compiler.plugin.version}</version>
             </plugin>
         </plugins>
     </build>

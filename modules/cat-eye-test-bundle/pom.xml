@@ -14,6 +14,7 @@
     <groupId>org.cat.eye.bundle</groupId>
     <artifactId>cat-eye-test-bundle</artifactId>
     <packaging>pom</packaging>
+
     <modules>
         <module>cat-eye-test-bungle-simple</module>
     </modules>

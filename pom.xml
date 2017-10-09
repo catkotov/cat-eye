@@ -8,7 +8,7 @@
         <groupId>org.cat.eye</groupId>
         <artifactId>cat-eye-parent</artifactId>
         <version>0.1-SNAPSHOT</version>
-        <relativePath>parent</relativePath>
+        <relativePath>parent/pom.xml</relativePath>
     </parent>
 
     <artifactId>cat-eye</artifactId>
