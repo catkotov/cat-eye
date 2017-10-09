@@ -20,4 +20,5 @@
             <useTransitiveFiltering>true</useTransitiveFiltering>
         </dependencySet>
     </dependencySets>
+
 </assembly>
