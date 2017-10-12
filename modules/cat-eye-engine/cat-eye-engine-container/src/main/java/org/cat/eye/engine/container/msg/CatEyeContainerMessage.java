@@ -31,10 +31,10 @@ public class CatEyeContainerMessage {
     }
 
     public static ByteBuffer createDatagram(CatEyeContainerMessage msg) {
-        int heaederLenght = msg.getMessageType().getBytes().length;
-        int messageLenght = msg.getMessage().array().length;
-        ByteBuffer buffer = ByteBuffer.allocate(4 + heaederLenght + messageLenght);
-        buffer.putInt(heaederLenght).put(msg.getMessageType().getBytes()).put(msg.getMessage());
+        int headerLength = msg.getMessageType().getBytes().length;
+        int messageLength = msg.getMessage().array().length;
+        ByteBuffer buffer = ByteBuffer.allocate(4 + headerLength + messageLength);
+        buffer.putInt(headerLength).put(msg.getMessageType().getBytes()).put(msg.getMessage());
 
         buffer.flip();
 
@@ -43,14 +43,13 @@ public class CatEyeContainerMessage {
 
     public static CatEyeContainerMessage parseDatagram(ByteBuffer buffer) throws CharacterCodingException {
 
-        int headerLenght = buffer.getInt();
+        int headerLength = buffer.getInt();
         int currentPosition = buffer.position();
 
-        buffer.mark().position(currentPosition + headerLenght);
+        buffer.mark().position(currentPosition + headerLength);
         ByteBuffer messageBuffer = buffer.slice();
-//        messageBuffer.flip();
 
-        buffer.reset().limit(currentPosition + headerLenght);
+        buffer.reset().limit(currentPosition + headerLength);
         ByteBuffer typeMsgBuffer = buffer.slice();
         CharsetDecoder decoder = charset.newDecoder();
         CharBuffer charBuffer = decoder.decode(typeMsgBuffer);
