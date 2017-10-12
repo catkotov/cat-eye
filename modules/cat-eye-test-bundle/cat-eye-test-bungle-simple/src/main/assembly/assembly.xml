@@ -8,7 +8,7 @@
         <fileSet>
             <directory>target/classes</directory>
             <lineEnding>keep</lineEnding>
-            <outputDirectory>${project.build}</outputDirectory>
+            <outputDirectory>\\</outputDirectory>
             <includes>
                 <include>**/**</include>
             </includes>
