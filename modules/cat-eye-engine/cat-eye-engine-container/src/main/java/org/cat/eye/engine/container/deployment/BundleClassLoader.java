@@ -2,7 +2,6 @@ package org.cat.eye.engine.container.deployment;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -26,10 +25,7 @@ public class BundleClassLoader extends ClassLoader {
     }
 
     private Class<?> getClass(String name) throws ClassNotFoundException {
-        // We are getting a name that looks like
-        // javablogging.package.ClassToLoad
-        // and we have to convert it into the .class file name
-        // like javablogging/package/ClassToLoad.class
+
         String file = name.replace('.', File.separatorChar) + ".class";
         byte[] b;
         try {
@@ -41,7 +37,7 @@ public class BundleClassLoader extends ClassLoader {
             resolveClass(c);
             return c;
         } catch (IOException e) {
-            e.printStackTrace(); // TODO replace it
+            LOGGER.error("BundleClassLoader.getClass - can't get class <" + name + ">", e);
             return null;
         }
     }
