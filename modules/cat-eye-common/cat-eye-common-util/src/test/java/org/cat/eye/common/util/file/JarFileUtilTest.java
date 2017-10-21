@@ -8,7 +8,7 @@ public class JarFileUtilTest {
     @Test
     public void getClassesNames() throws Exception {
 
-        String fullPath = Thread.currentThread().getContextClassLoader().getResource("").toString();
+        String fullPath = Thread.currentThread().getContextClassLoader().getResource("").getPath();
 
         JarFileUtil.getClassesNames(fullPath + "cat-eye-test-bungle-simple-0.1-SNAPSHOT-simple.jar");
     }

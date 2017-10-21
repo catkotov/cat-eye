@@ -18,6 +18,11 @@ public class JarFileUtil {
                 JarFile jarFile = new JarFile(file);
                 Enumeration<JarEntry> jarEntities = jarFile.entries();
                 if (jarEntities != null) {
+                    while (jarEntities.hasMoreElements()) {
+                        JarEntry jarEntry = jarEntities.nextElement();
+
+
+                    }
 
                 }
 
