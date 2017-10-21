@@ -19,12 +19,20 @@ public class BundleDeployer {
     private final static Logger LOGGER = LoggerFactory.getLogger(BundleDeployer.class);
 
     public void deploy(String pathToJar) {
-
+        // get urls of jar's file
         URL[] ursl = getUrlsFromJarFile(pathToJar);
-
-
-
-
+        // create class loader for bundle
+        URLBundleClassLoader bundleClassLoader = new URLBundleClassLoader(ursl, new BundleClassLoader());
+        // create and start thread for bundle deploying
+        Thread deployingThread = new Thread(new DeployingProcess(pathToJar));
+        deployingThread.setContextClassLoader(bundleClassLoader);
+        deployingThread.start();
+        try {
+            deployingThread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace(); // TODO
+        }
+        // add bundle to register
     }
 
     private URL[] getUrlsFromJarFile(String pathToJar) {
@@ -35,24 +43,25 @@ public class BundleDeployer {
 
         if (file.exists() && file.getName().endsWith(".jar")) {
             try {
+                List<URL> urls = new ArrayList<>();
+                urls.add(file.toURI().toURL());
+
                 JarFile jarFile = new JarFile(file);
                 Manifest manifest = jarFile.getManifest();
+
                 if (manifest != null) {
                     String classPath = manifest.getMainAttributes().getValue("class-path");
                     if (classPath != null) {
-                        List<URL> urls = new ArrayList<>();
                         for (String cp : classPath.split("\\s+")) {
                             File lib = new File(file.getParent(), cp);
                             urls.add(lib.toURI().toURL());
                         }
-
                         result = (URL[]) urls.toArray();
                     }
                 }
             } catch (IOException e) {
                 LOGGER.error("BundleDeployer.deploy - ", e);
             }
-
         } else {
             LOGGER.warn("BundleDeployer.deploy - ");
         }

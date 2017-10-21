@@ -64,6 +64,7 @@
 
     <modules>
         <module>cat-eye-common-context</module>
+        <module>cat-eye-common-util</module>
     </modules>
 
 
