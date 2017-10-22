@@ -25,6 +25,12 @@
         </dependency>
 
         <dependency>
+            <groupId>org.cat.eye.common</groupId>
+            <artifactId>cat-eye-common-util</artifactId>
+            <version>0.1-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.cat.eye.engine</groupId>
             <artifactId>cat-eye-engine-model</artifactId>
             <version>${project.parent.version}</version>
