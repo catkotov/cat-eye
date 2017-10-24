@@ -41,6 +41,6 @@ public class JarFileUtil {
     }
 
     private static String parseJarEntryName(String jarEntryName) {
-        return jarEntryName.replace(FILE_SEPARATOR, ".").substring(1, jarEntryName.lastIndexOf('.'));
+        return jarEntryName.replace(FILE_SEPARATOR, ".").substring(0, jarEntryName.lastIndexOf('.'));
     }
 }

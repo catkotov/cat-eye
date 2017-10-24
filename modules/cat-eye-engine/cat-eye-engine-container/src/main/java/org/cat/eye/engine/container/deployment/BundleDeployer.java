@@ -23,14 +23,19 @@ public class BundleDeployer {
         URL[] ursl = getUrlsFromJarFile(pathToJar);
         // create class loader for bundle
         URLBundleClassLoader bundleClassLoader = new URLBundleClassLoader(ursl, new BundleClassLoader());
+
+        ClassLoader cl = Thread.currentThread().getContextClassLoader();
+        Thread.currentThread().setContextClassLoader(bundleClassLoader);
+
         // create and start thread for bundle deploying
         Thread deployingThread = new Thread(new DeployingProcess(pathToJar));
         deployingThread.setContextClassLoader(bundleClassLoader);
         deployingThread.start();
         try {
             deployingThread.join();
+            Thread.currentThread().setContextClassLoader(cl);
         } catch (InterruptedException e) {
-            e.printStackTrace(); // TODO
+            LOGGER.error("BundleDeployer.deploy - can't deploy bundle: " + pathToJar, e);
         }
         // add bundle to register
     }
@@ -56,7 +61,7 @@ public class BundleDeployer {
                             File lib = new File(file.getParent(), cp);
                             urls.add(lib.toURI().toURL());
                         }
-                        result = (URL[]) urls.toArray();
+                        result = urls.toArray(new URL[urls.size()]);
                     }
                 }
             } catch (IOException e) {
