@@ -4,14 +4,10 @@ import org.cat.eye.common.util.file.JarFileUtil;
 import org.cat.eye.engine.model.annotation.IsComputable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.jar.JarFile;
-import java.util.jar.Manifest;
 
 public class DeployingProcess implements Runnable {
 
@@ -31,10 +27,10 @@ public class DeployingProcess implements Runnable {
             try {
                 Class<?> bundleClass = Thread.currentThread().getContextClassLoader().loadClass(className);
                 if (bundleClass.isAnnotationPresent(IsComputable.class)) {
-                    LOGGER.info("DeployingProcess.run - class " + className + " is computable!");
+                    LOGGER.info("DeployingProcess.run - class <" + className + "> is computable!");
                 }
             } catch (ClassNotFoundException e) {
-                LOGGER.error("DeployingProcess.run - ", e);
+                LOGGER.error("DeployingProcess.run - can't process class <" + className + ">.", e);
             }
         }
 

@@ -23,13 +23,13 @@ public class FileCounterComputer {
     @Id
     private final String path;
 
-    private int numberLocalFiles;
+    private List<FileCounterComputer> computers = new ArrayList<>();
 
     private long numberSubdirectoryFiles;
 
-    private long numberFiles;
+    private int numberLocalFiles;
 
-    private List<FileCounterComputer> computers = new ArrayList<>();
+    private long numberFiles;
 
     public FileCounterComputer(String path) {
         this.path = path;

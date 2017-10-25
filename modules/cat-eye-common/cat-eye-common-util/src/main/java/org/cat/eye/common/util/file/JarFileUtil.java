@@ -1,5 +1,7 @@
 package org.cat.eye.common.util.file;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -9,6 +11,8 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 public class JarFileUtil {
+
+    private final static Logger LOGGER = LoggerFactory.getLogger(JarFileUtil.class);
 
     private final static String FILE_SEPARATOR = "/";
 
@@ -31,10 +35,10 @@ public class JarFileUtil {
                     }
                 }
             } catch (IOException e) {
-
+                LOGGER.error("JarFileUtil.getClassesNames - can't create list of classes names.", e);
             }
         } else {
-
+            LOGGER.warn("JarFileUtil.getClassesNames - the file " + jarFilePath + " isn't jar file!");
         }
 
         return result;
