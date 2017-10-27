@@ -2,28 +2,24 @@ package org.cat.eye.test.bundle.simple;
 
 import org.cat.eye.engine.model.annotation.Compute;
 import org.cat.eye.engine.model.annotation.Id;
-import org.cat.eye.engine.model.annotation.IsComputable;
-import org.cat.eye.engine.model.annotation.Update;
+import org.cat.eye.engine.model.annotation.In;
+import org.cat.eye.engine.model.annotation.Out;
+import org.cat.eye.test.bundle.model.FileCounterStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-/**
- * Created by Kotov on 30.09.2017.
- */
-@IsComputable
-public class FileCounterComputer {
+public class OtherFileCounterComputer {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(FileCounterComputer.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(OtherFileCounterComputer.class);
 
     @Id
     private final String path;
 
-    private List<FileCounterComputer> computers = new ArrayList<>();
+    private List<OtherFileCounterComputer> computers = new ArrayList<>();
 
     private long numberSubdirectoryFiles;
 
@@ -31,7 +27,7 @@ public class FileCounterComputer {
 
     private long numberFiles;
 
-    public FileCounterComputer(String path) {
+    public OtherFileCounterComputer(String path) {
         this.path = path;
     }
 
@@ -40,7 +36,7 @@ public class FileCounterComputer {
     }
 
     @Compute(step = 1)
-    public List<FileCounterComputer> getDirectoriesAndFileCounter() {
+    public List<OtherFileCounterComputer> getDirectoriesAndFileCounter() {
 
         int fileCount = 0;
 
@@ -51,7 +47,7 @@ public class FileCounterComputer {
             if (files != null) {
                 for (File file : files) {
                     if (file.isDirectory()) {
-                        computers.add(new FileCounterComputer(file.getAbsolutePath()));
+                        computers.add(new OtherFileCounterComputer(file.getAbsolutePath()));
                         LOGGER.info("FileCounterComputer.getDirectoriesAndFileCounter - " +
                                 "Computation with path [{}} was created.", file.getAbsolutePath());
                     } else {
@@ -68,14 +64,13 @@ public class FileCounterComputer {
     }
 
     @Compute(step = 2)
-    @Update(fieldNames = {"computers"})
-    public List countFilesInSubdirectories() {
+    public List countFilesInSubdirectories(@In FileCounterStore store) {
 
         long counter = 0;
 
         if (!this.computers.isEmpty()) {
-            for (FileCounterComputer computer : computers) {
-                counter =+ computer.getNumberFiles();
+            for (OtherFileCounterComputer computer : computers) {
+                counter =+ store.getFileNumber(computer.getPath());
 
                 LOGGER.info("FileCounterComputer.countFilesInSubdirectories - " +
                         "Directory [{0}] contains [{1}] files.", computer.getPath(), computer.getNumberFiles());
@@ -91,11 +86,13 @@ public class FileCounterComputer {
     }
 
     @Compute(step = 3)
-    public List countFiles() {
+    public List countFiles(@Out FileCounterStore store) {
 
         long counter = 0;
         counter = numberLocalFiles + numberSubdirectoryFiles;
         numberFiles = counter;
+
+        store.putFileNumber(path, numberFiles);
 
         LOGGER.info("FileCounterComputer.countFiles - Full quantity files in directory [{0}] is [{1}]", path, counter);
 
@@ -111,7 +108,7 @@ public class FileCounterComputer {
         if (this == o) return true;
         if (!(o instanceof FileCounterComputer)) return false;
 
-        FileCounterComputer that = (FileCounterComputer) o;
+        OtherFileCounterComputer that = (OtherFileCounterComputer) o;
 
         return path.equals(that.path);
     }

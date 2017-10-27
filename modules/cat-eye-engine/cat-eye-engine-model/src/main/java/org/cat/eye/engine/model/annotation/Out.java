@@ -5,11 +5,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-/**
- * Before computation start need update fields.
- */
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.METHOD)
-public @interface Update {
-    String[] fieldNames();
+@Target(ElementType.PARAMETER)
+public @interface Out {
 }
