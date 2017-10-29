@@ -1,9 +1,6 @@
 package org.cat.eye.test.bundle.simple;
 
-import org.cat.eye.engine.model.annotation.Compute;
-import org.cat.eye.engine.model.annotation.Id;
-import org.cat.eye.engine.model.annotation.In;
-import org.cat.eye.engine.model.annotation.Out;
+import org.cat.eye.engine.model.annotation.*;
 import org.cat.eye.test.bundle.model.FileCounterStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+@IsComputable
 public class OtherFileCounterComputer {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(OtherFileCounterComputer.class);

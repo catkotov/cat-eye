@@ -5,6 +5,8 @@ import org.cat.eye.engine.container.CatEyeContainerRole;
 import org.cat.eye.engine.container.CatEyeContainerState;
 import org.cat.eye.engine.container.datagram.DatagramReceiver;
 import org.cat.eye.engine.container.datagram.DatagramSender;
+import org.cat.eye.engine.container.deployment.BundleDeployer;
+import org.cat.eye.engine.container.deployment.management.BundleManager;
 import org.cat.eye.engine.container.discovery.*;
 import org.cat.eye.engine.container.discovery.gossip.GossipContainerState;
 import org.cat.eye.engine.container.discovery.gossip.GossipMessageProcessor;
@@ -39,6 +41,14 @@ public class CatEyeContainerImpl implements CatEyeContainer {
 
     private Random random = new Random();
 
+    private BundleManager bundleManager;
+
+    private BundleDeployer bundleDeployer;
+
+    private String pathToBundleJar;
+
+    private String bundleDomain;
+
     public String getName() {
         return name;
     }
@@ -62,8 +72,9 @@ public class CatEyeContainerImpl implements CatEyeContainer {
         // start discovery process
         startDiscovery();
         // deploy bundle
-
+        bundleDeployer.deploy(pathToBundleJar, bundleDomain);
         // start calculation work flow
+
     }
 
     private void containerStateInitialize() {
@@ -132,5 +143,21 @@ public class CatEyeContainerImpl implements CatEyeContainer {
 
     public void setNeighbourDiscoveryReceiver(NeighboursDiscoveryReceiver neighbourDiscoveryReceiver) {
         this.neighbourDiscoveryReceiver = neighbourDiscoveryReceiver;
+    }
+
+    public void setBundleManager(BundleManager bundleManager) {
+        this.bundleManager = bundleManager;
+    }
+
+    public void setBundleDeployer(BundleDeployer bundleDeployer) {
+        this.bundleDeployer = bundleDeployer;
+    }
+
+    public void setPathToBundleJar(String pathToBundleJar) {
+        this.pathToBundleJar = pathToBundleJar;
+    }
+
+    public void setBundleDomain(String bundleDomain) {
+        this.bundleDomain = bundleDomain;
     }
 }

@@ -1,5 +1,6 @@
 package org.cat.eye.engine.container.deployment;
 
+import org.cat.eye.engine.container.deployment.management.BundleManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,24 +17,21 @@ import java.util.jar.Manifest;
  */
 public class BundleDeployer {
 
+    private BundleManager bundleManager;
+
     private final static Logger LOGGER = LoggerFactory.getLogger(BundleDeployer.class);
 
-    public void deploy(String pathToJar) {
+    public void deploy(String pathToJar, String domain) {
         // get urls of jar's file
         URL[] ursl = getUrlsFromJarFile(pathToJar);
         // create class loader for bundle
         URLBundleClassLoader bundleClassLoader = new URLBundleClassLoader(ursl, new BundleClassLoader());
-
-        ClassLoader cl = Thread.currentThread().getContextClassLoader();
-        Thread.currentThread().setContextClassLoader(bundleClassLoader);
-
         // create and start thread for bundle deploying
-        Thread deployingThread = new Thread(new DeployingProcess(pathToJar));
+        Thread deployingThread = new Thread(new DeployingProcess(pathToJar, domain, bundleManager));
         deployingThread.setContextClassLoader(bundleClassLoader);
         deployingThread.start();
         try {
             deployingThread.join();
-            Thread.currentThread().setContextClassLoader(cl);
         } catch (InterruptedException e) {
             LOGGER.error("BundleDeployer.deploy - can't deploy bundle: " + pathToJar, e);
         }
@@ -72,5 +70,9 @@ public class BundleDeployer {
         }
 
         return result;
+    }
+
+    public void setBundleManager(BundleManager bundleManager) {
+        this.bundleManager = bundleManager;
     }
 }

@@ -6,6 +6,7 @@ import org.junit.Test;
 
 @Ignore
 public class CatEyeContainerImplITManual {
+    @Ignore
     @Test
     public void startContainer() throws Exception {
         SpringContextProviderImpl.start(TestCatEyeContainerConfiguration.class.getName() + ".class");

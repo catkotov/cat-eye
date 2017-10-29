@@ -3,6 +3,9 @@ package org.cat.eye.engine.container.impl;
 import org.cat.eye.engine.container.CatEyeContainer;
 import org.cat.eye.engine.container.datagram.DatagramReceiver;
 import org.cat.eye.engine.container.datagram.DatagramSender;
+import org.cat.eye.engine.container.deployment.BundleDeployer;
+import org.cat.eye.engine.container.deployment.management.BundleManager;
+import org.cat.eye.engine.container.deployment.management.BundleManagerImpl;
 import org.cat.eye.engine.container.discovery.NeighboursDiscoveryLeadingLight;
 import org.cat.eye.engine.container.discovery.NeighboursDiscoveryReceiver;
 import org.springframework.context.annotation.Bean;
@@ -15,6 +18,12 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class TestCatEyeContainerConfiguration {
 
+    private final static String PATH_TO_JAR =
+            "E:/Projects/cat-eye/cat-eye/modules/cat-eye-test-bundle/cat-eye-test-bungle-simple/" +
+                    "target/cat-eye-test-bungle-simple-0.1-SNAPSHOT-simple.jar";
+
+    private final static String DOMAIN = "TEST_DOMAIN";
+
     @Bean
     CatEyeContainer getCatEyeContainer() {
         CatEyeContainerImpl container = new CatEyeContainerImpl();
@@ -23,6 +32,10 @@ public class TestCatEyeContainerConfiguration {
         container.setDatagramSender(getDatagramSender());
         container.setDatagramReceiver(getDatagramReceiver());
         container.setNeighbourDiscoveryReceiver(getNeighbourDiscoveryReceiver());
+        container.setBundleManager(getBundleManager());
+        container.setBundleDeployer(getBundleDeployer());
+        container.setPathToBundleJar(PATH_TO_JAR);
+        container.setBundleDomain(DOMAIN);
         return container;
     }
 
@@ -48,5 +61,17 @@ public class TestCatEyeContainerConfiguration {
         NeighboursDiscoveryReceiver receiver = new NeighboursDiscoveryReceiver();
         receiver.setDatagramReceiver(getDatagramReceiver());
         return receiver;
+    }
+
+    @Bean
+    BundleManager getBundleManager() {
+        return new BundleManagerImpl();
+    }
+
+    @Bean
+    BundleDeployer getBundleDeployer() {
+        BundleDeployer bundleDeployer = new BundleDeployer();
+        bundleDeployer.setBundleManager(getBundleManager());
+        return bundleDeployer;
     }
 }
