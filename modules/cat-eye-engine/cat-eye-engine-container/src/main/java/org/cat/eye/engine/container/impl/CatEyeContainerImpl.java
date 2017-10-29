@@ -3,6 +3,7 @@ package org.cat.eye.engine.container.impl;
 import org.cat.eye.engine.container.CatEyeContainer;
 import org.cat.eye.engine.container.CatEyeContainerRole;
 import org.cat.eye.engine.container.CatEyeContainerState;
+import org.cat.eye.engine.container.CatEyeContainerTaskCapacity;
 import org.cat.eye.engine.container.datagram.DatagramReceiver;
 import org.cat.eye.engine.container.datagram.DatagramSender;
 import org.cat.eye.engine.container.deployment.BundleDeployer;
@@ -14,12 +15,17 @@ import org.cat.eye.engine.container.discovery.gossip.GossipNeighboursState;
 import org.cat.eye.engine.container.discovery.gossip.Heartbeat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.concurrent.CustomizableThreadFactory;
 
 import javax.annotation.PostConstruct;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class CatEyeContainerImpl implements CatEyeContainer {
 
@@ -49,6 +55,16 @@ public class CatEyeContainerImpl implements CatEyeContainer {
 
     private String bundleDomain;
 
+    private AtomicBoolean isRuning = new AtomicBoolean(false);
+
+    private final static int DEFAULT_COMPUTATION_THREAD_POOL_SIZE = 4;
+    private AtomicInteger computationThreadPoolSize = new AtomicInteger(DEFAULT_COMPUTATION_THREAD_POOL_SIZE);
+    private ExecutorService computetionExecutorService;
+    private final static String COMPUTATION_THREAD_NAME_PREFIX = "COMPUTATION-THREAD-";
+
+    private final CatEyeContainerTaskCapacity containerTaskCapacity =
+            new CatEyeContainerTaskCapacity(this.computationThreadPoolSize.get());
+
     public String getName() {
         return name;
     }
@@ -73,8 +89,8 @@ public class CatEyeContainerImpl implements CatEyeContainer {
         startDiscovery();
         // deploy bundle
         bundleDeployer.deploy(pathToBundleJar, bundleDomain);
-        // start calculation work flow
-
+        // start computation work flow
+        initComputation();
     }
 
     private void containerStateInitialize() {
@@ -129,6 +145,27 @@ public class CatEyeContainerImpl implements CatEyeContainer {
 
     }
 
+    private void initComputation() {
+        isRuning.set(true);
+        initComputationThreadPool();
+
+    }
+
+    private void initComputationThreadPool() {
+
+        if (computationThreadPoolSize.get() > 0) {
+            computetionExecutorService = Executors.newFixedThreadPool(
+                    computationThreadPoolSize.get(),
+                    new CustomizableThreadFactory(COMPUTATION_THREAD_NAME_PREFIX)
+            );
+            containerTaskCapacity.setTotalTaskLimit(computationThreadPoolSize.get());
+        } else {
+            computetionExecutorService =
+                    Executors.newSingleThreadExecutor(new CustomizableThreadFactory(COMPUTATION_THREAD_NAME_PREFIX));
+            containerTaskCapacity.setTotalTaskLimit(1);
+        }
+    }
+
     public void setLeadingLight(NeighboursDiscoveryLeadingLight leadingLight) {
         this.leadingLight = leadingLight;
     }
@@ -159,5 +196,9 @@ public class CatEyeContainerImpl implements CatEyeContainer {
 
     public void setBundleDomain(String bundleDomain) {
         this.bundleDomain = bundleDomain;
+    }
+
+    public void setComputationThreadPoolSize(Integer computationThreadPoolSize) {
+        this.computationThreadPoolSize.set(computationThreadPoolSize);
     }
 }
