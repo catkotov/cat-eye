@@ -10,7 +10,7 @@ import java.util.Collections;
 import java.util.List;
 
 @IsComputable
-public class OtherFileCounterComputer {
+public class OtherFileCounterComputer implements OtherFileCounter {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(OtherFileCounterComputer.class);
 

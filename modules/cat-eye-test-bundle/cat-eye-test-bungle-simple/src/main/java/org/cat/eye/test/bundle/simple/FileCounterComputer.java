@@ -15,7 +15,7 @@ import java.util.List;
 /**
  * Created by Kotov on 30.09.2017.
  */
-@IsComputable
+//@IsComputable
 public class FileCounterComputer {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(FileCounterComputer.class);
