@@ -8,6 +8,8 @@ import org.cat.eye.engine.container.model.Computation;
 import org.cat.eye.engine.container.model.MethodSpecification;
 import org.junit.Ignore;
 import org.junit.Test;
+
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -17,12 +19,12 @@ import static org.junit.Assert.*;
 public class BundleDeployerTest {
 
     private final static String PATH_TO_JAR =
-            "D:/Sand-box/cat-eye/modules/cat-eye-test-bundle/cat-eye-test-bungle-simple/" +
+            "E:/Projects/cat-eye/cat-eye/modules/cat-eye-test-bundle/cat-eye-test-bungle-simple/" +
                     "target/cat-eye-test-bungle-simple-0.1-SNAPSHOT-simple.jar";
 
     private final static String DOMAIN = "TEST_DOMAIN";
 
-    @Ignore
+//    @Ignore
     @Test
     public void deploy() throws Exception {
         BundleManager bundleManager = new BundleManagerImpl();
@@ -51,6 +53,15 @@ public class BundleDeployerTest {
             String domain = computation.getDomain();
             UUID id = computation.getId();
             Object comp = computation.getComputer();
+
+            Set<MethodSpecification> methods = computables.get(comp.getClass());
+            MethodSpecification method = methods.stream().filter(spec -> spec.getStep() == computation.getNextStep()).findAny().get();
+
+            List<?> result = (List<?>) method.getMethod().invoke(comp);
+
+            computation.setNextStep(computation.getNextStep() + 1);
+
+            result.size();
         }
 
         Thread.currentThread().setContextClassLoader(cl);

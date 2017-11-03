@@ -14,6 +14,8 @@ public class ComputerInvocationHandler implements InvocationHandler {
 
     private String domain;
 
+    private int nextStep = 1;
+
     public ComputerInvocationHandler(UUID id, String computerName, String domain, Object computer) {
         this.id = id;
         this.computerName = computerName;
@@ -33,6 +35,14 @@ public class ComputerInvocationHandler implements InvocationHandler {
                 return domain;
             case "getComputer":
                 return computer;
+            case "getNextStep":
+                return nextStep;
+            case "setNextStep": {
+                nextStep = (Integer) args[0];
+                return proxy;
+            }
+            case "toString":
+                return computer.toString();
 
             default: return null;
         }

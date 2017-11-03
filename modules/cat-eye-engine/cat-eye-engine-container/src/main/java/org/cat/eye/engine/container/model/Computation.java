@@ -14,4 +14,10 @@ public interface Computation {
     String getDomain();
 
     Object getComputer();
+
+    int getNextStep();
+
+    void setNextStep(int nextStep);
+
+    String toString();
 }
