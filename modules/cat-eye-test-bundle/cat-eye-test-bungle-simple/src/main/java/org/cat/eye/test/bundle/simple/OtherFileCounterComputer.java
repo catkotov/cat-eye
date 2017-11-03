@@ -25,6 +25,10 @@ public class OtherFileCounterComputer implements OtherFileCounter {
 
     private long numberFiles;
 
+    public OtherFileCounterComputer() {
+        this.path = "C:/";
+    }
+
     public OtherFileCounterComputer(String path) {
         this.path = path;
     }
