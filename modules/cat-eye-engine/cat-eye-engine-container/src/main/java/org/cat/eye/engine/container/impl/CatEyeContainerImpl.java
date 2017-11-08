@@ -55,12 +55,14 @@ public class CatEyeContainerImpl implements CatEyeContainer {
 
     private String bundleDomain;
 
-    private AtomicBoolean isRuning = new AtomicBoolean(false);
+    private AtomicBoolean isRunning = new AtomicBoolean(false);
 
     private final static int DEFAULT_COMPUTATION_THREAD_POOL_SIZE = 4;
     private AtomicInteger computationThreadPoolSize = new AtomicInteger(DEFAULT_COMPUTATION_THREAD_POOL_SIZE);
     private ExecutorService computetionExecutorService;
     private final static String COMPUTATION_THREAD_NAME_PREFIX = "COMPUTATION-THREAD-";
+
+    private Thread computeThread;
 
     private final CatEyeContainerTaskCapacity containerTaskCapacity =
             new CatEyeContainerTaskCapacity(this.computationThreadPoolSize.get());
@@ -146,9 +148,37 @@ public class CatEyeContainerImpl implements CatEyeContainer {
     }
 
     private void initComputation() {
-        isRuning.set(true);
+        isRunning.set(true);
         initComputationThreadPool();
 
+        initComputeThread();
+
+    }
+
+    private void initComputeThread() {
+        if (computeThread == null) {
+            computeThread = new Thread(this::computeLoop, "ComputeThread");
+        }
+
+        if (!computeThread.isAlive()) {
+            computeThread.start();
+            LOGGER.info("CatEyeContainerImpl.initComputeThread - compute thread was started.");
+        } else {
+            LOGGER.info("CatEyeContainerImpl.initComputeThread - compute thread is already running.");
+        }
+    }
+
+    private void computeLoop() {
+        LOGGER.info("CatEyeContainerImpl.computeLoop - start the compute loop.");
+        while (isRunning.get()) {
+
+            containerTaskCapacity.await();
+            // create and submit task
+
+            // sleep if container task capacity is exhausted
+
+        }
+        LOGGER.info("CatEyeContainerImpl.computeLoop - finish the compute loop.");
     }
 
     private void initComputationThreadPool() {
