@@ -1,20 +1,17 @@
 package org.cat.eye.engine.container.deployment;
 
-import org.cat.eye.engine.container.crusher.computetion.ComputationFactory;
+import org.cat.eye.engine.container.crusher.computation.ComputationFactory;
 import org.cat.eye.engine.container.deployment.management.Bundle;
 import org.cat.eye.engine.container.deployment.management.BundleManager;
 import org.cat.eye.engine.container.deployment.management.BundleManagerImpl;
 import org.cat.eye.engine.container.model.Computation;
 import org.cat.eye.engine.container.model.MethodSpecification;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-
-import static org.junit.Assert.*;
 
 public class BundleDeployerTest {
 

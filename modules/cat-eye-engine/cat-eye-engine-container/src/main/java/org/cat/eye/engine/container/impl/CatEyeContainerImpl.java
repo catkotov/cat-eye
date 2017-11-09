@@ -4,6 +4,7 @@ import org.cat.eye.engine.container.CatEyeContainer;
 import org.cat.eye.engine.container.CatEyeContainerRole;
 import org.cat.eye.engine.container.CatEyeContainerState;
 import org.cat.eye.engine.container.CatEyeContainerTaskCapacity;
+import org.cat.eye.engine.container.crusher.ComputationExecutionTask;
 import org.cat.eye.engine.container.datagram.DatagramReceiver;
 import org.cat.eye.engine.container.datagram.DatagramSender;
 import org.cat.eye.engine.container.deployment.BundleDeployer;
@@ -13,6 +14,7 @@ import org.cat.eye.engine.container.discovery.gossip.GossipContainerState;
 import org.cat.eye.engine.container.discovery.gossip.GossipMessageProcessor;
 import org.cat.eye.engine.container.discovery.gossip.GossipNeighboursState;
 import org.cat.eye.engine.container.discovery.gossip.Heartbeat;
+import org.cat.eye.engine.container.model.Computation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.concurrent.CustomizableThreadFactory;
@@ -20,12 +22,15 @@ import org.springframework.scheduling.concurrent.CustomizableThreadFactory;
 import javax.annotation.PostConstruct;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 public class CatEyeContainerImpl implements CatEyeContainer {
 
@@ -59,10 +64,12 @@ public class CatEyeContainerImpl implements CatEyeContainer {
 
     private final static int DEFAULT_COMPUTATION_THREAD_POOL_SIZE = 4;
     private AtomicInteger computationThreadPoolSize = new AtomicInteger(DEFAULT_COMPUTATION_THREAD_POOL_SIZE);
-    private ExecutorService computetionExecutorService;
+    private ExecutorService computationExecutorService;
     private final static String COMPUTATION_THREAD_NAME_PREFIX = "COMPUTATION-THREAD-";
 
     private Thread computeThread;
+
+    private long computationThreadSleepTime = 100L;
 
     private final CatEyeContainerTaskCapacity containerTaskCapacity =
             new CatEyeContainerTaskCapacity(this.computationThreadPoolSize.get());
@@ -92,7 +99,7 @@ public class CatEyeContainerImpl implements CatEyeContainer {
         // deploy bundle
         bundleDeployer.deploy(pathToBundleJar, bundleDomain);
         // start computation work flow
-        initComputation();
+        initComputationProcess();
     }
 
     private void containerStateInitialize() {
@@ -147,7 +154,7 @@ public class CatEyeContainerImpl implements CatEyeContainer {
 
     }
 
-    private void initComputation() {
+    private void initComputationProcess() {
         isRunning.set(true);
         initComputationThreadPool();
 
@@ -171,26 +178,55 @@ public class CatEyeContainerImpl implements CatEyeContainer {
     private void computeLoop() {
         LOGGER.info("CatEyeContainerImpl.computeLoop - start the compute loop.");
         while (isRunning.get()) {
-
             containerTaskCapacity.await();
             // create and submit task
-
+            createComputationExecutionTask();
             // sleep if container task capacity is exhausted
-
+            if (containerTaskCapacity.getRemaining() <= 0) {
+                try {
+                    Thread.sleep(computationThreadSleepTime);
+                } catch (InterruptedException e) {
+                    LOGGER.error("CatEyeContainerImpl.computeLoop - exception during computation thread sleeping.", e);
+                }
+            }
         }
         LOGGER.info("CatEyeContainerImpl.computeLoop - finish the compute loop.");
+    }
+
+    private void createComputationExecutionTask() {
+        // get computation list
+
+        //
+        List<Future<List<Computation>>> futures = new ArrayList<>();
+
+        // for every computation create and submit execution task
+        ComputationExecutionTask task = new ComputationExecutionTask(null, null);
+        Future<List<Computation>> result = computationExecutorService.submit(task);
+        futures.add(result);
+
+
+        // resolve futures to get computations
+        try {
+            futures.parallelStream().filter(Future::isDone).collect(Collectors.toList());
+        } catch (Exception e) {
+
+        }
+
+
+        // save computations
+
     }
 
     private void initComputationThreadPool() {
 
         if (computationThreadPoolSize.get() > 0) {
-            computetionExecutorService = Executors.newFixedThreadPool(
+            computationExecutorService = Executors.newFixedThreadPool(
                     computationThreadPoolSize.get(),
                     new CustomizableThreadFactory(COMPUTATION_THREAD_NAME_PREFIX)
             );
             containerTaskCapacity.setTotalTaskLimit(computationThreadPoolSize.get());
         } else {
-            computetionExecutorService =
+            computationExecutorService =
                     Executors.newSingleThreadExecutor(new CustomizableThreadFactory(COMPUTATION_THREAD_NAME_PREFIX));
             containerTaskCapacity.setTotalTaskLimit(1);
         }
@@ -230,5 +266,9 @@ public class CatEyeContainerImpl implements CatEyeContainer {
 
     public void setComputationThreadPoolSize(Integer computationThreadPoolSize) {
         this.computationThreadPoolSize.set(computationThreadPoolSize);
+    }
+
+    public void setComputationThreadSleepTime(long computationThreadSleepTime) {
+        this.computationThreadSleepTime = computationThreadSleepTime;
     }
 }

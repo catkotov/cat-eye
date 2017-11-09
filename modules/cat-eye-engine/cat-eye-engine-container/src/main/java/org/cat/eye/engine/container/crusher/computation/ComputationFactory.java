@@ -1,4 +1,4 @@
-package org.cat.eye.engine.container.crusher.computetion;
+package org.cat.eye.engine.container.crusher.computation;
 
 
 import org.cat.eye.engine.container.model.Computation;
