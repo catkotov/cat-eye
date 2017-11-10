@@ -194,26 +194,12 @@ public class CatEyeContainerImpl implements CatEyeContainer {
     }
 
     private void createComputationExecutionTask() {
-        // get computation list
+        // get computation list by service
 
-        //
-        List<Future<List<Computation>>> futures = new ArrayList<>();
 
         // for every computation create and submit execution task
         ComputationExecutionTask task = new ComputationExecutionTask(null, null);
-        Future<List<Computation>> result = computationExecutorService.submit(task);
-        futures.add(result);
-
-
-        // resolve futures to get computations
-        try {
-            futures.parallelStream().filter(Future::isDone).collect(Collectors.toList());
-        } catch (Exception e) {
-
-        }
-
-
-        // save computations
+        computationExecutorService.submit(task);
 
     }
 
