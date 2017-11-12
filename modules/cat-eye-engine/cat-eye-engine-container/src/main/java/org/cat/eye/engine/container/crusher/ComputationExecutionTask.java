@@ -1,11 +1,8 @@
 package org.cat.eye.engine.container.crusher;
 
-import org.cat.eye.engine.container.crusher.computation.ComputationFactory;
 import org.cat.eye.engine.container.deployment.management.Bundle;
 import org.cat.eye.engine.container.model.Computation;
 import org.cat.eye.engine.container.model.MethodSpecification;
-
-import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Parameter;
 import java.util.*;
@@ -15,12 +12,12 @@ import java.util.*;
  */
 public class ComputationExecutionTask implements Runnable {
 
-    private Computation computation;
+    private Computation parentComputation;
 
     private Bundle bundle;
 
     public ComputationExecutionTask(Computation computation, Bundle bundle) {
-        this.computation = computation;
+        this.parentComputation = computation;
         this.bundle = bundle;
     }
 
@@ -30,23 +27,20 @@ public class ComputationExecutionTask implements Runnable {
         ClassLoader currentCL = Thread.currentThread().getContextClassLoader();
         // set bundle class loader
         Thread.currentThread().setContextClassLoader(bundle.getClassLoader());
-
-        Map<Class<?>, Set<MethodSpecification>> computables = bundle.getComputables();
-
-        Object computer = computation.getComputer();
-        Set<MethodSpecification> methods = computables.get(computer.getClass());
-
-
-
-
+        // get computable classes with them methods' specifications
+        Map<Class<?>, Set<MethodSpecification>> computableClasses = bundle.getComputables();
+        // get method specification for current parentComputation
+        Object computer = parentComputation.getComputer();
+        Set<MethodSpecification> methods = computableClasses.get(computer.getClass());
+        // get parentComputation next step method
         Optional<MethodSpecification> optional =
-                methods.stream().filter(spec -> spec.getStep() == computation.getNextStep()).findFirst();
-
+                methods.stream().filter(spec -> spec.getStep() == parentComputation.getNextStep()).findFirst();
+        // execute method if it is present
         if (optional.isPresent()) {
             try {
                 MethodSpecification specification = optional.get();
-                Map<Parameter,Annotation> parameters = specification.getParameterAnnotationMap();
-                if (parameters != null && !parameters.isEmpty()) {
+                Parameter[]  parameters = specification.getParameters();
+                if (parameters != null && parameters.length != 0) {
                     // get parameters from service
 
                     // invoke method with parameters
@@ -58,10 +52,15 @@ public class ComputationExecutionTask implements Runnable {
                 } else {
                     List<?> computers = (List<?>) optional.get().getMethod().invoke(computer);
                     // create computations
-                }
-                // set parent computation status
 
-                // update parent computation by service
+                }
+
+
+                // set parent parentComputation status
+
+                // update parent parentComputation by service
+
+                // set parent of these computations
 
                 // store computations by service
 
@@ -71,7 +70,13 @@ public class ComputationExecutionTask implements Runnable {
                 e.printStackTrace();
             }
 
-            computation.setNextStep(computation.getNextStep() + 1);
+            parentComputation.setNextStep(parentComputation.getNextStep() + 1);
+
+        } else {
+            // mark computations as COMPLETED
+
+            // update parentComputation in store
+
         }
 
 

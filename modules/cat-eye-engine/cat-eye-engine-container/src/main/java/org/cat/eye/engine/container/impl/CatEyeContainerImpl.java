@@ -8,6 +8,7 @@ import org.cat.eye.engine.container.crusher.ComputationExecutionTask;
 import org.cat.eye.engine.container.datagram.DatagramReceiver;
 import org.cat.eye.engine.container.datagram.DatagramSender;
 import org.cat.eye.engine.container.deployment.BundleDeployer;
+import org.cat.eye.engine.container.deployment.management.Bundle;
 import org.cat.eye.engine.container.deployment.management.BundleManager;
 import org.cat.eye.engine.container.discovery.*;
 import org.cat.eye.engine.container.discovery.gossip.GossipContainerState;
@@ -15,22 +16,19 @@ import org.cat.eye.engine.container.discovery.gossip.GossipMessageProcessor;
 import org.cat.eye.engine.container.discovery.gossip.GossipNeighboursState;
 import org.cat.eye.engine.container.discovery.gossip.Heartbeat;
 import org.cat.eye.engine.container.model.Computation;
+import org.cat.eye.engine.container.service.ComputationContextService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.concurrent.CustomizableThreadFactory;
-
 import javax.annotation.PostConstruct;
 import java.net.NetworkInterface;
 import java.net.SocketException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 public class CatEyeContainerImpl implements CatEyeContainer {
 
@@ -43,7 +41,7 @@ public class CatEyeContainerImpl implements CatEyeContainer {
     private NeighboursDiscoveryReceiver neighbourDiscoveryReceiver;
 
     private DatagramReceiver datagramReceiver;
-
+    // container name
     private String name;
 
     private GossipContainerState containerState;
@@ -57,7 +55,7 @@ public class CatEyeContainerImpl implements CatEyeContainer {
     private BundleDeployer bundleDeployer;
 
     private String pathToBundleJar;
-
+    // TODO must get from out side service
     private String bundleDomain;
 
     private AtomicBoolean isRunning = new AtomicBoolean(false);
@@ -73,6 +71,8 @@ public class CatEyeContainerImpl implements CatEyeContainer {
 
     private final CatEyeContainerTaskCapacity containerTaskCapacity =
             new CatEyeContainerTaskCapacity(this.computationThreadPoolSize.get());
+
+    private ComputationContextService computationContextService;
 
     public String getName() {
         return name;
@@ -194,13 +194,17 @@ public class CatEyeContainerImpl implements CatEyeContainer {
     }
 
     private void createComputationExecutionTask() {
+
+        int limit = containerTaskCapacity.getRemaining();
         // get computation list by service
-
-
+        List<Computation> computations = computationContextService.takeComputationsForExecution(limit);
         // for every computation create and submit execution task
-        ComputationExecutionTask task = new ComputationExecutionTask(null, null);
-        computationExecutorService.submit(task);
-
+        if (computations != null && !computations.isEmpty()) {
+            computations.forEach(c -> {
+                ComputationExecutionTask task = new ComputationExecutionTask(c, bundleManager.getBundle(c.getDomain()));
+                computationExecutorService.submit(task);
+            });
+        }
     }
 
     private void initComputationThreadPool() {
@@ -256,5 +260,9 @@ public class CatEyeContainerImpl implements CatEyeContainer {
 
     public void setComputationThreadSleepTime(long computationThreadSleepTime) {
         this.computationThreadSleepTime = computationThreadSleepTime;
+    }
+
+    public void setComputationContextService(ComputationContextService computationContextService) {
+        this.computationContextService = computationContextService;
     }
 }

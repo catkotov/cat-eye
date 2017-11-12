@@ -8,6 +8,7 @@ import org.cat.eye.engine.container.model.Computation;
 import org.cat.eye.engine.container.model.MethodSpecification;
 import org.junit.Test;
 
+import java.lang.reflect.Parameter;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -59,6 +60,12 @@ public class BundleDeployerTest {
             computation.setNextStep(computation.getNextStep() + 1);
 
             result.size();
+
+            method = methods.stream().filter(spec -> spec.getStep() == computation.getNextStep()).findAny().get();
+
+            Parameter[] parameters = method.getParameters();
+
+            int i = parameters.length;
         }
 
         Thread.currentThread().setContextClassLoader(cl);

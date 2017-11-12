@@ -19,5 +19,9 @@ public interface Computation {
 
     void setNextStep(int nextStep);
 
+    ComputationState getState();
+
+    void setState(ComputationState state);
+
     String toString();
 }

@@ -1,5 +1,7 @@
 package org.cat.eye.engine.container.crusher.computation;
 
+import org.cat.eye.engine.container.model.ComputationState;
+
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.UUID;
@@ -16,11 +18,14 @@ public class ComputerInvocationHandler implements InvocationHandler {
 
     private int nextStep = 1;
 
-    public ComputerInvocationHandler(UUID id, String computerName, String domain, Object computer) {
+    private ComputationState state;
+
+    public ComputerInvocationHandler(UUID id, String computerName, String domain, Object computer, ComputationState state) {
         this.id = id;
         this.computerName = computerName;
         this.domain = domain;
         this.computer = computer;
+        this.state = state;
     }
 
     @Override
@@ -37,10 +42,13 @@ public class ComputerInvocationHandler implements InvocationHandler {
                 return computer;
             case "getNextStep":
                 return nextStep;
-            case "setNextStep": {
+            case "setNextStep":
                 nextStep = (Integer) args[0];
-                return proxy;
-            }
+            case "getState":
+                return state;
+            case "setState":
+                state = (ComputationState) args[0];
+
             case "toString":
                 return computer.toString();
 

@@ -8,7 +8,6 @@ import org.cat.eye.engine.container.model.MethodSpecification;
 import org.cat.eye.engine.model.annotation.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.List;
@@ -78,22 +77,22 @@ public class DeployingProcess implements Runnable {
             for (Method method : methods) {
                 if (method.isAnnotationPresent(Compute.class)) {
                     int step = method.getAnnotation(Compute.class).step();
-                    Map<Parameter, Annotation> parameterAnnotationMap = null;
                     Parameter[] parameters = method.getParameters();
                     if (parameters != null && parameters.length != 0) {
-                        parameterAnnotationMap = new ConcurrentHashMap<>();
+
                         for (Parameter parameter : parameters) {
-                            if (parameter.isAnnotationPresent(In.class)) {
-                                parameterAnnotationMap.put(parameter, parameter.getAnnotation(In.class));
-                            } else if (parameter.isAnnotationPresent(Out.class)) {
-                                parameterAnnotationMap.put(parameter, parameter.getAnnotation(Out.class));
-                            } else if (parameter.isAnnotationPresent(InOut.class)) {
-                                parameterAnnotationMap.put(parameter, parameter.getAnnotation(InOut.class));
+                            if (!parameter.isAnnotationPresent(In.class)
+                                    && !parameter.isAnnotationPresent(Out.class)
+                                    && !parameter.isAnnotationPresent(InOut.class)) {
+
+                                String errorMsg = String.format("Parameter [%s] of method [%s] in class [%s] is not annotated!!!",
+                                        parameter.getName(), method.getName(), bundleClass.getName());
+                                throw new RuntimeException(errorMsg);
                             }
                         }
                     }
 
-                    methodSpecificationSet.add(new MethodSpecification(method, step, parameterAnnotationMap));
+                    methodSpecificationSet.add(new MethodSpecification(method, step, parameters));
                 }
             }
         }
