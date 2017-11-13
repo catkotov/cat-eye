@@ -2,6 +2,8 @@ package org.cat.eye.engine.container.service.impl;
 
 import org.cat.eye.engine.container.model.Computation;
 import org.cat.eye.engine.container.service.ComputationContextService;
+
+import java.lang.reflect.Parameter;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
@@ -22,6 +24,8 @@ public class SimpleComputationContextService implements ComputationContextServic
     private Map<UUID, Computation> computationStore = new ConcurrentHashMap<>();
 
     private Queue<Computation> executionQueue = new ConcurrentLinkedQueue<>();
+
+    private Map<String, Object> argumentStore = new ConcurrentHashMap<>();
 
     @Override
     public List<Computation> takeComputationsForExecution(int limit) {
@@ -56,6 +60,18 @@ public class SimpleComputationContextService implements ComputationContextServic
     @Override
     public Computation getComputation(UUID id) {
         return computationStore.get(id);
+    }
+
+    @Override
+    public Object getArgument(Parameter parameter, String domain) {
+        return argumentStore.get(domain + "-" + parameter.getType().getName());
+    }
+
+    @Override
+    public void storeArguments(Object[] args, String domain) {
+        for (Object arg : args) {
+            argumentStore.put(domain + "-" + arg.getClass().getName(), arg);
+        }
     }
 
 }

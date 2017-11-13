@@ -8,7 +8,6 @@ import org.cat.eye.engine.container.crusher.ComputationExecutionTask;
 import org.cat.eye.engine.container.datagram.DatagramReceiver;
 import org.cat.eye.engine.container.datagram.DatagramSender;
 import org.cat.eye.engine.container.deployment.BundleDeployer;
-import org.cat.eye.engine.container.deployment.management.Bundle;
 import org.cat.eye.engine.container.deployment.management.BundleManager;
 import org.cat.eye.engine.container.discovery.*;
 import org.cat.eye.engine.container.discovery.gossip.GossipContainerState;
@@ -201,7 +200,8 @@ public class CatEyeContainerImpl implements CatEyeContainer {
         // for every computation create and submit execution task
         if (computations != null && !computations.isEmpty()) {
             computations.forEach(c -> {
-                ComputationExecutionTask task = new ComputationExecutionTask(c, bundleManager.getBundle(c.getDomain()));
+                ComputationExecutionTask task =
+                        new ComputationExecutionTask(c, bundleManager.getBundle(c.getDomain()), computationContextService);
                 computationExecutorService.submit(task);
             });
         }

@@ -12,10 +12,10 @@ import java.util.UUID;
  */
 public class ComputationFactory {
 
-    public static Computation create(Object computer, String domain) {
+    public static Computation create(Object computer, UUID parentId, String domain) {
 
         ComputerInvocationHandler handler =
-                new ComputerInvocationHandler(UUID.randomUUID(), computer.getClass().getName(), domain, computer, ComputationState.CREATED);
+                new ComputerInvocationHandler(UUID.randomUUID(), parentId, computer.getClass().getName(), domain, computer, ComputationState.CREATED);
 
         return (Computation)
                 Proxy.newProxyInstance(computer.getClass().getClassLoader(), new Class[] {Computation.class}, handler);

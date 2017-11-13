@@ -20,8 +20,11 @@ public class ComputerInvocationHandler implements InvocationHandler {
 
     private ComputationState state;
 
-    public ComputerInvocationHandler(UUID id, String computerName, String domain, Object computer, ComputationState state) {
+    private UUID parentId;
+
+    public ComputerInvocationHandler(UUID id, UUID parentId, String computerName, String domain, Object computer, ComputationState state) {
         this.id = id;
+        this.parentId = parentId;
         this.computerName = computerName;
         this.domain = domain;
         this.computer = computer;
@@ -48,6 +51,8 @@ public class ComputerInvocationHandler implements InvocationHandler {
                 return state;
             case "setState":
                 state = (ComputationState) args[0];
+            case "getParentId":
+                return parentId;
 
             case "toString":
                 return computer.toString();

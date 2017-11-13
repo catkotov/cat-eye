@@ -45,7 +45,7 @@ public class BundleDeployerTest {
         for (Map.Entry<Class<?>, Set<MethodSpecification>> entry : computables.entrySet()) {
             Class<?> clazz = entry.getKey();
             Object computer = clazz.newInstance();
-            Computation computation = ComputationFactory.create(computer, DOMAIN);
+            Computation computation = ComputationFactory.create(computer, null, DOMAIN);
 
             String computerName = computation.getComputerName();
             String domain = computation.getDomain();

@@ -9,6 +9,8 @@ public interface Computation {
 
     UUID getId();
 
+    UUID getParentId();
+
     String getComputerName();
 
     String getDomain();
