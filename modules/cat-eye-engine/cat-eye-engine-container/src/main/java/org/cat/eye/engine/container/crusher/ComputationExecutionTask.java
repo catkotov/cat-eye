@@ -90,7 +90,12 @@ public class ComputationExecutionTask implements Runnable {
                             .collect(Collectors.toList());
                     // register children in computation
 
+                    // store computations by service
+
+                    // update current computation state
+
                     // put new computations to queue
+                    computationContextService.putCreatedComputationsToQueue(childComputations);
 
                 } else {
                     // set computation status
@@ -98,13 +103,14 @@ public class ComputationExecutionTask implements Runnable {
                     // try to execute next step
 
                 }
+
                 // update parent computation state
 
                 // update parent computation by service
 
                 // set parent of these computations
 
-                // store computations by service
+                //
 
 
             } catch (IllegalAccessException | InvocationTargetException e) {
