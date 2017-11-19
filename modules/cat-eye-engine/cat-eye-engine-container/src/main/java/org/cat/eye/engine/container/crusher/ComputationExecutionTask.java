@@ -8,7 +8,6 @@ import org.cat.eye.engine.container.model.MethodSpecification;
 import org.cat.eye.engine.container.service.ComputationContextService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Parameter;
 import java.util.*;
@@ -44,6 +43,14 @@ public class ComputationExecutionTask implements Runnable {
         // get method specification for current computation
         Object computer = computation.getComputer();
         Set<MethodSpecification> methods = computableClasses.get(computer.getClass());
+
+        executeNextStep(computer, methods);
+
+        // restore class loader
+        Thread.currentThread().setContextClassLoader(currentCL);
+    }
+
+    private void executeNextStep(Object computer, Set<MethodSpecification> methods) {
         // get computation next step method
         Optional<MethodSpecification> optional =
                 methods.stream().filter(spec -> spec.getStep() == computation.getNextStep()).findFirst();
@@ -89,45 +96,46 @@ public class ComputationExecutionTask implements Runnable {
                             .map(c -> ComputationFactory.create(c, computation.getId(), bundle.getDomain()))
                             .collect(Collectors.toList());
                     // register children in computation
-
+                    List<UUID> childIDs = childComputations.stream().map(Computation::getId).collect(Collectors.toList());
+                    computation.setChildrenIDs(childIDs);
                     // store computations by service
-
+                    computationContextService.storeComputations(childComputations);
                     // update current computation state
-
+                    computationContextService.storeComputation(computation);
                     // put new computations to queue
                     computationContextService.putCreatedComputationsToQueue(childComputations);
-
+                    // set number of next step
+                    computation.setNextStep(computation.getNextStep() + 1);
                 } else {
                     // set computation status
                     computation.setState(ComputationState.READY);
                     // try to execute next step
-
+                    computation.setNextStep(computation.getNextStep() + 1);
+                    // update current computation state
+                    computationContextService.storeComputation(computation);
+                    // call recursively this method
+                    executeNextStep(computer, methods);
                 }
-
-                // update parent computation state
-
-                // update parent computation by service
-
-                // set parent of these computations
-
-                //
-
-
             } catch (IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
             }
-
-            computation.setNextStep(computation.getNextStep() + 1);
-
         } else {
             // mark computations as COMPLETED
             computation.setState(ComputationState.COMPLETED);
             // update computation in store
             computationContextService.storeComputation(computation);
+            // try to update state of parent computation
+            UUID parentId = computation.getParentId();
+            Computation parentComputation = computationContextService.getComputation(parentId);
+            parentComputation.addCompletedChildId(computation.getId());
+            computationContextService.storeComputation(parentComputation); // TODO double store (see line135)
+            // put parent computation to queue if it is ready (has READY state)
+            if (parentComputation.isChildrenCompleted()) {
+                parentComputation.setState(ComputationState.READY);
+                computationContextService.storeComputation(parentComputation); // TODO double store (see line 131)
+                computationContextService.putReadyComputationToQueue(parentComputation);
+            }
         }
-
-
-        // restore class loader
-        Thread.currentThread().setContextClassLoader(currentCL);
     }
+
 }

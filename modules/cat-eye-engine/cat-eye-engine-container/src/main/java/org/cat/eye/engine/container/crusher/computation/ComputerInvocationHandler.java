@@ -4,7 +4,7 @@ import org.cat.eye.engine.container.model.ComputationState;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
-import java.util.UUID;
+import java.util.*;
 
 public class ComputerInvocationHandler implements InvocationHandler {
 
@@ -21,6 +21,10 @@ public class ComputerInvocationHandler implements InvocationHandler {
     private ComputationState state;
 
     private UUID parentId;
+
+    private Set<UUID> childrenIDs = new HashSet<>();
+
+    private Set<UUID> completedChildrenIDs = new HashSet<>();
 
     public ComputerInvocationHandler(UUID id, UUID parentId, String computerName, String domain, Object computer, ComputationState state) {
         this.id = id;
@@ -53,6 +57,12 @@ public class ComputerInvocationHandler implements InvocationHandler {
                 state = (ComputationState) args[0];
             case "getParentId":
                 return parentId;
+            case "setChildrenIDs":
+                childrenIDs.addAll((List<UUID>) args[0]);
+            case "addCompletedChildId":
+                completedChildrenIDs.add((UUID) args[0]);
+            case "isChildrenCompleted":
+                return childrenIDs.size() == completedChildrenIDs.size();
 
             case "toString":
                 return computer.toString();

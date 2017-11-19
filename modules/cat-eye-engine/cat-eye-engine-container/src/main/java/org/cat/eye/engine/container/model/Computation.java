@@ -1,5 +1,6 @@
 package org.cat.eye.engine.container.model;
 
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -24,6 +25,12 @@ public interface Computation {
     ComputationState getState();
 
     void setState(ComputationState state);
+
+    void setChildrenIDs(List<UUID> childrenIDs);
+
+    void addCompletedChildId(UUID childId);
+
+    boolean isChildrenCompleted();
 
     String toString();
 }
