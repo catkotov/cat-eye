@@ -265,4 +265,9 @@ public class CatEyeContainerImpl implements CatEyeContainer {
     public void setComputationContextService(ComputationContextService computationContextService) {
         this.computationContextService = computationContextService;
     }
+
+    public  ComputationContextService getComputationContextService() {
+        return this.computationContextService;
+    }
+
 }

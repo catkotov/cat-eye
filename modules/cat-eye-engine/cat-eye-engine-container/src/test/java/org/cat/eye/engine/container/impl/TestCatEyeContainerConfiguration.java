@@ -8,6 +8,8 @@ import org.cat.eye.engine.container.deployment.management.BundleManager;
 import org.cat.eye.engine.container.deployment.management.BundleManagerImpl;
 import org.cat.eye.engine.container.discovery.NeighboursDiscoveryLeadingLight;
 import org.cat.eye.engine.container.discovery.NeighboursDiscoveryReceiver;
+import org.cat.eye.engine.container.service.ComputationContextService;
+import org.cat.eye.engine.container.service.impl.SimpleComputationContextService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -36,6 +38,7 @@ public class TestCatEyeContainerConfiguration {
         container.setBundleDeployer(getBundleDeployer());
         container.setPathToBundleJar(PATH_TO_JAR);
         container.setBundleDomain(DOMAIN);
+        container.setComputationContextService(getComputationContextService());
         return container;
     }
 
@@ -73,5 +76,10 @@ public class TestCatEyeContainerConfiguration {
         BundleDeployer bundleDeployer = new BundleDeployer();
         bundleDeployer.setBundleManager(getBundleManager());
         return bundleDeployer;
+    }
+
+    @Bean
+    ComputationContextService getComputationContextService() {
+        return new SimpleComputationContextService();
     }
 }
