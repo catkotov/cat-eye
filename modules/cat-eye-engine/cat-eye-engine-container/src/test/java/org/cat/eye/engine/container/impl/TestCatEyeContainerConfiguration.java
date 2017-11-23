@@ -8,7 +8,7 @@ import org.cat.eye.engine.common.deployment.management.BundleManager;
 import org.cat.eye.engine.common.deployment.management.BundleManagerImpl;
 import org.cat.eye.engine.container.discovery.NeighboursDiscoveryLeadingLight;
 import org.cat.eye.engine.container.discovery.NeighboursDiscoveryReceiver;
-import org.cat.eye.engine.container.service.ComputationContextService;
+import org.cat.eye.engine.common.service.ComputationContextService;
 import org.cat.eye.engine.container.service.impl.SimpleComputationContextService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -15,7 +15,7 @@ import org.cat.eye.engine.container.discovery.gossip.GossipMessageProcessor;
 import org.cat.eye.engine.container.discovery.gossip.GossipNeighboursState;
 import org.cat.eye.engine.container.discovery.gossip.Heartbeat;
 import org.cat.eye.engine.common.model.Computation;
-import org.cat.eye.engine.container.service.ComputationContextService;
+import org.cat.eye.engine.common.service.ComputationContextService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.concurrent.CustomizableThreadFactory;
