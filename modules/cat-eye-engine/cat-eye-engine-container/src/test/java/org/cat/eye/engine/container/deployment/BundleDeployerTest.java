@@ -6,6 +6,7 @@ import org.cat.eye.engine.container.deployment.management.BundleManager;
 import org.cat.eye.engine.container.deployment.management.BundleManagerImpl;
 import org.cat.eye.engine.container.model.Computation;
 import org.cat.eye.engine.container.model.MethodSpecification;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.lang.reflect.Parameter;
@@ -22,7 +23,7 @@ public class BundleDeployerTest {
 
     private final static String DOMAIN = "TEST_DOMAIN";
 
-//    @Ignore
+    @Ignore
     @Test
     public void deploy() throws Exception {
         BundleManager bundleManager = new BundleManagerImpl();
