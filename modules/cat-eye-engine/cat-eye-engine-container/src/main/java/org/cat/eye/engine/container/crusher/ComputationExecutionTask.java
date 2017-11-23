@@ -1,5 +1,6 @@
 package org.cat.eye.engine.container.crusher;
 
+import org.cat.eye.engine.container.CatEyeContainerTaskCapacity;
 import org.cat.eye.engine.container.crusher.computation.ComputationFactory;
 import org.cat.eye.engine.container.deployment.management.Bundle;
 import org.cat.eye.engine.container.model.Computation;
@@ -20,16 +21,22 @@ public class ComputationExecutionTask implements Runnable {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(ComputationExecutionTask.class);
 
-    private Computation computation;
+    private final Computation computation;
 
-    private Bundle bundle;
+    private final Bundle bundle;
 
-    private ComputationContextService computationContextService;
+    private final ComputationContextService computationContextService;
 
-    public ComputationExecutionTask(Computation computation, Bundle bundle, ComputationContextService computationContextService) {
+    private final CatEyeContainerTaskCapacity containerTaskCapacity;
+
+    public ComputationExecutionTask(Computation computation,
+                                    Bundle bundle,
+                                    ComputationContextService computationContextService,
+                                    CatEyeContainerTaskCapacity containerTaskCapacity) {
         this.computation = computation;
         this.bundle = bundle;
         this.computationContextService = computationContextService;
+        this.containerTaskCapacity = containerTaskCapacity;
     }
 
     @Override
@@ -40,84 +47,90 @@ public class ComputationExecutionTask implements Runnable {
         Thread.currentThread().setContextClassLoader(bundle.getClassLoader());
         // get computable classes with them methods' specifications
         Map<Class<?>, Set<MethodSpecification>> computableClasses = bundle.getComputables();
-        // get method specification for current computation
-        Object computer = computation.getComputer();
-        Set<MethodSpecification> methods = computableClasses.get(computer.getClass());
 
-        executeNextStep(computer, methods);
-
-        // restore class loader
-        Thread.currentThread().setContextClassLoader(currentCL);
+        try {
+            // get methods' specification for current computation and execute next step (method)
+            Object computer = computation.getComputer();
+            Set<MethodSpecification> methods = computableClasses.get(computer.getClass());
+            executeNextStep(computer, methods);
+        } catch (Throwable t) {
+            LOGGER.error("ComputationExecutionTask.run - error reason: " + t.getMessage(), t);
+            if (t instanceof Error) {
+                throw (Error) t;
+            }
+        } finally {
+            //
+            containerTaskCapacity.release();
+            // restore class loader
+            Thread.currentThread().setContextClassLoader(currentCL);
+        }
     }
 
-    private void executeNextStep(Object computer, Set<MethodSpecification> methods) {
+    private void executeNextStep(Object computer, Set<MethodSpecification> methods)
+                                                        throws IllegalAccessException, InvocationTargetException {
         // get computation next step method
         Optional<MethodSpecification> optional =
                 methods.stream().filter(spec -> spec.getStep() == computation.getNextStep()).findFirst();
         // execute method if it is present
         if (optional.isPresent()) {
-            try {
-                List<?> computers;
-                MethodSpecification specification = optional.get();
-                Parameter[]  parameters = specification.getParameters();
-                if (parameters != null && parameters.length != 0) {
-                    // get parameters from service
-                    Object[] args = new Object[parameters.length];
-                    for (int i = 0; i < parameters.length; i++) {
-                        Object arg = computationContextService.getArgument(parameters[i], bundle.getDomain());
-                        if (arg == null) {
-                            try {
-                                arg = parameters[i].getType().newInstance();
-                            } catch (InstantiationException e) {
-                                String error = String.format("ComputationExecutionTask.run - " +
-                                        "can't create parameter: computable class [%s], method [%s], type [%s].",
-                                        computer.getClass().getName(), optional.get().getMethod(), parameters[i].getType());
-                                LOGGER.error(error, e);
-                                throw new RuntimeException(error, e);
-                            }
+            List<?> computers;
+            MethodSpecification specification = optional.get();
+            Parameter[]  parameters = specification.getParameters();
+            if (parameters != null && parameters.length != 0) {
+                // get parameters from service
+                Object[] args = new Object[parameters.length];
+                for (int i = 0; i < parameters.length; i++) {
+                    Object arg = computationContextService.getArgument(parameters[i], bundle.getDomain());
+                    if (arg == null) {
+                        try {
+                            arg = parameters[i].getType().newInstance();
+                        } catch (InstantiationException e) {
+                            String error = String.format("ComputationExecutionTask.run - " +
+                                    "can't create parameter: computable class [%s], method [%s], type [%s].",
+                                    computer.getClass().getName(), optional.get().getMethod(), parameters[i].getType());
+                            LOGGER.error(error, e);
+                            throw new RuntimeException(error, e);
                         }
-                        args[i] = arg;
                     }
-                    // invoke method with parameters
-                    computers = (List<?>) optional.get().getMethod().invoke(computer, args);
-                    // store output parameters by service
-                    computationContextService.storeArguments(args, bundle.getDomain());
-                } else {
-                    // invoke method without parameters
-                    computers = (List<?>) optional.get().getMethod().invoke(computer);
+                    args[i] = arg;
                 }
+                // invoke method with parameters
+                computers = (List<?>) optional.get().getMethod().invoke(computer, args);
+                // store output parameters by service
+                computationContextService.storeArguments(args, bundle.getDomain());
+            } else {
+                // invoke method without parameters
+                computers = (List<?>) optional.get().getMethod().invoke(computer);
+            }
 
-                if (computers != null && !computers.isEmpty()) {
-                    // set computation status
-                    computation.setState(ComputationState.WAITING);
-                    // create computations
-                    List<Computation> childComputations = computers
-                            .parallelStream()
-                            .map(c -> ComputationFactory.create(c, computation.getId(), bundle.getDomain()))
-                            .collect(Collectors.toList());
-                    // register children in computation
-                    List<UUID> childIDs = childComputations.stream().map(Computation::getId).collect(Collectors.toList());
-                    computation.setChildrenIDs(childIDs);
-                    // store computations by service
-                    computationContextService.storeComputations(childComputations);
-                    // update current computation state
-                    computationContextService.storeComputation(computation);
-                    // put new computations to queue
-                    computationContextService.putCreatedComputationsToQueue(childComputations);
-                    // set number of next step
-                    computation.setNextStep(computation.getNextStep() + 1);
-                } else {
-                    // set computation status
-                    computation.setState(ComputationState.READY);
-                    // try to execute next step
-                    computation.setNextStep(computation.getNextStep() + 1);
-                    // update current computation state
-                    computationContextService.storeComputation(computation);
-                    // call recursively this method
-                    executeNextStep(computer, methods);
-                }
-            } catch (IllegalAccessException | InvocationTargetException e) {
-                e.printStackTrace();
+            if (computers != null && !computers.isEmpty()) {
+                // set computation status
+                computation.setState(ComputationState.WAITING);
+                // create computations
+                List<Computation> childComputations = computers
+                        .parallelStream()
+                        .map(c -> ComputationFactory.create(c, computation.getId(), bundle.getDomain()))
+                        .collect(Collectors.toList());
+                // register children in computation
+                List<UUID> childIDs = childComputations.stream().map(Computation::getId).collect(Collectors.toList());
+                computation.setChildrenIDs(childIDs);
+                // store computations by service
+                computationContextService.storeComputations(childComputations);
+                // update current computation state
+                computationContextService.storeComputation(computation);
+                // put new computations to queue
+                computationContextService.putCreatedComputationsToQueue(childComputations);
+                // set number of next step
+                computation.setNextStep(computation.getNextStep() + 1);
+            } else {
+                // set computation status
+                computation.setState(ComputationState.READY);
+                // try to execute next step
+                computation.setNextStep(computation.getNextStep() + 1);
+                // update current computation state
+                computationContextService.storeComputation(computation);
+                // call recursively this method
+                executeNextStep(computer, methods);
             }
         } else {
             // mark computations as COMPLETED
