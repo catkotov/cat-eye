@@ -1,11 +1,11 @@
-package org.cat.eye.engine.container.deployment;
+package org.cat.eye.engine.common.deployment;
 
-import org.cat.eye.engine.container.crusher.computation.ComputationFactory;
-import org.cat.eye.engine.container.deployment.management.Bundle;
-import org.cat.eye.engine.container.deployment.management.BundleManager;
-import org.cat.eye.engine.container.deployment.management.BundleManagerImpl;
-import org.cat.eye.engine.container.model.Computation;
-import org.cat.eye.engine.container.model.MethodSpecification;
+import org.cat.eye.engine.common.crusher.computation.ComputationFactory;
+import org.cat.eye.engine.common.deployment.management.Bundle;
+import org.cat.eye.engine.common.deployment.management.BundleManager;
+import org.cat.eye.engine.common.deployment.management.BundleManagerImpl;
+import org.cat.eye.engine.common.model.Computation;
+import org.cat.eye.engine.common.model.MethodSpecification;
 import org.junit.Ignore;
 import org.junit.Test;
 

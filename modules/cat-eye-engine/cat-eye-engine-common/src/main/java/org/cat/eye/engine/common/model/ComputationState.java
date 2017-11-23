@@ -1,4 +1,4 @@
-package org.cat.eye.engine.container.model;
+package org.cat.eye.engine.common.model;
 
 public enum ComputationState {
     CREATED,

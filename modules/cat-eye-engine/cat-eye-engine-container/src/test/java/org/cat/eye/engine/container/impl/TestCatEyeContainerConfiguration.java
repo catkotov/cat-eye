@@ -1,11 +1,11 @@
 package org.cat.eye.engine.container.impl;
 
-import org.cat.eye.engine.container.CatEyeContainer;
+import org.cat.eye.engine.common.CatEyeContainer;
 import org.cat.eye.engine.container.datagram.DatagramReceiver;
 import org.cat.eye.engine.container.datagram.DatagramSender;
-import org.cat.eye.engine.container.deployment.BundleDeployer;
-import org.cat.eye.engine.container.deployment.management.BundleManager;
-import org.cat.eye.engine.container.deployment.management.BundleManagerImpl;
+import org.cat.eye.engine.common.deployment.BundleDeployer;
+import org.cat.eye.engine.common.deployment.management.BundleManager;
+import org.cat.eye.engine.common.deployment.management.BundleManagerImpl;
 import org.cat.eye.engine.container.discovery.NeighboursDiscoveryLeadingLight;
 import org.cat.eye.engine.container.discovery.NeighboursDiscoveryReceiver;
 import org.cat.eye.engine.container.service.ComputationContextService;

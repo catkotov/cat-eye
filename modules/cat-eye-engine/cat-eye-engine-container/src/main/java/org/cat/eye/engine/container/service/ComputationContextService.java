@@ -1,6 +1,6 @@
 package org.cat.eye.engine.container.service;
 
-import org.cat.eye.engine.container.model.Computation;
+import org.cat.eye.engine.common.model.Computation;
 import java.lang.reflect.Parameter;
 import java.util.List;
 import java.util.UUID;

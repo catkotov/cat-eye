@@ -1,6 +1,6 @@
-package org.cat.eye.engine.container.crusher.computation;
+package org.cat.eye.engine.common.crusher.computation;
 
-import org.cat.eye.engine.container.model.ComputationState;
+import org.cat.eye.engine.common.model.ComputationState;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;

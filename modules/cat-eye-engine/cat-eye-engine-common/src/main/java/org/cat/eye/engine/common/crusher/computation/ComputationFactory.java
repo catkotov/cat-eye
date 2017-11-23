@@ -1,8 +1,8 @@
-package org.cat.eye.engine.container.crusher.computation;
+package org.cat.eye.engine.common.crusher.computation;
 
 
-import org.cat.eye.engine.container.model.Computation;
-import org.cat.eye.engine.container.model.ComputationState;
+import org.cat.eye.engine.common.model.Computation;
+import org.cat.eye.engine.common.model.ComputationState;
 
 import java.lang.reflect.Proxy;
 import java.util.UUID;

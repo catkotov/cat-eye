@@ -1,4 +1,4 @@
-package org.cat.eye.engine.container;
+package org.cat.eye.engine.common;
 
 public enum CatEyeContainerRole {
     MASTER,

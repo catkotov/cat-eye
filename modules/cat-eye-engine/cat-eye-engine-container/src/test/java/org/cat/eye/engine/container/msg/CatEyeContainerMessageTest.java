@@ -1,7 +1,7 @@
 package org.cat.eye.engine.container.msg;
 
-import org.cat.eye.engine.container.CatEyeContainerRole;
-import org.cat.eye.engine.container.CatEyeContainerState;
+import org.cat.eye.engine.common.CatEyeContainerRole;
+import org.cat.eye.engine.common.CatEyeContainerState;
 import org.cat.eye.engine.container.discovery.gossip.GossipContainerState;
 import org.cat.eye.engine.container.discovery.gossip.GossipMsg;
 import org.cat.eye.engine.container.discovery.gossip.GossipNeighboursState;

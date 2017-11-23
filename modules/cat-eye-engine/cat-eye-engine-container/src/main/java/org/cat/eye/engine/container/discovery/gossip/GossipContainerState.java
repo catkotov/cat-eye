@@ -1,7 +1,7 @@
 package org.cat.eye.engine.container.discovery.gossip;
 
-import org.cat.eye.engine.container.CatEyeContainerRole;
-import org.cat.eye.engine.container.CatEyeContainerState;
+import org.cat.eye.engine.common.CatEyeContainerRole;
+import org.cat.eye.engine.common.CatEyeContainerState;
 
 /**
  * Created by Kotov on 25.08.2017.
