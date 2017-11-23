@@ -78,6 +78,7 @@
         <module>cat-eye-engine-container</module>
         <module>cat-eye-engine-model</module>
         <module>cat-eye-engine-common</module>
+        <module>cat-eye-engine-container-unit</module>
     </modules>
 
 </project>
