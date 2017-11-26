@@ -82,11 +82,11 @@ public class CatEyeContainerImpl implements CatEyeContainer {
     }
 
     public int getThreadPoolSize() {
-        return 0;
+        return computationThreadPoolSize.get();
     }
 
     public void setThreadPoolSize(int size) {
-
+        computationThreadPoolSize.set(size);
     }
 
     @PostConstruct
