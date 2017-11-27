@@ -6,6 +6,7 @@ import org.cat.eye.engine.common.deployment.management.BundleManager;
 import org.cat.eye.engine.common.deployment.management.BundleManagerImpl;
 import org.cat.eye.engine.common.model.Computation;
 import org.cat.eye.engine.common.model.MethodSpecification;
+import org.cat.eye.engine.container.deployment.BundleDeployerImpl;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -28,7 +29,7 @@ public class BundleDeployerTest {
     public void deploy() throws Exception {
         BundleManager bundleManager = new BundleManagerImpl();
 
-        BundleDeployer deployer = new BundleDeployer();
+        BundleDeployer deployer = new BundleDeployerImpl();
         deployer.setBundleManager(bundleManager);
 
         deployer.deploy(PATH_TO_JAR, DOMAIN);

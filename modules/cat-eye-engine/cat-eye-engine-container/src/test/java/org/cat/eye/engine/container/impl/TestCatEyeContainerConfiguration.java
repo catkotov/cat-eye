@@ -1,9 +1,10 @@
 package org.cat.eye.engine.container.impl;
 
 import org.cat.eye.engine.common.CatEyeContainer;
+import org.cat.eye.engine.common.deployment.BundleDeployer;
 import org.cat.eye.engine.container.datagram.DatagramReceiver;
 import org.cat.eye.engine.container.datagram.DatagramSender;
-import org.cat.eye.engine.common.deployment.BundleDeployer;
+import org.cat.eye.engine.container.deployment.BundleDeployerImpl;
 import org.cat.eye.engine.common.deployment.management.BundleManager;
 import org.cat.eye.engine.common.deployment.management.BundleManagerImpl;
 import org.cat.eye.engine.container.discovery.NeighboursDiscoveryLeadingLight;
@@ -73,7 +74,7 @@ public class TestCatEyeContainerConfiguration {
 
     @Bean
     BundleDeployer getBundleDeployer() {
-        BundleDeployer bundleDeployer = new BundleDeployer();
+        BundleDeployer bundleDeployer = new BundleDeployerImpl();
         bundleDeployer.setBundleManager(getBundleManager());
         return bundleDeployer;
     }
