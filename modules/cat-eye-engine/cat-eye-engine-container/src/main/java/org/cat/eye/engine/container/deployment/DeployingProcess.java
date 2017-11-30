@@ -1,6 +1,6 @@
 package org.cat.eye.engine.container.deployment;
 
-import org.cat.eye.common.util.file.JarFileUtil;
+import org.cat.eye.common.util.file.ClassFileUtil;
 import org.cat.eye.engine.common.deployment.management.Bundle;
 import org.cat.eye.engine.common.deployment.management.BundleImpl;
 import org.cat.eye.engine.common.deployment.management.BundleManager;
@@ -33,7 +33,7 @@ public class DeployingProcess implements Runnable {
     @Override
     public void run() {
 
-        List<String> classNameLst = JarFileUtil.getClassesNames(jarFilePath);
+        List<String> classNameLst = ClassFileUtil.getClassesNamesFromJar(jarFilePath);
 
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 

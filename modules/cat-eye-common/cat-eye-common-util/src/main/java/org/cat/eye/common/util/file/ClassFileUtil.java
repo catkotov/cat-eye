@@ -10,13 +10,13 @@ import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-public class JarFileUtil {
+public class ClassFileUtil {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(JarFileUtil.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(ClassFileUtil.class);
 
     private final static String FILE_SEPARATOR = "/";
 
-    public static List<String> getClassesNames(String jarFilePath) {
+    public static List<String> getClassesNamesFromJar(String jarFilePath) {
 
         List<String> result = new ArrayList<>();
 
@@ -35,10 +35,23 @@ public class JarFileUtil {
                     }
                 }
             } catch (IOException e) {
-                LOGGER.error("JarFileUtil.getClassesNames - can't create list of classes names.", e);
+                LOGGER.error("JarFileUtil.getClassesNamesFromJar - can't create list of classes names.", e);
             }
         } else {
-            LOGGER.warn("JarFileUtil.getClassesNames - the file " + jarFilePath + " isn't jar file!");
+            LOGGER.warn("JarFileUtil.getClassesNamesFromJar - the file " + jarFilePath + " isn't jar file!");
+        }
+
+        return result;
+    }
+
+    public static List<String> getClassNamesFromPath(String classPath) {
+
+        List<String> result = new ArrayList<>();
+
+        File file = new File(classPath);
+
+        if (file.exists() && file.isDirectory()) {
+
         }
 
         return result;

@@ -1,5 +1,6 @@
 package org.cat.eye.engine.container.deployment;
 
+import org.cat.eye.engine.common.deployment.BundleClassLoader;
 import org.cat.eye.engine.common.deployment.BundleDeployer;
 import org.cat.eye.engine.common.deployment.management.BundleManager;
 import org.slf4j.Logger;
@@ -36,7 +37,6 @@ public class BundleDeployerImpl implements BundleDeployer {
         } catch (InterruptedException e) {
             LOGGER.error("BundleDeployer.deploy - can't deploy bundle: " + pathToJar, e);
         }
-        // add bundle to register
     }
 
     private URL[] getUrlsFromJarFile(String pathToJar) {
