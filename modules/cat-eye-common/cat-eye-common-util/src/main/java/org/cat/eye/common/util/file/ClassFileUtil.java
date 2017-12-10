@@ -30,7 +30,7 @@ public class ClassFileUtil {
                     while (jarEntities.hasMoreElements()) {
                         JarEntry jarEntry = jarEntities.nextElement();
                         if (jarEntry.getName().endsWith(".class")) {
-                            result.add(parseJarEntryName(jarEntry.getName()));
+                            result.add(parseFullClassName(jarEntry.getName()));
                         }
                     }
                 }
@@ -51,13 +51,39 @@ public class ClassFileUtil {
         File file = new File(classPath);
 
         if (file.exists() && file.isDirectory()) {
-
+            File[] files = file.listFiles();
+            if (files != null && files.length != 0) {
+                for (File f : files) {
+                    if (f.isDirectory()) {
+                        result = traverseDirectoryTree(result, f.getName(), f);
+                    } else if (f.getName().endsWith(".class")) {
+                        result.add(parseFullClassName(f.getName()));
+                    }
+                }
+            }
         }
 
         return result;
     }
 
-    private static String parseJarEntryName(String jarEntryName) {
+    private static List<String> traverseDirectoryTree(List<String> classLst, String directoryPath, File file) {
+
+        File[] files = file.listFiles();
+
+        if (files != null && files.length != 0) {
+            for (File f : files) {
+                if (f.isDirectory()) {
+                    traverseDirectoryTree(classLst, directoryPath + "/" + f.getName(), f);
+                } else if (f.getName().endsWith(".class")) {
+                    classLst.add(parseFullClassName(directoryPath + "/" + f.getName()));
+                }
+            }
+        }
+
+        return classLst;
+    }
+
+    private static String parseFullClassName(String jarEntryName) {
         return jarEntryName.replace(FILE_SEPARATOR, ".").substring(0, jarEntryName.lastIndexOf('.'));
     }
 }
