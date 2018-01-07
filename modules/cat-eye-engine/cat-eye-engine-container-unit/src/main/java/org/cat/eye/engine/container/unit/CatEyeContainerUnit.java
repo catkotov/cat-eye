@@ -32,7 +32,7 @@ public class CatEyeContainerUnit implements CatEyeContainer {
 
     private BundleManager bundleManager;
 
-    private String pathToBundleJar;
+    private String pathToClasses;
 
     private String bundleDomain;
 
@@ -71,10 +71,9 @@ public class CatEyeContainerUnit implements CatEyeContainer {
         computationThreadPoolSize.set(size);
     }
 
-    @PostConstruct
-    private void initialize() throws Exception {
+    public void initialize() throws Exception {
         // deploy bundle
-        bundleDeployer.deploy(pathToBundleJar, bundleDomain);
+        bundleDeployer.deploy(pathToClasses, bundleDomain);
         // start computation work flow
         initComputationProcess();
     }
@@ -152,8 +151,8 @@ public class CatEyeContainerUnit implements CatEyeContainer {
         this.bundleDeployer = bundleDeployer;
     }
 
-    public void setPathToBundleJar(String pathToBundleJar) {
-        this.pathToBundleJar = pathToBundleJar;
+    public void setPathToClasses(String pathToClasses) {
+        this.pathToClasses = pathToClasses;
     }
 
     public void setBundleDomain(String bundleDomain) {
