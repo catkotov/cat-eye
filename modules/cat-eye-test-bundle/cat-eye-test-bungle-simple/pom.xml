@@ -21,6 +21,10 @@
             <groupId>org.cat.eye.engine</groupId>
             <artifactId>cat-eye-engine-model</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.cat.eye.engine</groupId>
+            <artifactId>cat-eye-engine-container-unit</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -39,6 +43,11 @@
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>RELEASE</version>
         </dependency>
     </dependencies>
 

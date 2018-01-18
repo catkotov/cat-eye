@@ -26,7 +26,11 @@
                 <artifactId>cat-eye-engine-model</artifactId>
                 <version>${cat.eye.version}</version>
             </dependency>
-
+            <dependency>
+                <groupId>org.cat.eye.engine</groupId>
+                <artifactId>cat-eye-engine-container-unit</artifactId>
+                <version>${cat.eye.version}</version>
+            </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>jcl-over-slf4j</artifactId>
