@@ -31,11 +31,15 @@ public class BundleClassLoader extends ClassLoader {
         try {
             // This loads the byte code data from the file
             b = loadClassData(file);
-            // defineClass is inherited from the ClassLoader class
-            // and converts the byte array into a Class
-            Class<?> c = defineClass(name, b, 0, b.length);
-            resolveClass(c);
-            return c;
+            if (b != null) {
+                // defineClass is inherited from the ClassLoader class
+                // and converts the byte array into a Class
+                Class<?> c = defineClass(name, b, 0, b.length);
+                resolveClass(c);
+                return c;
+            } else {
+                return null;
+            }
         } catch (IOException e) {
             LOGGER.error("BundleClassLoader.getClass - can't get class <" + name + ">", e);
             return null;
@@ -45,14 +49,18 @@ public class BundleClassLoader extends ClassLoader {
     private byte[] loadClassData(String name) throws IOException {
         // Opening the file
         InputStream stream = getClass().getClassLoader().getResourceAsStream(name);
-        int size = stream.available();
-        byte buff[] = new byte[size];
-        DataInputStream in = new DataInputStream(stream);
-        // Reading the binary data
-        in.readFully(buff);
-        in.close();
-        stream.close();
+        if (stream != null) {
+            int size = stream.available();
+            byte buff[] = new byte[size];
+            DataInputStream in = new DataInputStream(stream);
+            // Reading the binary data
+            in.readFully(buff);
+            in.close();
+            stream.close();
 
-        return buff;
+            return buff;
+        } else {
+            return null;
+        }
     }
 }

@@ -21,6 +21,7 @@ public class CatEyeContainerUnitConfig {
         container.setName("UNIT_TEST_CONTAINER");
         container.setBundleManager(getBundleManager());
         container.setBundleDeployer(getBundleDeployer());
+        container.setComputationContextService(getComputationContextService());
 
         return container;
     }
