@@ -3,10 +3,7 @@ package org.cat.eye.engine.common.service.impl;
 import org.cat.eye.engine.common.model.Computation;
 import org.cat.eye.engine.common.service.ComputationContextService;
 import java.lang.reflect.Parameter;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.locks.Lock;
@@ -31,9 +28,9 @@ public class SimpleComputationContextService implements ComputationContextServic
 
         lock.lock();
 
-        List<Computation> result;
+        List<Computation> result = new ArrayList<>();
         try {
-            result = executionQueue.stream().limit(limit).collect(Collectors.toList());
+            result.addAll(executionQueue); // = executionQueue.stream().limit(limit).collect(Collectors.toList());
         } finally {
             lock.unlock();
         }
