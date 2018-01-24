@@ -105,8 +105,14 @@ public class CatEyeContainerUnit implements CatEyeContainer {
         }
 
         if (!computeThread.isAlive()) {
+            LOGGER.info("CatEyeContainerUnit.initComputeThread - start compute thread.");
             computeThread.start();
-            LOGGER.info("CatEyeContainerUnit.initComputeThread - compute thread was started.");
+            try {
+                computeThread.join();
+            } catch (InterruptedException e) {
+                LOGGER.info("CatEyeContainerUnit.initComputeThread - compute thread was interrupted.");
+            }
+            LOGGER.info("CatEyeContainerUnit.initComputeThread - compute thread was finished.");
         } else {
             LOGGER.info("CatEyeContainerUnit.initComputeThread - compute thread is already running.");
         }
