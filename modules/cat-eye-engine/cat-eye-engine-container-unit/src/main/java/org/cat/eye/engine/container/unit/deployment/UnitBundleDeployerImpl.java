@@ -18,7 +18,7 @@ public class UnitBundleDeployerImpl implements BundleDeployer {
     @Override
     public void deploy(String classPath, String domain) {
 
-        BundleClassLoader bundleClassLoader = new BundleClassLoader();
+        ClassLoader bundleClassLoader = Thread.currentThread().getContextClassLoader(); // new BundleClassLoader();
 
         // create and start thread for bundle deploying
         Thread deployingThread = new Thread(new UnitDeployingProcess(classPath, domain, bundleManager));
@@ -27,7 +27,7 @@ public class UnitBundleDeployerImpl implements BundleDeployer {
         try {
             deployingThread.join();
         } catch (InterruptedException e) {
-            LOGGER.error("UnitBundleDeployerImpl.deploy - can't deploy bundle: " + classPath, e);
+            LOGGER.error("deploy - can't deploy bundle: " + classPath, e);
         }
     }
 

@@ -36,21 +36,21 @@ public class AbstractDeployingProcess {
                     continue;
                 }
 
-                LOGGER.info("AbstractDeployingProcess.run - class <" + className + "> is computable!");
+                LOGGER.info("run - class <" + className + "> is computable!");
 
                 Set<MethodSpecification> methodSpecificationSet = getMethodSpecifications(bundleClass);
 
                 computables.put(bundleClass, methodSpecificationSet);
 
             } catch (ClassNotFoundException e) {
-                LOGGER.error("AbstractDeployingProcess.run - can't process class <" + className + ">.", e);
+                LOGGER.error("run - can't process class <" + className + ">.", e);
             }
         }
         // create and store bundle context
         if (!computables.isEmpty()) {
             Bundle bundle = new BundleImpl(domain, computables, classLoader);
             bundleManager.putBundle(bundle);
-            LOGGER.info("AbstractDeployingProcess.run - bundle " + bundle.getDomain() + " was deployed.");
+            LOGGER.info("run - bundle " + bundle.getDomain() + " was deployed.");
         }
     }
 

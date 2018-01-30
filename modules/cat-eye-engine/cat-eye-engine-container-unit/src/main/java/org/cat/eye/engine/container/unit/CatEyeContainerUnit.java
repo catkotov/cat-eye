@@ -105,21 +105,21 @@ public class CatEyeContainerUnit implements CatEyeContainer {
         }
 
         if (!computeThread.isAlive()) {
-            LOGGER.info("CatEyeContainerUnit.initComputeThread - start compute thread.");
+            LOGGER.info("initComputeThread - start compute thread.");
             computeThread.start();
             try {
                 computeThread.join();
             } catch (InterruptedException e) {
-                LOGGER.info("CatEyeContainerUnit.initComputeThread - compute thread was interrupted.");
+                LOGGER.info("initComputeThread - compute thread was interrupted.");
             }
-            LOGGER.info("CatEyeContainerUnit.initComputeThread - compute thread was finished.");
+            LOGGER.info("initComputeThread - compute thread was finished.");
         } else {
-            LOGGER.info("CatEyeContainerUnit.initComputeThread - compute thread is already running.");
+            LOGGER.info("initComputeThread - compute thread is already running.");
         }
     }
 
     private void computeLoop() {
-        LOGGER.info("CatEyeContainerUnit.computeLoop - start the compute loop.");
+        LOGGER.info("computeLoop - start the compute loop.");
         while (isRunning.get()) {
             containerTaskCapacity.await();
             // create and submit task
@@ -129,11 +129,11 @@ public class CatEyeContainerUnit implements CatEyeContainer {
                 try {
                     Thread.sleep(computationThreadSleepTime);
                 } catch (InterruptedException e) {
-                    LOGGER.error("CatEyeContainerUnit.computeLoop - exception during computation thread sleeping.", e);
+                    LOGGER.error("computeLoop - exception during computation thread sleeping.", e);
                 }
             }
         }
-        LOGGER.info("CatEyeContainerImpl.computeLoop - finish the compute loop.");
+        LOGGER.info("computeLoop - finish the compute loop.");
     }
 
     private void createComputationExecutionTask() {

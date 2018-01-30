@@ -54,7 +54,7 @@ public class ComputationExecutionTask implements Runnable {
             Set<MethodSpecification> methods = computableClasses.get(computer.getClass());
             executeNextStep(computer, methods);
         } catch (Throwable t) {
-            LOGGER.error("ComputationExecutionTask.run - error reason: " + t.getMessage(), t);
+            LOGGER.error("run - error reason: " + t.getMessage(), t);
             if (t instanceof Error) {
                 throw (Error) t;
             }

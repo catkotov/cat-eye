@@ -50,7 +50,7 @@ public class OtherFileCounterComputer implements OtherFileCounter {
                 for (File file : files) {
                     if (file.isDirectory()) {
                         computers.add(new OtherFileCounterComputer(file.getAbsolutePath()));
-                        LOGGER.info("FileCounterComputer.getDirectoriesAndFileCounter - " +
+                        LOGGER.info("getDirectoriesAndFileCounter - " +
                                 "Computation with path [{}} was created.", file.getAbsolutePath());
                     } else {
                         fileCount++;
@@ -74,14 +74,14 @@ public class OtherFileCounterComputer implements OtherFileCounter {
             for (OtherFileCounterComputer computer : computers) {
                 counter =+ store.getFileNumber(computer.getPath());
 
-                LOGGER.info("FileCounterComputer.countFilesInSubdirectories - " +
+                LOGGER.info("countFilesInSubdirectories - " +
                         "Directory [{0}] contains [{1}] files.", computer.getPath(), computer.getNumberFiles());
             }
         }
 
         numberSubdirectoryFiles = counter;
 
-        LOGGER.info("FileCounterComputer.countFilesInSubdirectories - " +
+        LOGGER.info("countFilesInSubdirectories - " +
                 "There are [{}] in subdirectories of directory [{}].", counter, path);
 
         return Collections.EMPTY_LIST;
@@ -96,7 +96,7 @@ public class OtherFileCounterComputer implements OtherFileCounter {
 
         store.putFileNumber(path, numberFiles);
 
-        LOGGER.info("FileCounterComputer.countFiles - Full quantity files in directory [{0}] is [{1}]", path, counter);
+        LOGGER.info("countFiles - Full quantity files in directory [{0}] is [{1}]", path, counter);
 
         return Collections.EMPTY_LIST;
     }
