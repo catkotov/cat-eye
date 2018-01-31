@@ -51,16 +51,20 @@ public class ComputerInvocationHandler implements InvocationHandler {
                 return nextStep;
             case "setNextStep":
                 nextStep = (Integer) args[0];
+                break;
             case "getState":
                 return state;
             case "setState":
                 state = (ComputationState) args[0];
+                break;
             case "getParentId":
                 return parentId;
             case "setChildrenIDs":
                 childrenIDs.addAll((List<UUID>) args[0]);
+                break;
             case "addCompletedChildId":
                 completedChildrenIDs.add((UUID) args[0]);
+                break;
             case "isChildrenCompleted":
                 return childrenIDs.size() == completedChildrenIDs.size();
 
@@ -69,5 +73,7 @@ public class ComputerInvocationHandler implements InvocationHandler {
 
             default: return null;
         }
+
+        return null;
     }
 }

@@ -26,13 +26,28 @@ public class SimpleComputationContextService implements ComputationContextServic
     @Override
     public List<Computation> takeComputationsForExecution(int limit) {
 
-        lock.lock();
+        List<Computation> result = null;
 
-        List<Computation> result = new ArrayList<>();
-        try {
-            result.addAll(executionQueue); // = executionQueue.stream().limit(limit).collect(Collectors.toList());
-        } finally {
-            lock.unlock();
+        if (executionQueue.size() != 0) {
+
+            lock.lock();
+
+            result = new ArrayList<>();
+            try {
+                int compCount;
+
+                if (limit <= executionQueue.size()) {
+                    compCount = limit;
+                } else {
+                    compCount = executionQueue.size();
+                }
+
+                for (int i = 0; i < compCount; i++) {
+                    result.add(executionQueue.poll());
+                }
+            } finally {
+                lock.unlock();
+            }
         }
 
         return result;
