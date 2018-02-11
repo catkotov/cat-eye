@@ -140,13 +140,15 @@ public class ComputationExecutionTask implements Runnable {
             // try to update state of parent computation
             UUID parentId = computation.getParentId();
             Computation parentComputation = computationContextService.getComputation(parentId);
-            parentComputation.addCompletedChildId(computation.getId());
-            computationContextService.storeComputation(parentComputation); // TODO double store (see line135)
-            // put parent computation to queue if it is ready (has READY state)
-            if (parentComputation.isChildrenCompleted()) {
-                parentComputation.setState(ComputationState.READY);
-                computationContextService.storeComputation(parentComputation); // TODO double store (see line 131)
-                computationContextService.putReadyComputationToQueue(parentComputation);
+            if (parentComputation != null) {
+                parentComputation.addCompletedChildId(computation.getId());
+                computationContextService.storeComputation(parentComputation); // TODO double store (see line135)
+                // put parent computation to queue if it is ready (has READY state)
+                if (parentComputation.isChildrenCompleted()) {
+                    parentComputation.setState(ComputationState.READY);
+                    computationContextService.storeComputation(parentComputation); // TODO double store (see line 131)
+                    computationContextService.putReadyComputationToQueue(parentComputation);
+                }
             }
         }
     }

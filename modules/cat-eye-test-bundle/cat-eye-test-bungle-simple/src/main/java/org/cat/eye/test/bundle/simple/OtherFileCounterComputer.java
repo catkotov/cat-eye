@@ -2,6 +2,7 @@ package org.cat.eye.test.bundle.simple;
 
 import org.cat.eye.engine.model.annotation.*;
 import org.cat.eye.test.bundle.model.FileCounterStore;
+import org.cat.eye.test.bundle.model.impl.FileCounterStoreImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.io.File;
@@ -66,7 +67,7 @@ public class OtherFileCounterComputer implements OtherFileCounter {
     }
 
     @Compute(step = 2)
-    public List countFilesInSubdirectories(@In FileCounterStore store) {
+    public List countFilesInSubdirectories(@In FileCounterStoreImpl store) {
 
         long counter = 0;
 
@@ -75,20 +76,20 @@ public class OtherFileCounterComputer implements OtherFileCounter {
                 counter =+ store.getFileNumber(computer.getPath());
 
                 LOGGER.info("countFilesInSubdirectories - " +
-                        "Directory [{0}] contains [{1}] files.", computer.getPath(), computer.getNumberFiles());
+                        "Directory [{}] contains [{}] files.", computer.getPath(), computer.getNumberFiles());
             }
         }
 
         numberSubdirectoryFiles = counter;
 
         LOGGER.info("countFilesInSubdirectories - " +
-                "There are [{}] in subdirectories of directory [{}].", counter, path);
+                "There are [{}] subdirectories in directory [{}].", counter, path);
 
         return Collections.EMPTY_LIST;
     }
 
     @Compute(step = 3)
-    public List countFiles(@Out FileCounterStore store) {
+    public List countFiles(@Out FileCounterStoreImpl store) {
 
         long counter = 0;
         counter = numberLocalFiles + numberSubdirectoryFiles;
@@ -96,7 +97,7 @@ public class OtherFileCounterComputer implements OtherFileCounter {
 
         store.putFileNumber(path, numberFiles);
 
-        LOGGER.info("countFiles - Full quantity files in directory [{0}] is [{1}]", path, counter);
+        LOGGER.info("countFiles - Full quantity files in directory [{}] is [{}]", path, counter);
 
         return Collections.EMPTY_LIST;
     }
