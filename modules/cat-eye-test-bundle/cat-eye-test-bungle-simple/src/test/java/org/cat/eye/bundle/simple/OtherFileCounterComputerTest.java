@@ -24,7 +24,7 @@ public class OtherFileCounterComputerTest {
         containerUnit.setBundleDomain("TEST_DOMAIN");
         ComputationContextService contextService = containerUnit.getComputationContextService();
 
-        contextService.putReadyComputationToQueue(ComputationFactory.create(new OtherFileCounterComputer("E:/cassandra"), UUID.randomUUID(), "TEST_DOMAIN"));
+        contextService.putReadyComputationToQueue(ComputationFactory.create(new OtherFileCounterComputer("C:/data"), UUID.randomUUID(), "TEST_DOMAIN"));
         containerUnit.initialize();
     }
 }

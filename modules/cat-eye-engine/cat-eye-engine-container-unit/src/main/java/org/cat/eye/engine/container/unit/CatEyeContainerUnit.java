@@ -123,7 +123,7 @@ public class CatEyeContainerUnit implements CatEyeContainer {
         while (isRunning.get()) {
             containerTaskCapacity.await();
             // create and submit task
-            createComputationExecutionTask();
+            isRunning.set(createComputationExecutionTask());
             // sleep if container task capacity is exhausted
             if (containerTaskCapacity.getRemaining() <= 0) {
                 try {
@@ -136,7 +136,13 @@ public class CatEyeContainerUnit implements CatEyeContainer {
         LOGGER.info("computeLoop - finish the compute loop.");
     }
 
-    private void createComputationExecutionTask() {
+    private boolean createComputationExecutionTask() {
+
+        try {
+            Thread.sleep(computationThreadSleepTime);
+        } catch (InterruptedException e) {
+            LOGGER.error("createComputationExecutionTask - error of thread sleeping.", e);
+        }
 
         int limit = containerTaskCapacity.getRemaining();
         // get computation list by service
@@ -148,6 +154,10 @@ public class CatEyeContainerUnit implements CatEyeContainer {
                         new ComputationExecutionTask(c, bundleManager.getBundle(c.getDomain()), computationContextService, containerTaskCapacity);
                 computationExecutorService.submit(task);
             });
+
+            return true;
+        } else {
+            return false;
         }
     }
 

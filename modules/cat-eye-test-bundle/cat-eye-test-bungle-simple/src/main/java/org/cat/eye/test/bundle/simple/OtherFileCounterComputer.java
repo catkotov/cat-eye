@@ -1,7 +1,6 @@
 package org.cat.eye.test.bundle.simple;
 
 import org.cat.eye.engine.model.annotation.*;
-import org.cat.eye.test.bundle.model.FileCounterStore;
 import org.cat.eye.test.bundle.model.impl.FileCounterStoreImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,19 +25,15 @@ public class OtherFileCounterComputer implements OtherFileCounter {
 
     private long numberFiles;
 
-    public OtherFileCounterComputer() {
-        this.path = "C:/";
-    }
-
     public OtherFileCounterComputer(String path) {
         this.path = path;
     }
 
-    public String getPath() {
+    private String getPath() {
         return path;
     }
 
-    @Compute(step = 1)
+    @Compute
     public List<OtherFileCounterComputer> getDirectoriesAndFileCounter() {
 
         int fileCount = 0;
@@ -91,7 +86,7 @@ public class OtherFileCounterComputer implements OtherFileCounter {
     @Compute(step = 3)
     public List countFiles(@Out FileCounterStoreImpl store) {
 
-        long counter = 0;
+        long counter;
         counter = numberLocalFiles + numberSubdirectoryFiles;
         numberFiles = counter;
 
@@ -102,14 +97,14 @@ public class OtherFileCounterComputer implements OtherFileCounter {
         return Collections.EMPTY_LIST;
     }
 
-    public long getNumberFiles() {
+    private long getNumberFiles() {
         return numberFiles;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof FileCounterComputer)) return false;
+        if (!(o instanceof OtherFileCounterComputer)) return false;
 
         OtherFileCounterComputer that = (OtherFileCounterComputer) o;
 
