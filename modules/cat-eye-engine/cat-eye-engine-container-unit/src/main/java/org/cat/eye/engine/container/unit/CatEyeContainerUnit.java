@@ -139,7 +139,7 @@ public class CatEyeContainerUnit implements CatEyeContainer {
     private boolean createComputationExecutionTask() {
 
         try {
-            Thread.sleep(computationThreadSleepTime);
+            Thread.sleep(computationThreadSleepTime * 4);
         } catch (InterruptedException e) {
             LOGGER.error("createComputationExecutionTask - error of thread sleeping.", e);
         }

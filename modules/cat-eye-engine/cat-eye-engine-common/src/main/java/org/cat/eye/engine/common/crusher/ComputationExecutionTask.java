@@ -66,8 +66,8 @@ public class ComputationExecutionTask implements Runnable {
         }
     }
 
-    private void executeNextStep(Object computer, Set<MethodSpecification> methods)
-                                                        throws IllegalAccessException, InvocationTargetException {
+    private void executeNextStep(Object computer,
+                                 Set<MethodSpecification> methods) throws IllegalAccessException, InvocationTargetException {
         // get computation next step method
         Optional<MethodSpecification> optional =
                 methods.stream().filter(spec -> spec.getStep() == computation.getNextStep()).findFirst();

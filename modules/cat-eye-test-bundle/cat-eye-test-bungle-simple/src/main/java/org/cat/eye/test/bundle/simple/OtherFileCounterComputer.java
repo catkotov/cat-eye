@@ -10,7 +10,7 @@ import java.util.Collections;
 import java.util.List;
 
 @IsComputable
-public class OtherFileCounterComputer implements OtherFileCounter {
+public class OtherFileCounterComputer {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(OtherFileCounterComputer.class);
 
@@ -20,7 +20,7 @@ public class OtherFileCounterComputer implements OtherFileCounter {
     private List<OtherFileCounterComputer> computers = new ArrayList<>();
 
     private long numberSubdirectoryFiles;
-
+    // number of files in directory
     private int numberLocalFiles;
 
     private long numberFiles;
@@ -47,7 +47,7 @@ public class OtherFileCounterComputer implements OtherFileCounter {
                     if (file.isDirectory()) {
                         computers.add(new OtherFileCounterComputer(file.getAbsolutePath()));
                         LOGGER.info("getDirectoriesAndFileCounter - " +
-                                "Computation with path [{}} was created.", file.getAbsolutePath());
+                                "STEP-1: Computation with path [{}} was created.", file.getAbsolutePath());
                     } else {
                         fileCount++;
                     }
@@ -57,6 +57,8 @@ public class OtherFileCounterComputer implements OtherFileCounter {
 
         // write result
         numberLocalFiles = fileCount;
+
+        LOGGER.info("getDirectoriesAndFileCounter - STEP-1: Directory [{}] contains [{}] local files.", path, numberLocalFiles);
 
         return computers;
     }
@@ -68,17 +70,17 @@ public class OtherFileCounterComputer implements OtherFileCounter {
 
         if (!this.computers.isEmpty()) {
             for (OtherFileCounterComputer computer : computers) {
-                counter =+ store.getFileNumber(computer.getPath());
+                counter =+ computer.getNumberLocalFiles();
 
                 LOGGER.info("countFilesInSubdirectories - " +
-                        "Directory [{}] contains [{}] files.", computer.getPath(), computer.getNumberFiles());
+                        "STEP-2: Directory [{}] contains [{}] files (exclude subdirectories).", computer.getPath(), computer.getNumberLocalFiles());
             }
         }
 
         numberSubdirectoryFiles = counter;
 
         LOGGER.info("countFilesInSubdirectories - " +
-                "There are [{}] subdirectories in directory [{}].", counter, path);
+                "STEP-2: There are [{}] files in directory [{}] (include subdirectories).", counter, path);
 
         return Collections.EMPTY_LIST;
     }
@@ -92,13 +94,17 @@ public class OtherFileCounterComputer implements OtherFileCounter {
 
         store.putFileNumber(path, numberFiles);
 
-        LOGGER.info("countFiles - Full quantity files in directory [{}] is [{}]", path, counter);
+        LOGGER.info("countFiles - STEP-3: Full quantity files in directory [{}] is [{}]", path, counter);
 
         return Collections.EMPTY_LIST;
     }
 
     private long getNumberFiles() {
         return numberFiles;
+    }
+
+    public long getNumberLocalFiles() {
+        return numberLocalFiles;
     }
 
     @Override
