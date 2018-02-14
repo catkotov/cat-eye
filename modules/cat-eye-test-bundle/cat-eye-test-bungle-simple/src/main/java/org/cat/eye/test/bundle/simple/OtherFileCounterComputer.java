@@ -34,7 +34,7 @@ public class OtherFileCounterComputer {
     }
 
     @Compute
-    public List<OtherFileCounterComputer> getDirectoriesAndFileCounter() {
+    public List<OtherFileCounterComputer> getDirectoriesAndFileCounter(@In FileCounterStoreImpl store) {
 
         int fileCount = 0;
 
@@ -58,13 +58,15 @@ public class OtherFileCounterComputer {
         // write result
         numberLocalFiles = fileCount;
 
+        store.putFileNumber(path, fileCount);
+
         LOGGER.info("getDirectoriesAndFileCounter - STEP-1: Directory [{}] contains [{}] local files.", path, numberLocalFiles);
 
         return computers;
     }
 
     @Compute(step = 2)
-    public List countFilesInSubdirectories(@In FileCounterStoreImpl store) {
+    public List countFilesInSubdirectories() {
 
         long counter = 0;
 

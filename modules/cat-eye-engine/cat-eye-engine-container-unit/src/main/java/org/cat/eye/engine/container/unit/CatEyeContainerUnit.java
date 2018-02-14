@@ -10,9 +10,12 @@ import org.cat.eye.engine.common.service.ComputationContextService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.concurrent.CustomizableThreadFactory;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -138,23 +141,26 @@ public class CatEyeContainerUnit implements CatEyeContainer {
 
     private boolean createComputationExecutionTask() {
 
-        try {
-            Thread.sleep(computationThreadSleepTime * 4);
-        } catch (InterruptedException e) {
-            LOGGER.error("createComputationExecutionTask - error of thread sleeping.", e);
-        }
-
         int limit = containerTaskCapacity.getRemaining();
         // get computation list by service
         List<Computation> computations = computationContextService.takeComputationsForExecution(limit);
         // for every computation create and submit execution task
         if (computations != null && !computations.isEmpty()) {
+
+            List<Future<?>> taskList = new ArrayList<>();
             computations.forEach(c -> {
                 ComputationExecutionTask task =
                         new ComputationExecutionTask(c, bundleManager.getBundle(c.getDomain()), computationContextService, containerTaskCapacity);
-                computationExecutorService.submit(task);
+                taskList.add(computationExecutorService.submit(task));
             });
 
+            while(taskList.size() != taskList.stream().filter(future -> future.isDone()).count()) {
+                try {
+                    Thread.sleep(computationThreadSleepTime);
+                } catch (InterruptedException e) {
+                    LOGGER.error("createComputationExecutionTask - error of thread sleeping.", e);
+                }
+            }
             return true;
         } else {
             return false;
