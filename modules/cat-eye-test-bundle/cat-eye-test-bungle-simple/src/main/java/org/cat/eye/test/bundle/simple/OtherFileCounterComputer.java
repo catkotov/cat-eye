@@ -72,15 +72,15 @@ public class OtherFileCounterComputer {
             for (OtherFileCounterComputer computer : computers) {
                 counter =+ computer.getNumberLocalFiles();
 
-                LOGGER.info("countFilesInSubdirectories - " +
-                        "STEP-2: Directory [{}] contains [{}] files (exclude subdirectories).", computer.getPath(), computer.getNumberLocalFiles());
+//                LOGGER.info("countFilesInSubdirectories - " +
+//                        "STEP-2: Directory [{}] contains [{}] files (exclude subdirectories).", computer.getPath(), computer.getNumberLocalFiles());
             }
         }
 
         numberSubdirectoryFiles = counter;
 
         LOGGER.info("countFilesInSubdirectories - " +
-                "STEP-2: There are [{}] files in directory [{}] (include subdirectories).", counter, path);
+                "STEP-2: There are [{}] files in subdirectories of directory [{}].", counter, path);
 
         return Collections.EMPTY_LIST;
     }
@@ -88,13 +88,11 @@ public class OtherFileCounterComputer {
     @Compute(step = 3)
     public List countFiles(@Out FileCounterStoreImpl store) {
 
-        long counter;
-        counter = numberLocalFiles + numberSubdirectoryFiles;
-        numberFiles = counter;
+        numberFiles = numberLocalFiles + numberSubdirectoryFiles;
 
         store.putFileNumber(path, numberFiles);
 
-        LOGGER.info("countFiles - STEP-3: Full quantity files in directory [{}] is [{}]", path, counter);
+        LOGGER.info("countFiles - STEP-3: Full quantity files in directory [{}] is [{}]", path, numberFiles);
 
         return Collections.EMPTY_LIST;
     }
