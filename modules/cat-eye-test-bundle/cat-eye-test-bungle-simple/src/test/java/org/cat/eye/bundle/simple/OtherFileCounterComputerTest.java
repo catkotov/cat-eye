@@ -4,7 +4,7 @@ import org.cat.eye.engine.common.crusher.computation.ComputationFactory;
 import org.cat.eye.engine.common.service.ComputationContextService;
 import org.cat.eye.engine.container.unit.CatEyeContainerUnit;
 import org.cat.eye.engine.container.unit.CatEyeContainerUnitFactory;
-import org.cat.eye.test.bundle.simple.OtherFileCounterComputer;
+import org.cat.eye.test.bundle.simple.StartFileCounterComputer;
 import org.junit.Test;
 
 import java.util.UUID;
@@ -20,11 +20,11 @@ public class OtherFileCounterComputerTest {
     @Test
     public void fileCounterTest() throws Exception {
 
-        containerUnit.setPathToClasses("E:\\Projects\\cat-eye\\cat-eye\\modules\\cat-eye-test-bundle\\cat-eye-test-bungle-simple\\target\\classes");
+        containerUnit.setPathToClasses("D:\\Sand-box\\cat-eye\\modules\\cat-eye-test-bundle\\cat-eye-test-bungle-simple\\target\\classes");
         containerUnit.setBundleDomain("TEST_DOMAIN");
         ComputationContextService contextService = containerUnit.getComputationContextService();
 
-        contextService.putReadyComputationToQueue(ComputationFactory.create(new OtherFileCounterComputer("C:/data"), UUID.randomUUID(), "TEST_DOMAIN"));
+        contextService.putReadyComputationToQueue(ComputationFactory.create(new StartFileCounterComputer("C:\\Java"), UUID.randomUUID(), "TEST_DOMAIN"));
         containerUnit.initialize();
     }
 }

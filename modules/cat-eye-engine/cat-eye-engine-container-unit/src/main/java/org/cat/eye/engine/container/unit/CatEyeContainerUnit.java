@@ -10,7 +10,6 @@ import org.cat.eye.engine.common.service.ComputationContextService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.concurrent.CustomizableThreadFactory;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -49,7 +48,7 @@ public class CatEyeContainerUnit implements CatEyeContainer {
 
     private Thread computeThread;
 
-    private long computationThreadSleepTime = 100L;
+    private long computationThreadSleepTime = 50L;
 
     private ComputationContextService computationContextService;
 

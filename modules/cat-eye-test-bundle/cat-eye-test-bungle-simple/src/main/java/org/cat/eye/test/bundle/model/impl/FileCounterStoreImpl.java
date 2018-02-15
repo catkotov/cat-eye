@@ -1,8 +1,8 @@
 package org.cat.eye.test.bundle.model.impl;
 
 import org.cat.eye.test.bundle.model.FileCounterStore;
-
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class FileCounterStoreImpl implements FileCounterStore {
@@ -17,6 +17,11 @@ public class FileCounterStoreImpl implements FileCounterStore {
     @Override
     public void putFileNumber(String directoryName, long fileNumber) {
         store.put(directoryName, fileNumber);
+    }
+
+    @Override
+    public Set<String> getDirecotoryNames() {
+        return store.keySet();
     }
 
 }
