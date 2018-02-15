@@ -38,7 +38,7 @@ public class CatEyeContainerUnit implements CatEyeContainer {
 
     private AtomicBoolean isRunning = new AtomicBoolean(false);
 
-    private final static int DEFAULT_COMPUTATION_THREAD_POOL_SIZE = 4;
+    private final static int DEFAULT_COMPUTATION_THREAD_POOL_SIZE = 32;
     private AtomicInteger computationThreadPoolSize = new AtomicInteger(DEFAULT_COMPUTATION_THREAD_POOL_SIZE);
     private ExecutorService computationExecutorService;
     private final static String COMPUTATION_THREAD_NAME_PREFIX = "COMPUTATION-THREAD-";
@@ -48,7 +48,7 @@ public class CatEyeContainerUnit implements CatEyeContainer {
 
     private Thread computeThread;
 
-    private long computationThreadSleepTime = 50L;
+    private long computationThreadSleepTime = 5L;
 
     private ComputationContextService computationContextService;
 
@@ -111,6 +111,7 @@ public class CatEyeContainerUnit implements CatEyeContainer {
             computeThread.start();
             try {
                 computeThread.join();
+                computationExecutorService.shutdown();
             } catch (InterruptedException e) {
                 LOGGER.info("initComputeThread - compute thread was interrupted.");
             }
@@ -160,8 +161,10 @@ public class CatEyeContainerUnit implements CatEyeContainer {
                     LOGGER.error("createComputationExecutionTask - error of thread sleeping.", e);
                 }
             }
+
             return true;
         } else {
+            LOGGER.info("createComputationExecutionTask - Computation is finished!!!");
             return false;
         }
     }

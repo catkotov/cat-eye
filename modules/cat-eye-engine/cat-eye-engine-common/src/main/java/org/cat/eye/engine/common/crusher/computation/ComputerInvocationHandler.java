@@ -5,6 +5,7 @@ import org.cat.eye.engine.common.model.ComputationState;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 public class ComputerInvocationHandler implements InvocationHandler {
 
@@ -22,9 +23,9 @@ public class ComputerInvocationHandler implements InvocationHandler {
 
     private UUID parentId;
 
-    private Set<UUID> childrenIDs = new HashSet<>();
+    private Set<UUID> childrenIDs = new CopyOnWriteArraySet<>();
 
-    private Set<UUID> completedChildrenIDs = new HashSet<>();
+    private Set<UUID> completedChildrenIDs = new CopyOnWriteArraySet<>();
 
     public ComputerInvocationHandler(UUID id, UUID parentId, String computerName, String domain, Object computer, ComputationState state) {
         this.id = id;

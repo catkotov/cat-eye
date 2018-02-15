@@ -2,6 +2,9 @@ package org.cat.eye.engine.common.service.impl;
 
 import org.cat.eye.engine.common.model.Computation;
 import org.cat.eye.engine.common.service.ComputationContextService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.lang.reflect.Parameter;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -14,6 +17,8 @@ import java.util.stream.Collectors;
  * Created by Kotov on 10.11.2017.
  */
 public class SimpleComputationContextService implements ComputationContextService {
+
+    private final static Logger LOGGER = LoggerFactory.getLogger(SimpleComputationContextService.class);
 
     private Lock lock = new ReentrantLock();
 
