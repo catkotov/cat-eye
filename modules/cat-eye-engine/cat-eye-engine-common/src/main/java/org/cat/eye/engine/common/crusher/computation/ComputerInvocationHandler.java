@@ -1,5 +1,6 @@
 package org.cat.eye.engine.common.crusher.computation;
 
+import org.cat.eye.engine.common.model.Computation;
 import org.cat.eye.engine.common.model.ComputationState;
 
 import java.lang.reflect.InvocationHandler;
@@ -72,9 +73,17 @@ public class ComputerInvocationHandler implements InvocationHandler {
             case "toString":
                 return computer.toString();
 
+            case "hashCode":
+                return Objects.hash(id);
+
+            case "equals": {
+                return args[0] instanceof Computation && Objects.equals(id, ((Computation) args[0]).getId());
+            }
+
             default: return null;
         }
 
         return null;
     }
+
 }

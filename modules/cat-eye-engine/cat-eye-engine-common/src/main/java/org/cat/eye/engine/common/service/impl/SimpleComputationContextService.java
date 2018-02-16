@@ -11,7 +11,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.stream.Collectors;
 
 /**
  * Created by Kotov on 10.11.2017.
@@ -65,7 +64,18 @@ public class SimpleComputationContextService implements ComputationContextServic
 
     @Override
     public void putReadyComputationToQueue(Computation computation) {
-        executionQueue.add(computation);
+
+        lock.lock();
+
+        try {
+            if (!executionQueue.contains(computation)) {
+                executionQueue.add(computation);
+            } else {
+                LOGGER.info("++++++++ It's double computation +++++++");
+            }
+        } finally {
+            lock.unlock();
+        }
     }
 
     @Override
