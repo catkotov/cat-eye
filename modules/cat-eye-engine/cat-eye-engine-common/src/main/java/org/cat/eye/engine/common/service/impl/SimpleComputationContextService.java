@@ -19,7 +19,9 @@ public class SimpleComputationContextService implements ComputationContextServic
 
     private final static Logger LOGGER = LoggerFactory.getLogger(SimpleComputationContextService.class);
 
-    private Lock lock = new ReentrantLock();
+    private Lock getLock = new ReentrantLock();
+
+    private Lock putLock = new ReentrantLock();
 
     private Map<UUID, Computation> computationStore = new ConcurrentHashMap<>();
 
@@ -34,7 +36,7 @@ public class SimpleComputationContextService implements ComputationContextServic
 
         if (executionQueue.size() != 0) {
 
-            lock.lock();
+            getLock.lock();
 
             result = new ArrayList<>();
             try {
@@ -50,7 +52,7 @@ public class SimpleComputationContextService implements ComputationContextServic
                     result.add(executionQueue.poll());
                 }
             } finally {
-                lock.unlock();
+                getLock.unlock();
             }
         }
 
@@ -65,7 +67,7 @@ public class SimpleComputationContextService implements ComputationContextServic
     @Override
     public void putReadyComputationToQueue(Computation computation) {
 
-        lock.lock();
+        putLock.lock();
 
         try {
             if (!executionQueue.contains(computation)) {
@@ -74,7 +76,7 @@ public class SimpleComputationContextService implements ComputationContextServic
                 LOGGER.info("++++++++ It's double computation +++++++");
             }
         } finally {
-            lock.unlock();
+            putLock.unlock();
         }
     }
 
