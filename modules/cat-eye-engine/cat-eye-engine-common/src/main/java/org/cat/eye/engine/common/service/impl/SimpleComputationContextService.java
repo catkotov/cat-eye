@@ -72,8 +72,6 @@ public class SimpleComputationContextService implements ComputationContextServic
         try {
             if (!executionQueue.contains(computation)) {
                 executionQueue.add(computation);
-            } else {
-                LOGGER.info("++++++++ It's double computation +++++++");
             }
         } finally {
             putLock.unlock();
