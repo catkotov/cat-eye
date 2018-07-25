@@ -1,5 +1,7 @@
 package org.cat.eye.engine.container.unit;
 
+import akka.actor.ActorSystem;
+import akka.actor.dsl.Creators;
 import org.cat.eye.engine.common.deployment.BundleDeployer;
 import org.cat.eye.engine.common.deployment.management.BundleManager;
 import org.cat.eye.engine.common.deployment.management.BundleManagerImpl;
@@ -42,4 +44,10 @@ public class CatEyeContainerUnitConfig {
     ComputationContextService getComputationContextService() {
         return new SimpleComputationContextService();
     }
+
+    @Bean
+    ActorSystem getActorSystem() {
+        return ActorSystem.create();
+    }
+
 }
