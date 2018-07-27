@@ -7,9 +7,9 @@ import akka.actor.Props;
 import org.springframework.context.ApplicationContext;
 
 
-public class AkkaForSpringExtention extends AbstractExtensionId<AkkaForSpringExtention.AkkaExt> {
+public class SpringExtention extends AbstractExtensionId<SpringExtention.AkkaExt> {
 
-    public static AkkaForSpringExtention INSTANCE = new AkkaForSpringExtention();
+    public static SpringExtention SPRING_EXTENTION_PROVIDER = new SpringExtention();
 
     @Override
     public AkkaExt createExtension(ExtendedActorSystem system) {
