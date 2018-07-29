@@ -1,5 +1,8 @@
 package org.cat.eye.engine.common.crusher;
 
+import akka.actor.ActorRef;
+import akka.pattern.Patterns;
+import akka.util.Timeout;
 import org.cat.eye.engine.common.CatEyeContainerTaskCapacity;
 import org.cat.eye.engine.common.crusher.computation.ComputationFactory;
 import org.cat.eye.engine.common.deployment.management.Bundle;
@@ -7,11 +10,17 @@ import org.cat.eye.engine.common.model.Computation;
 import org.cat.eye.engine.common.model.ComputationState;
 import org.cat.eye.engine.common.model.MethodSpecification;
 import org.cat.eye.engine.common.service.ComputationContextService;
+import org.cat.eye.engine.common.service.impl.ComputationsQueueActor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import scala.concurrent.Await;
+import scala.concurrent.Future;
+import scala.concurrent.duration.FiniteDuration;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Parameter;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -29,14 +38,18 @@ public class ComputationExecutionTask implements Runnable {
 
     private final CatEyeContainerTaskCapacity containerTaskCapacity;
 
+    private final ActorRef queueActor;
+
     public ComputationExecutionTask(Computation computation,
                                     Bundle bundle,
                                     ComputationContextService computationContextService,
-                                    CatEyeContainerTaskCapacity containerTaskCapacity) {
+                                    CatEyeContainerTaskCapacity containerTaskCapacity,
+                                    ActorRef queueActor) {
         this.computation = computation;
         this.bundle = bundle;
         this.computationContextService = computationContextService;
         this.containerTaskCapacity = containerTaskCapacity;
+        this.queueActor = queueActor;
     }
 
     @Override
@@ -119,7 +132,14 @@ public class ComputationExecutionTask implements Runnable {
                 // update current computation state
                 computationContextService.storeComputation(computation);
                 // put new computations to queue
-                computationContextService.putCreatedComputationsToQueue(childComputations);
+                ComputationsQueueActor.CreatedComputations createdComputations = new ComputationsQueueActor.CreatedComputations(childComputations);
+                FiniteDuration duration = FiniteDuration.create(1, TimeUnit.SECONDS);
+                Timeout timeout = Timeout.durationToTimeout(duration);
+                Future<Object> result = Patterns.ask(queueActor, createdComputations, timeout);
+
+//                Await.result(result, duration);
+
+//                computationContextService.putCreatedComputationsToQueue(childComputations);
                 // set number of next step
                 computation.setNextStep(computation.getNextStep() + 1);
             } else {
@@ -149,7 +169,13 @@ public class ComputationExecutionTask implements Runnable {
                 if (parentComputation.isChildrenCompleted() && parentComputation.getState() == ComputationState.WAITING) {
                     parentComputation.setState(ComputationState.READY);
                     computationContextService.storeComputation(parentComputation);
-                    computationContextService.putReadyComputationToQueue(parentComputation);
+
+                    ComputationsQueueActor.ReadyComputation readyComputation = new ComputationsQueueActor.ReadyComputation(parentComputation);
+                    FiniteDuration duration = FiniteDuration.create(1, TimeUnit.SECONDS);
+                    Timeout timeout = Timeout.durationToTimeout(duration);
+                    Future<Object> result = Patterns.ask(queueActor, readyComputation, timeout);
+
+//                    computationContextService.putReadyComputationToQueue(parentComputation);
                 }
             }
         }

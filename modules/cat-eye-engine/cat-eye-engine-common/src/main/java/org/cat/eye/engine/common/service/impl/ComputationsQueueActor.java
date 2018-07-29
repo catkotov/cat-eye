@@ -3,16 +3,21 @@ package org.cat.eye.engine.common.service.impl;
 import akka.actor.AbstractActor;
 import org.cat.eye.engine.common.model.Computation;
 import org.cat.eye.engine.common.service.ComputationContextService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
 import java.util.List;
 
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class ComputationsQueueActor extends AbstractActor {
 
+    @Autowired
     private ComputationContextService contextService;
 
     @Override
@@ -24,9 +29,11 @@ public class ComputationsQueueActor extends AbstractActor {
                         contextService.putCreatedComputationsToQueue(createdComputations.getComputations()))
                 .match(TakeComputations.class, takeComputations -> {
                     List<Computation> computations = contextService.takeComputationsForExecution(takeComputations.getLimit());
-                    getSender().tell(null, getSelf());
-                })
-                .build();
+                    if (computations == null) {
+                        computations = Collections.emptyList();
+                    }
+                    getSender().tell(computations, getSelf());
+                }).build();
     }
 
     public static class ReadyComputation {

@@ -201,7 +201,7 @@ public class CatEyeContainerImpl implements CatEyeContainer {
         if (computations != null && !computations.isEmpty()) {
             computations.forEach(c -> {
                 ComputationExecutionTask task =
-                        new ComputationExecutionTask(c, bundleManager.getBundle(c.getDomain()), computationContextService, containerTaskCapacity);
+                        new ComputationExecutionTask(c, bundleManager.getBundle(c.getDomain()), computationContextService, containerTaskCapacity, null);
                 computationExecutorService.submit(task);
             });
         }

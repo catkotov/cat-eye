@@ -25,6 +25,24 @@
             </dependency>
 
             <dependency>
+                <groupId>org.cat.eye.common</groupId>
+                <artifactId>cat-eye-common-util</artifactId>
+                <version>${cat.eye.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.cat.eye.engine</groupId>
+                <artifactId>cat-eye-engine-common</artifactId>
+                <version>${cat.eye.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.cat.eye.engine</groupId>
+                <artifactId>cat-eye-engine-model</artifactId>
+                <version>${cat.eye.version}</version>
+            </dependency>
+
+            <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-context</artifactId>
                 <version>${spring.version}</version>

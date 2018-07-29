@@ -4,6 +4,9 @@ import org.cat.eye.engine.common.model.Computation;
 import org.cat.eye.engine.common.service.ComputationContextService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Parameter;
 import java.util.*;
@@ -15,6 +18,8 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * Created by Kotov on 10.11.2017.
  */
+//@Component
+//@Scope(ConfigurableBeanFactory.SCOPE_SINGLETON)
 public class SimpleComputationContextService implements ComputationContextService {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(SimpleComputationContextService.class);
