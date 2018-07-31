@@ -23,11 +23,13 @@ public class ComputationsQueueActor extends AbstractActor {
     @Override
     public Receive createReceive() {
         return receiveBuilder()
-                .match(ReadyComputation.class, readyComputation ->
-                        contextService.putReadyComputationToQueue(readyComputation.getComputation()))
-                .match(CreatedComputations.class, createdComputations ->
-                        contextService.putCreatedComputationsToQueue(createdComputations.getComputations()))
-                .match(TakeComputations.class, takeComputations -> {
+                .match(ReadyComputation.class, readyComputation -> {
+                        contextService.putReadyComputationToQueue(readyComputation.getComputation());
+                        getSender().tell(Boolean.TRUE, getSelf());
+                }).match(CreatedComputations.class, createdComputations -> {
+                        contextService.putCreatedComputationsToQueue(createdComputations.getComputations());
+                        getSender().tell(Boolean.TRUE, getSelf());
+                }).match(TakeComputations.class, takeComputations -> {
                     List<Computation> computations = contextService.takeComputationsForExecution(takeComputations.getLimit());
                     if (computations == null) {
                         computations = Collections.emptyList();

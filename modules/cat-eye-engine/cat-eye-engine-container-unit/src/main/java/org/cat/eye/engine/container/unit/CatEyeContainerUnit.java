@@ -2,7 +2,8 @@ package org.cat.eye.engine.container.unit;
 
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
-import akka.pattern.Patterns;
+//import akka.pattern.Patterns;
+import akka.pattern.PatternsCS;
 import akka.util.Timeout;
 import org.cat.eye.common.context.akka.SpringExtention;
 import org.cat.eye.engine.common.CatEyeContainer;
@@ -16,16 +17,14 @@ import org.cat.eye.engine.common.service.impl.ComputationsQueueActor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.concurrent.CustomizableThreadFactory;
-import scala.concurrent.Await;
+//import scala.concurrent.Await;
 import scala.concurrent.duration.FiniteDuration;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import scala.concurrent.Future;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
+//import scala.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -34,7 +33,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class CatEyeContainerUnit implements CatEyeContainer {
 
-    public static final Logger LOGGER = LoggerFactory.getLogger(CatEyeContainerUnit.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CatEyeContainerUnit.class);
 
     // container name
     private String name;
@@ -87,8 +86,11 @@ public class CatEyeContainerUnit implements CatEyeContainer {
     }
 
     public void initialize() throws Exception {
-        computationQueue =
-                actorSystem.actorOf(SpringExtention.SPRING_EXTENTION_PROVIDER.get(actorSystem).props("computationsQueueActor"), "computationQueue");
+
+        computationQueue = actorSystem.actorOf(
+                SpringExtention.SPRING_EXTENTION_PROVIDER.get(actorSystem).props("computationsQueueActor"),
+                "computationQueue"
+        );
 
         // deploy bundle
         bundleDeployer.deploy(pathToClasses, bundleDomain);
@@ -166,12 +168,20 @@ public class CatEyeContainerUnit implements CatEyeContainer {
         FiniteDuration duration = FiniteDuration.create(1, TimeUnit.SECONDS);
         Timeout timeout = Timeout.durationToTimeout(duration);
 
-        Future<Object> result = Patterns.ask(computationQueue, takeComputations, timeout);
+//        Future<Object> result = Patterns.ask(computationQueue, takeComputations, timeout);
+
+//        List<Computation> computations;// = null;
+//        try {
+//            computations[0] = (List<Computation>) Await.result(result, duration);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
 
         List<Computation> computations = null;
         try {
-            computations = (List<Computation>) Await.result(result, duration);
-        } catch (Exception e) {
+            computations = (List<Computation>)
+                    PatternsCS.ask(computationQueue, takeComputations, timeout).toCompletableFuture().get();
+        } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
 
@@ -179,11 +189,11 @@ public class CatEyeContainerUnit implements CatEyeContainer {
         // for every computation create and submit execution task
         if (computations != null && !computations.isEmpty()) {
 
-            List<java.util.concurrent.Future<?>> taskList = new ArrayList<>();
+            List<Future<?>> taskList = new ArrayList<>();
             computations.forEach(c -> {
                 ActorRef taskComputationQueue =
                         actorSystem.actorOf(SpringExtention.SPRING_EXTENTION_PROVIDER
-                                .get(actorSystem).props("computationsQueueActor"), UUID.randomUUID().toString());
+                                .get(actorSystem).props("computationsQueueActor"), "computations-actor-" + UUID.randomUUID());
                 ComputationExecutionTask task =
                         new ComputationExecutionTask(c,
                                 bundleManager.getBundle(c.getDomain()),
@@ -191,7 +201,7 @@ public class CatEyeContainerUnit implements CatEyeContainer {
                 taskList.add(computationExecutorService.submit(task));
             });
 
-            while(taskList.size() != taskList.stream().filter(java.util.concurrent.Future::isDone).count()) {
+            while(taskList.size() != taskList.stream().filter(Future::isDone).count()) {
                 try {
                     Thread.sleep(computationThreadSleepTime);
                 } catch (InterruptedException e) {
