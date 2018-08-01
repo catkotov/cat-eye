@@ -1,5 +1,6 @@
 package org.cat.eye.engine.container.unit;
 
+import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import org.cat.eye.common.context.akka.SpringExtention;
 import org.cat.eye.engine.common.deployment.BundleDeployer;
@@ -8,21 +9,23 @@ import org.cat.eye.engine.common.deployment.management.BundleManagerImpl;
 import org.cat.eye.engine.common.service.ComputationContextService;
 import org.cat.eye.engine.common.service.impl.SimpleComputationContextService;
 import org.cat.eye.engine.container.unit.deployment.UnitBundleDeployerImpl;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Scope;
 
 /**
  * Created by Kotov on 29.12.2017.
  */
 @Configuration
 @ComponentScan(basePackages = {"org.cat.eye.engine.common.service"})
-public class CatEyeContainerUnitConfig {
+public class CatEyeContainerUnitConfig implements ApplicationContextAware {
 
-    @Autowired
-    ApplicationContext applicationContext;
+    private ApplicationContext applicationContext;
 
     @Bean
     CatEyeContainerUnit getCatEyeContainerUnit() {
@@ -32,6 +35,7 @@ public class CatEyeContainerUnitConfig {
         container.setBundleDeployer(getBundleDeployer());
         container.setComputationContextService(getComputationContextService());
         container.setActorSystem(getActorSystem());
+        container.setComputationQueue(getComputationQueue());
 
         return container;
     }
@@ -60,4 +64,16 @@ public class CatEyeContainerUnitConfig {
         return system;
     }
 
+    @Bean
+    @Scope(ConfigurableBeanFactory.SCOPE_SINGLETON)
+    ActorRef getComputationQueue() {
+        return getActorSystem().actorOf(
+                SpringExtention.SPRING_EXTENTION_PROVIDER.get(getActorSystem()).props("computationsQueueActor"),
+                "computationQueue");
+    }
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
+    }
 }

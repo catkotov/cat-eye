@@ -2,10 +2,8 @@ package org.cat.eye.engine.container.unit;
 
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
-//import akka.pattern.Patterns;
 import akka.pattern.PatternsCS;
 import akka.util.Timeout;
-import org.cat.eye.common.context.akka.SpringExtention;
 import org.cat.eye.engine.common.CatEyeContainer;
 import org.cat.eye.engine.common.CatEyeContainerTaskCapacity;
 import org.cat.eye.engine.common.crusher.ComputationExecutionTask;
@@ -17,14 +15,10 @@ import org.cat.eye.engine.common.service.impl.ComputationsQueueActor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.concurrent.CustomizableThreadFactory;
-//import scala.concurrent.Await;
 import scala.concurrent.duration.FiniteDuration;
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.*;
-//import scala.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -71,7 +65,7 @@ public class CatEyeContainerUnit implements CatEyeContainer {
         return name;
     }
 
-    public void setName(String name) {
+    void setName(String name) {
         this.name = name;
     }
 
@@ -86,12 +80,6 @@ public class CatEyeContainerUnit implements CatEyeContainer {
     }
 
     public void initialize() throws Exception {
-
-        computationQueue = actorSystem.actorOf(
-                SpringExtention.SPRING_EXTENTION_PROVIDER.get(actorSystem).props("computationsQueueActor"),
-                "computationQueue"
-        );
-
         // deploy bundle
         bundleDeployer.deploy(pathToClasses, bundleDomain);
         // start computation work flow
@@ -157,47 +145,40 @@ public class CatEyeContainerUnit implements CatEyeContainer {
             }
         }
         LOGGER.info("computeLoop - finish the compute loop.");
+
+        actorSystem.terminate();
+        actorSystem.getWhenTerminated().toCompletableFuture().join();
+
+        LOGGER.info("computeLoop - Actor System was terminated.");
     }
 
+    @SuppressWarnings("unchecked")
     private boolean createComputationExecutionTask() {
 
         int limit = containerTaskCapacity.getRemaining();
         // get computation list by service
-
         ComputationsQueueActor.TakeComputations takeComputations = new ComputationsQueueActor.TakeComputations(limit);
         FiniteDuration duration = FiniteDuration.create(1, TimeUnit.SECONDS);
         Timeout timeout = Timeout.durationToTimeout(duration);
-
-//        Future<Object> result = Patterns.ask(computationQueue, takeComputations, timeout);
-
-//        List<Computation> computations;// = null;
-//        try {
-//            computations[0] = (List<Computation>) Await.result(result, duration);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
 
         List<Computation> computations = null;
         try {
             computations = (List<Computation>)
                     PatternsCS.ask(computationQueue, takeComputations, timeout).toCompletableFuture().get();
         } catch (InterruptedException | ExecutionException e) {
+            // TODO
             e.printStackTrace();
         }
 
-//        List<Computation> computations = computationContextService.takeComputationsForExecution(limit);
         // for every computation create and submit execution task
         if (computations != null && !computations.isEmpty()) {
 
             List<Future<?>> taskList = new ArrayList<>();
             computations.forEach(c -> {
-                ActorRef taskComputationQueue =
-                        actorSystem.actorOf(SpringExtention.SPRING_EXTENTION_PROVIDER
-                                .get(actorSystem).props("computationsQueueActor"), "computations-actor-" + UUID.randomUUID());
                 ComputationExecutionTask task =
                         new ComputationExecutionTask(c,
                                 bundleManager.getBundle(c.getDomain()),
-                                computationContextService, containerTaskCapacity, taskComputationQueue);
+                                computationContextService, containerTaskCapacity, computationQueue);
                 taskList.add(computationExecutorService.submit(task));
             });
 
@@ -242,5 +223,13 @@ public class CatEyeContainerUnit implements CatEyeContainer {
 
     public void setActorSystem(ActorSystem actorSystem) {
         this.actorSystem = actorSystem;
+    }
+
+    public void setComputationQueue(ActorRef computationQueue) {
+        this.computationQueue = computationQueue;
+    }
+
+    public ActorRef getComputationQueue() {
+        return this.computationQueue;
     }
 }
