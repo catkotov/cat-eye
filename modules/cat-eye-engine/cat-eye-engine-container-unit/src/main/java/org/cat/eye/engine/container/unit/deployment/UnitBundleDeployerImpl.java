@@ -1,6 +1,5 @@
 package org.cat.eye.engine.container.unit.deployment;
 
-import org.cat.eye.engine.common.deployment.BundleClassLoader;
 import org.cat.eye.engine.common.deployment.BundleDeployer;
 import org.cat.eye.engine.common.deployment.management.BundleManager;
 import org.slf4j.Logger;
