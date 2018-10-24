@@ -22,6 +22,7 @@ import org.springframework.scheduling.concurrent.CustomizableThreadFactory;
 import javax.annotation.PostConstruct;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ExecutorService;
@@ -196,7 +197,7 @@ public class CatEyeContainerImpl implements CatEyeContainer {
 
         int limit = containerTaskCapacity.getRemaining();
         // get computation list by service
-        List<Computation> computations = computationContextService.takeComputationsForExecution(limit);
+        List<Computation> computations = Collections.emptyList(); //computationContextService.takeComputationsForExecution(limit);
         // for every computation create and submit execution task
         if (computations != null && !computations.isEmpty()) {
             computations.forEach(c -> {

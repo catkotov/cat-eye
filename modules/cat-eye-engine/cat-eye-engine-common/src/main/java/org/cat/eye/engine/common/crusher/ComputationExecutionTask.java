@@ -1,7 +1,6 @@
 package org.cat.eye.engine.common.crusher;
 
 import akka.actor.ActorRef;
-import akka.pattern.Patterns;
 import akka.pattern.PatternsCS;
 import akka.util.Timeout;
 import org.cat.eye.engine.common.CatEyeContainerTaskCapacity;
@@ -14,7 +13,6 @@ import org.cat.eye.engine.common.service.ComputationContextService;
 import org.cat.eye.engine.common.service.impl.ComputationsQueueActor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import scala.concurrent.Future;
 import scala.concurrent.duration.FiniteDuration;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Parameter;
@@ -38,6 +36,9 @@ public class ComputationExecutionTask implements Runnable {
     private final CatEyeContainerTaskCapacity containerTaskCapacity;
 
     private final ActorRef queueActor;
+
+    private FiniteDuration duration = FiniteDuration.create(1, TimeUnit.SECONDS);
+    private Timeout timeout = Timeout.durationToTimeout(duration);
 
     public ComputationExecutionTask(Computation computation,
                                     Bundle bundle,
@@ -132,16 +133,8 @@ public class ComputationExecutionTask implements Runnable {
                 computationContextService.storeComputation(computation);
                 // put new computations to queue
                 ComputationsQueueActor.CreatedComputations createdComputations = new ComputationsQueueActor.CreatedComputations(childComputations);
-                FiniteDuration duration = FiniteDuration.create(1, TimeUnit.SECONDS);
-                Timeout timeout = Timeout.durationToTimeout(duration);
-//                Future<Object> result = Patterns.ask(queueActor, createdComputations, timeout);
-                PatternsCS.ask(queueActor, createdComputations, timeout);
+                PatternsCS.ask(queueActor, createdComputations, timeout).toCompletableFuture().join();
 
-
-
-//                Await.result(result, duration);
-
-//                computationContextService.putCreatedComputationsToQueue(childComputations);
                 // set number of next step
                 computation.setNextStep(computation.getNextStep() + 1);
             } else {
@@ -171,13 +164,9 @@ public class ComputationExecutionTask implements Runnable {
                 if (parentComputation.isChildrenCompleted() && parentComputation.getState() == ComputationState.WAITING) {
                     parentComputation.setState(ComputationState.READY);
                     computationContextService.storeComputation(parentComputation);
-
+                    // put ready computation to queue
                     ComputationsQueueActor.ReadyComputation readyComputation = new ComputationsQueueActor.ReadyComputation(parentComputation);
-                    FiniteDuration duration = FiniteDuration.create(1, TimeUnit.SECONDS);
-                    Timeout timeout = Timeout.durationToTimeout(duration);
-//                    Future<Object> result = Patterns.ask(queueActor, readyComputation, timeout);
-                    PatternsCS.ask(queueActor, readyComputation, timeout);
-//                    computationContextService.putReadyComputationToQueue(parentComputation);
+                    PatternsCS.ask(queueActor, readyComputation, timeout).toCompletableFuture().join();
                 }
             }
         }

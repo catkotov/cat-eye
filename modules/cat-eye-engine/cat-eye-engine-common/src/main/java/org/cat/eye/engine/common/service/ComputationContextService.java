@@ -7,12 +7,6 @@ import java.util.UUID;
 
 public interface ComputationContextService {
 
-    List<Computation> takeComputationsForExecution(int limit);
-
-    void putCreatedComputationsToQueue(List<Computation> computations);
-
-    void putReadyComputationToQueue(Computation computation);
-
     void storeComputations(List<Computation> computations);
 
     void storeComputation(Computation computation);
