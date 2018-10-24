@@ -29,7 +29,7 @@ public class OtherFileCounterComputerTest {
     @Test
     public void fileCounterTest() throws Exception {
 
-        containerUnit.setPathToClasses("D:\\Sand-box\\cat-eye\\modules\\cat-eye-test-bundle\\cat-eye-test-bungle-simple\\target\\classes");
+        containerUnit.setPathToClasses("E:\\Projects\\cat-eye\\cat-eye\\modules\\cat-eye-test-bundle\\cat-eye-test-bungle-simple\\target\\classes");
         containerUnit.setBundleDomain("TEST_DOMAIN");
         ActorRef contextService = containerUnit.getComputationQueue();
 
