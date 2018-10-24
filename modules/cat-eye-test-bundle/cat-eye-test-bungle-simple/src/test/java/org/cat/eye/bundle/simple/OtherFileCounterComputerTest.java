@@ -20,11 +20,11 @@ public class OtherFileCounterComputerTest {
     @Test
     public void fileCounterTest() throws Exception {
 
-        containerUnit.setPathToClasses("D:\\Sand-box\\cat-eye\\modules\\cat-eye-test-bundle\\cat-eye-test-bungle-simple\\target\\classes");
+        containerUnit.setPathToClasses("E:\\Projects\\cat-eye\\cat-eye\\modules\\cat-eye-test-bundle\\cat-eye-test-bungle-simple\\target\\classes");
         containerUnit.setBundleDomain("TEST_DOMAIN");
         ComputationContextService contextService = containerUnit.getComputationContextService();
 
-        contextService.putReadyComputationToQueue(ComputationFactory.create(new StartFileCounterComputer("C:\\Java"), UUID.randomUUID(), "TEST_DOMAIN"));
+        contextService.putReadyComputationToQueue(ComputationFactory.create(new StartFileCounterComputer("E:\\"), UUID.randomUUID(), "TEST_DOMAIN"));
         containerUnit.initialize();
     }
 }
