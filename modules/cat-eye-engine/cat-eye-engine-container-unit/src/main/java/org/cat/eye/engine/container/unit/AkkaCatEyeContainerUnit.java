@@ -1,7 +1,7 @@
 package org.cat.eye.engine.container.unit;
 
+import akka.actor.ActorSystem;
 import org.cat.eye.engine.common.deployment.BundleDeployer;
-import org.cat.eye.engine.common.deployment.management.BundleManager;
 import org.cat.eye.engine.common.deployment.management.BundleManagerImpl;
 import org.cat.eye.engine.container.unit.deployment.UnitBundleDeployerImpl;
 
@@ -10,6 +10,7 @@ import org.cat.eye.engine.container.unit.deployment.UnitBundleDeployerImpl;
  */
 public class AkkaCatEyeContainerUnit {
 
+    private ActorSystem actorSystem = ActorSystem.create("cat-eye-container-unit-actor-system");
     private BundleDeployer bundleDeployer;
 
     private String pathToClasses;
