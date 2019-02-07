@@ -3,6 +3,8 @@ package org.cat.eye.common.util.file;
 import org.junit.Test;
 
 import java.util.List;
+import java.util.Objects;
+
 import static org.junit.Assert.*;
 
 public class JarFileUtilTest {
@@ -13,7 +15,7 @@ public class JarFileUtilTest {
     @Test
     public void getClassesNamesFromJarTest() throws Exception {
 
-        String fullPath = Thread.currentThread().getContextClassLoader().getResource("").getPath();
+        String fullPath = Objects.requireNonNull(Thread.currentThread().getContextClassLoader().getResource("")).getPath();
         List<String> classLst = ClassFileUtil.getClassesNamesFromJar(fullPath + "cat-eye-test-bungle-simple-0.1-SNAPSHOT-simple.jar");
         assertNotNull(classLst);
     }
@@ -21,7 +23,7 @@ public class JarFileUtilTest {
     @Test
     public void getClassesNamesFromClassPathTest() throws Exception {
 
-        String fullPath = Thread.currentThread().getContextClassLoader().getResource("").getPath();
+        String fullPath = Objects.requireNonNull(Thread.currentThread().getContextClassLoader().getResource("")).getPath();
         List<String> classLst = ClassFileUtil.getClassNamesFromPath(CLASS_PATH);
         assertNotNull(classLst);
     }
