@@ -2,6 +2,8 @@ package org.cat.eye.engine.container.unit.actors;
 
 import akka.actor.AbstractActor;
 import akka.actor.ActorRef;
+import akka.actor.Props;
+import akka.routing.SmallestMailboxPool;
 import org.cat.eye.engine.common.model.Computation;
 
 import java.util.List;
@@ -15,7 +17,7 @@ public class ComputationDispatcherUnit extends AbstractActor {
 
         private final List<Computation> computations;
 
-        public RunnableComputations(List<Computation> computations) {
+        RunnableComputations(List<Computation> computations) {
             this.computations = computations;
         }
 
@@ -25,6 +27,9 @@ public class ComputationDispatcherUnit extends AbstractActor {
     }
 
     private ActorRef driver;
+
+    ActorRef router = getContext().actorOf(
+            new SmallestMailboxPool(8).props(Props.create(ComputationEngineUnit.class, driver, getSelf())));
 
     public ComputationDispatcherUnit(ActorRef driver) {
         this.driver = driver;

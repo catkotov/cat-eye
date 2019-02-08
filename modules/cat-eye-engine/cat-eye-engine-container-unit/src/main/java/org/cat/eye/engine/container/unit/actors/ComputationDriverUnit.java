@@ -1,7 +1,12 @@
 package org.cat.eye.engine.container.unit.actors;
 
 import akka.actor.AbstractActor;
+import akka.actor.ActorRef;
+import akka.actor.Props;
 import org.cat.eye.engine.common.model.Computation;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Kotov on 08.02.2019.
@@ -16,7 +21,7 @@ public class ComputationDriverUnit extends AbstractActor {
             this.computation = computation;
         }
 
-        public Computation getComputation() {
+        Computation getComputation() {
             return this.computation;
         }
     }
@@ -34,11 +39,15 @@ public class ComputationDriverUnit extends AbstractActor {
         }
     }
 
+    private ActorRef dispatcher = getContext().actorOf(Props.create(ComputationDriverUnit.class, getSelf()));
+
     @Override
     public Receive createReceive() {
         return receiveBuilder()
                 .match(NewComputation.class, newComputation -> {
-
+                    List<Computation> computations = new ArrayList<>(1);
+                    computations.add(newComputation.getComputation());
+                    dispatcher.tell(new ComputationDispatcherUnit.RunnableComputations(computations), getSelf());
                 })
                 .match(CompletedComputation.class, completedComputation -> {
 
