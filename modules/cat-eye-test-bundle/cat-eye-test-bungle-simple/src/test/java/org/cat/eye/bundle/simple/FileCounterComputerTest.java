@@ -21,7 +21,7 @@ import java.util.UUID;
  */
 @ContextConfiguration(classes = CatEyeContainerUnitConfig.class)
 @RunWith(SpringJUnit4ClassRunner.class)
-public class OtherFileCounterComputerTest {
+public class FileCounterComputerTest {
 
     @Autowired
     private CatEyeContainerUnit containerUnit;

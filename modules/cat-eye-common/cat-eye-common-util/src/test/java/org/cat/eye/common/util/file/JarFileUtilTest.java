@@ -9,11 +9,11 @@ import static org.junit.Assert.*;
 
 public class JarFileUtilTest {
 
-    public static final String CLASS_PATH =
-            "E:\\Projects\\cat-eye\\cat-eye\\modules\\cat-eye-engine\\cat-eye-engine-container\\target\\test-classes";
+//    public static final String CLASS_PATH =
+//            "E:\\Projects\\cat-eye\\cat-eye\\modules\\cat-eye-engine\\cat-eye-engine-container\\target\\test-classes";
 
     @Test
-    public void getClassesNamesFromJarTest() throws Exception {
+    public void getClassesNamesFromJarTest() {
 
         String fullPath = Objects.requireNonNull(Thread.currentThread().getContextClassLoader().getResource("")).getPath();
         List<String> classLst = ClassFileUtil.getClassesNamesFromJar(fullPath + "cat-eye-test-bungle-simple-0.1-SNAPSHOT-simple.jar");
@@ -21,10 +21,10 @@ public class JarFileUtilTest {
     }
 
     @Test
-    public void getClassesNamesFromClassPathTest() throws Exception {
+    public void getClassesNamesFromClassPathTest() {
 
         String fullPath = Objects.requireNonNull(Thread.currentThread().getContextClassLoader().getResource("")).getPath();
-        List<String> classLst = ClassFileUtil.getClassNamesFromPath(CLASS_PATH);
+        List<String> classLst = ClassFileUtil.getClassNamesFromPath(fullPath);
         assertNotNull(classLst);
     }
 }

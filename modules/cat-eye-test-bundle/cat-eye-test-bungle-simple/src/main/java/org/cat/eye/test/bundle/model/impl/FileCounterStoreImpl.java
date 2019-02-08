@@ -20,7 +20,7 @@ public class FileCounterStoreImpl implements FileCounterStore {
     }
 
     @Override
-    public Set<String> getDirecotoryNames() {
+    public Set<String> getDirectoryNames() {
         return store.keySet();
     }
 

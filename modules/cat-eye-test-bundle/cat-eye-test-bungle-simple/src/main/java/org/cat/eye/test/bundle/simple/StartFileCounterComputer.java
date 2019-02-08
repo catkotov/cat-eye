@@ -44,9 +44,9 @@ public class StartFileCounterComputer {
     public List getNumberFilesInDirectory(@Out FileCounterStoreImpl store) {
 
         if (store != null) {
-            Set<String> dirSet = store.getDirecotoryNames();
+            Set<String> dirSet = store.getDirectoryNames();
             if (dirSet != null && !dirSet.isEmpty()) {
-                dirSet.stream().forEach(dir -> {
+                dirSet.forEach(dir -> {
                     long fileNumber = store.getFileNumber(dir);
                     filesTotalNumber += fileNumber;
                     LOGGER.info("getNumberFilesInDirectory - STEP-2: Directory [{}] contains [{}] files", dir, fileNumber);

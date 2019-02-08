@@ -8,5 +8,5 @@ public interface FileCounterStore {
 
     void putFileNumber(String directoryName, long fileNumber);
 
-    Set<String> getDirecotoryNames();
+    Set<String> getDirectoryNames();
 }
