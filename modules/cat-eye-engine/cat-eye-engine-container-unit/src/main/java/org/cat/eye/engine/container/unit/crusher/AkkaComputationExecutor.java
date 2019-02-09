@@ -7,6 +7,7 @@ import org.cat.eye.engine.common.model.Computation;
 import org.cat.eye.engine.common.model.ComputationState;
 import org.cat.eye.engine.common.model.MethodSpecification;
 import org.cat.eye.engine.common.service.ComputationContextService;
+import org.cat.eye.engine.container.unit.actors.ComputationDispatcherUnit;
 import org.cat.eye.engine.container.unit.actors.ComputationDriverUnit;
 import org.cat.eye.engine.container.unit.actors.ComputationEngineUnit;
 import org.slf4j.Logger;
@@ -130,7 +131,7 @@ public class AkkaComputationExecutor {
                 computationContextService.storeComputation(computation);
                 // put new computations to queue
                 childComputations.forEach(c ->
-                        dispatcher.tell(new ComputationEngineUnit.RunningComputation(computation), engine));
+                        dispatcher.tell(new ComputationDispatcherUnit.RunnableComputation(computation), engine));
             } else {
                 // set computation status
                 computation.setState(ComputationState.READY);
@@ -163,7 +164,7 @@ public class AkkaComputationExecutor {
                         parentComputation.setState(ComputationState.READY);
                         computationContextService.storeComputation(parentComputation);
                         // put ready computation to queue
-                        dispatcher.tell(new ComputationEngineUnit.RunningComputation(parentComputation), engine);
+                        dispatcher.tell(new ComputationDispatcherUnit.RunnableComputation(parentComputation), engine);
                     }
                 }
             } else {
