@@ -34,7 +34,7 @@ public class FileCounterComputerTest {
         ActorRef contextService = containerUnit.getComputationQueue();
 
         Computation computation =
-                ComputationFactory.create(new StartFileCounterComputer("C:\\Java"), UUID.randomUUID(), "TEST_DOMAIN");
+                ComputationFactory.create(new StartFileCounterComputer("C:\\Java"), null, "TEST_DOMAIN");
 
         ComputationsQueueActor.ReadyComputation readyComputation = new ComputationsQueueActor.ReadyComputation(computation);
 

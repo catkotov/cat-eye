@@ -6,5 +6,6 @@ public enum ComputationState {
     READY,
     COMPLETED,
     CANCELED,
-    FAILED
+    FAILED,
+    RUNNING
 }

@@ -16,4 +16,8 @@ public interface ComputationContextService {
     Object getArgument(Parameter parameter, String domain);
 
     void storeArguments(Object[] args, String domain);
+
+    default void putRunningComputation(Computation computation) {}
+
+    default void removeRunningComputation(Computation computation) {}
 }

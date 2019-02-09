@@ -4,42 +4,54 @@ import akka.actor.AbstractActor;
 import akka.actor.ActorRef;
 import akka.actor.Props;
 import akka.routing.SmallestMailboxPool;
+import org.cat.eye.engine.common.deployment.management.Bundle;
 import org.cat.eye.engine.common.model.Computation;
-
-import java.util.List;
+import org.cat.eye.engine.common.model.ComputationState;
+import org.cat.eye.engine.common.service.ComputationContextService;
 
 /**
  * Created by Kotov on 08.02.2019.
  */
 public class ComputationDispatcherUnit extends AbstractActor {
 
-    public static class RunnableComputations {
+    public static class RunnableComputation {
 
-        private final List<Computation> computations;
+        private final Computation computation;
 
-        RunnableComputations(List<Computation> computations) {
-            this.computations = computations;
+        public RunnableComputation(Computation computations) {
+            this.computation = computations;
         }
 
-        public List<Computation> getComputations() {
-            return this.computations;
+        public Computation getComputation() {
+            return this.computation;
         }
     }
 
     private ActorRef driver;
 
-    ActorRef router = getContext().actorOf(
-            new SmallestMailboxPool(8).props(Props.create(ComputationEngineUnit.class, driver, getSelf())));
+    private ComputationContextService computationContextService;
 
-    public ComputationDispatcherUnit(ActorRef driver) {
+    private Bundle bundle;
+
+    private ActorRef router = getContext().actorOf(
+            new SmallestMailboxPool(8).props(
+                    Props.create(ComputationEngineUnit.class, driver, getSelf(), computationContextService, bundle)));
+
+    public ComputationDispatcherUnit(ActorRef driver, ComputationContextService computationContextService, Bundle bundle) {
         this.driver = driver;
+        this.computationContextService = computationContextService;
+        this.bundle = bundle;
     }
 
     @Override
     public Receive createReceive() {
         return receiveBuilder()
-                .match(RunnableComputations.class, runnableComputations -> {
-
+                .match(RunnableComputation.class, runnableComputation -> {
+                    Computation computation = runnableComputation.getComputation();
+                    computation.setState(ComputationState.RUNNING);
+                    computationContextService.storeComputation(computation);
+                    computationContextService.putRunningComputation(computation);
+                    router.tell(new ComputationEngineUnit.RunningComputation(computation), getSelf());
                 })
                 .build();
     }
