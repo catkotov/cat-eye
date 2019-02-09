@@ -113,6 +113,7 @@ public class AkkaComputationExecutor {
             if (computers != null && !computers.isEmpty()) {
                 // set computation status
                 computation.setState(ComputationState.WAITING);
+                computationContextService.removeRunningComputation(computation);
                 // create computations
                 List<Computation> childComputations = computers
                         .parallelStream()
@@ -136,6 +137,7 @@ public class AkkaComputationExecutor {
                 // try to execute next step
                 computation.setNextStep(computation.getNextStep() + 1);
                 // update current computation state
+                computationContextService.removeRunningComputation(computation);
                 computationContextService.storeComputation(computation);
                 // call recursively this method
                 executeNextStep(computer, methods);

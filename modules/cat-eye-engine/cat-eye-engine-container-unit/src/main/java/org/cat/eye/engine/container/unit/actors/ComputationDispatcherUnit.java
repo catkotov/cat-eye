@@ -33,14 +33,16 @@ public class ComputationDispatcherUnit extends AbstractActor {
 
     private Bundle bundle;
 
-    private ActorRef router = getContext().actorOf(
-            new SmallestMailboxPool(8).props(
-                    Props.create(ComputationEngineUnit.class, driver, getSelf(), computationContextService, bundle)));
+    private ActorRef router;
 
     public ComputationDispatcherUnit(ActorRef driver, ComputationContextService computationContextService, Bundle bundle) {
         this.driver = driver;
         this.computationContextService = computationContextService;
         this.bundle = bundle;
+
+        this.router = getContext().actorOf(
+                new SmallestMailboxPool(8).props(
+                        Props.create(ComputationEngineUnit.class, driver, getSelf(), computationContextService, bundle)));
     }
 
     @Override

@@ -6,6 +6,7 @@ import akka.actor.Props;
 import org.cat.eye.engine.common.deployment.management.Bundle;
 import org.cat.eye.engine.common.model.Computation;
 import org.cat.eye.engine.common.service.ComputationContextService;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * Created by Kotov on 08.02.2019.
@@ -42,13 +43,19 @@ public class ComputationDriverUnit extends AbstractActor {
 
     private Bundle bundle;
 
-    public ComputationDriverUnit(ComputationContextService computationContextService, Bundle bundle) {
+    private CountDownLatch latch;
+
+    private ActorRef dispatcher;
+
+    public ComputationDriverUnit(ComputationContextService computationContextService, Bundle bundle, CountDownLatch latch) {
         this.computationContextService = computationContextService;
         this.bundle = bundle;
+        this.latch = latch;
+        this.dispatcher = getContext().actorOf(
+                Props.create(ComputationDispatcherUnit.class, getSelf(), computationContextService, bundle));
     }
 
-    private ActorRef dispatcher =
-            getContext().actorOf(Props.create(ComputationDriverUnit.class, getSelf(), computationContextService, bundle));
+
 
     @Override
     public Receive createReceive() {
@@ -57,9 +64,7 @@ public class ComputationDriverUnit extends AbstractActor {
                     dispatcher.tell(
                         new ComputationDispatcherUnit.RunnableComputation(newComputation.getComputation()), getSelf())
                 )
-                .match(CompletedComputation.class, completedComputation -> {
-
-                })
+                .match(CompletedComputation.class, completedComputation -> latch.countDown())
                 .build();
     }
 }
