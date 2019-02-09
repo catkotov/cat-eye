@@ -125,13 +125,13 @@ public class AkkaComputationExecutor {
                 computation.setChildrenIDs(childIDs);
                 // store computations by service
                 computationContextService.storeComputations(childComputations);
-                // set number of next step
-                computation.setNextStep(computation.getNextStep() + 1);
                 // update current computation state
                 computationContextService.storeComputation(computation);
                 // put new computations to queue
                 childComputations.forEach(c ->
-                        dispatcher.tell(new ComputationDispatcherUnit.RunnableComputation(computation), engine));
+                        dispatcher.tell(new ComputationDispatcherUnit.RunnableComputation(c), engine));
+                // set number of next step
+                computation.setNextStep(computation.getNextStep() + 1);
             } else {
                 // set computation status
                 computation.setState(ComputationState.READY);
