@@ -4,7 +4,7 @@ import akka.actor.ActorRef;
 import org.cat.eye.engine.common.crusher.computation.ComputationFactory;
 import org.cat.eye.engine.common.model.Computation;
 import org.cat.eye.engine.container.unit.AkkaCatEyeContainerUnit;
-import org.cat.eye.engine.container.unit.actors.ComputationDriverUnit;
+import org.cat.eye.engine.common.actors.ComputationDriverUnit;
 import org.cat.eye.test.bundle.simple.StartFileCounterComputer;
 import org.junit.Test;
 import java.util.concurrent.CountDownLatch;

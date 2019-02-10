@@ -1,11 +1,11 @@
-package org.cat.eye.engine.container.unit.actors;
+package org.cat.eye.engine.common.actors;
 
 import akka.actor.AbstractActor;
 import akka.actor.ActorRef;
+import org.cat.eye.engine.common.crusher.AkkaComputationExecutor;
 import org.cat.eye.engine.common.deployment.management.Bundle;
 import org.cat.eye.engine.common.model.Computation;
 import org.cat.eye.engine.common.service.ComputationContextService;
-import org.cat.eye.engine.container.unit.crusher.AkkaComputationExecutor;
 
 /**
  * Created by Kotov on 08.02.2019.

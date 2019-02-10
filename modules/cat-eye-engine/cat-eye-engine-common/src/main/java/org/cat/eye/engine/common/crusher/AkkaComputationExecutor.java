@@ -1,59 +1,54 @@
 package org.cat.eye.engine.common.crusher;
 
 import akka.actor.ActorRef;
-import akka.pattern.PatternsCS;
-import akka.util.Timeout;
-import org.cat.eye.engine.common.CatEyeContainerTaskCapacity;
 import org.cat.eye.engine.common.crusher.computation.ComputationFactory;
 import org.cat.eye.engine.common.deployment.management.Bundle;
 import org.cat.eye.engine.common.model.Computation;
 import org.cat.eye.engine.common.model.ComputationState;
 import org.cat.eye.engine.common.model.MethodSpecification;
 import org.cat.eye.engine.common.service.ComputationContextService;
-import org.cat.eye.engine.common.service.impl.ComputationsQueueActor;
+import org.cat.eye.engine.common.actors.ComputationDispatcherUnit;
+import org.cat.eye.engine.common.actors.ComputationDriverUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import scala.concurrent.duration.FiniteDuration;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Parameter;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
- * Created by Kotov on 09.11.2017.
+ * Created by Kotov on 09.02.2019.
  */
-public class ComputationExecutionTask implements Runnable {
+public class AkkaComputationExecutor {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(ComputationExecutionTask.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(AkkaComputationExecutor.class);
 
-    private final Computation computation;
+    private Computation computation;
 
-    private final Bundle bundle;
+    private Bundle bundle;
 
-    private final ComputationContextService computationContextService;
+    private ComputationContextService computationContextService;
 
-    private final CatEyeContainerTaskCapacity containerTaskCapacity;
+    private ActorRef dispatcher;
 
-    private final ActorRef queueActor;
+    private ActorRef driver;
 
-    private FiniteDuration duration = FiniteDuration.create(1, TimeUnit.SECONDS);
-    private Timeout timeout = Timeout.durationToTimeout(duration);
+    private ActorRef engine;
 
-    public ComputationExecutionTask(Computation computation,
-                                    Bundle bundle,
-                                    ComputationContextService computationContextService,
-                                    CatEyeContainerTaskCapacity containerTaskCapacity,
-                                    ActorRef queueActor) {
+    public AkkaComputationExecutor(Computation computation,
+                                   Bundle bundle,
+                                   ComputationContextService computationContextService,
+                                   ActorRef dispatcher, ActorRef driver, ActorRef engine) {
+
         this.computation = computation;
         this.bundle = bundle;
         this.computationContextService = computationContextService;
-        this.containerTaskCapacity = containerTaskCapacity;
-        this.queueActor = queueActor;
+        this.dispatcher = dispatcher;
+        this.driver = driver;
+        this.engine = engine;
     }
 
-    @Override
-    public void run() {
+    public void run () {
         // save current class loader
         ClassLoader currentCL = Thread.currentThread().getContextClassLoader();
         // set bundle class loader
@@ -72,20 +67,19 @@ public class ComputationExecutionTask implements Runnable {
                 throw (Error) t;
             }
         } finally {
-            //
-            containerTaskCapacity.release();
             // restore class loader
             Thread.currentThread().setContextClassLoader(currentCL);
         }
     }
 
-    private void executeNextStep(Object computer,
-                                 Set<MethodSpecification> methods) throws IllegalAccessException, InvocationTargetException {
+    private void executeNextStep(Object computer, Set<MethodSpecification> methods)
+                                                        throws IllegalAccessException, InvocationTargetException {
         // get computation next step method
         Optional<MethodSpecification> optional =
                 methods.stream().filter(spec -> spec.getStep() == computation.getNextStep()).findFirst();
         // execute method if it is present
         if (optional.isPresent()) {
+
             List<?> computers;
             MethodSpecification specification = optional.get();
             Parameter[]  parameters = specification.getParameters();
@@ -99,7 +93,7 @@ public class ComputationExecutionTask implements Runnable {
                             arg = parameters[i].getType().newInstance();
                         } catch (InstantiationException e) {
                             String error = String.format("ComputationExecutionTask.run - " +
-                                    "can't create parameter: computable class [%s], method [%s], type [%s].",
+                                            "can't create parameter: computable class [%s], method [%s], type [%s].",
                                     computer.getClass().getName(), optional.get().getMethod(), parameters[i].getType());
                             LOGGER.error(error, e);
                             throw new RuntimeException(error, e);
@@ -119,6 +113,7 @@ public class ComputationExecutionTask implements Runnable {
             if (computers != null && !computers.isEmpty()) {
                 // set computation status
                 computation.setState(ComputationState.WAITING);
+                computationContextService.removeRunningComputation(computation);
                 // create computations
                 List<Computation> childComputations = computers
                         .parallelStream()
@@ -129,29 +124,31 @@ public class ComputationExecutionTask implements Runnable {
                 computation.setChildrenIDs(childIDs);
                 // store computations by service
                 computationContextService.storeComputations(childComputations);
+                // set number of next step
+                computation.setNextStep(computation.getNextStep() + 1);
                 // update current computation state
                 computationContextService.storeComputation(computation);
                 // put new computations to queue
-                ComputationsQueueActor.CreatedComputations createdComputations = new ComputationsQueueActor.CreatedComputations(childComputations);
-                PatternsCS.ask(queueActor, createdComputations, timeout).toCompletableFuture().join();
-
-                // set number of next step
-                computation.setNextStep(computation.getNextStep() + 1);
+                childComputations.forEach(c ->
+                        dispatcher.tell(new ComputationDispatcherUnit.RunnableComputation(c), engine));
             } else {
                 // set computation status
                 computation.setState(ComputationState.READY);
                 // try to execute next step
                 computation.setNextStep(computation.getNextStep() + 1);
                 // update current computation state
+                computationContextService.removeRunningComputation(computation);
                 computationContextService.storeComputation(computation);
                 // call recursively this method
                 executeNextStep(computer, methods);
             }
+
         } else {
             // mark computations as COMPLETED
             computation.setState(ComputationState.COMPLETED);
             // update computation in store
             computationContextService.storeComputation(computation);
+            computationContextService.removeRunningComputation(computation);
             // try to update state of parent computation
             UUID parentId = computation.getParentId();
             if (parentId != null) {
@@ -166,12 +163,12 @@ public class ComputationExecutionTask implements Runnable {
                         parentComputation.setState(ComputationState.READY);
                         computationContextService.storeComputation(parentComputation);
                         // put ready computation to queue
-                        ComputationsQueueActor.ReadyComputation readyComputation = new ComputationsQueueActor.ReadyComputation(parentComputation);
-                        PatternsCS.ask(queueActor, readyComputation, timeout).toCompletableFuture().join();
+                        dispatcher.tell(new ComputationDispatcherUnit.RunnableComputation(parentComputation), engine);
                     }
                 }
+            } else {
+                driver.tell(new ComputationDriverUnit.CompletedComputation(computation), engine);
             }
         }
     }
-
 }
