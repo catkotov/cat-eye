@@ -39,20 +39,14 @@ public class ComputationDriverUnit extends AbstractActor {
         }
     }
 
-    private ComputationContextService computationContextService;
-
-    private Bundle bundle;
-
     private CountDownLatch latch;
 
     private ActorRef dispatcher;
 
     public ComputationDriverUnit(ComputationContextService computationContextService, Bundle bundle, CountDownLatch latch) {
-        this.computationContextService = computationContextService;
-        this.bundle = bundle;
         this.latch = latch;
         this.dispatcher = getContext().actorOf(
-                Props.create(ComputationDispatcherUnit.class, getSelf(), computationContextService, bundle));
+                Props.create(ComputationDispatcherUnit.class, getSelf(), computationContextService, bundle), "dispatcher");
     }
 
 

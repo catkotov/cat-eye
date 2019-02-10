@@ -22,27 +22,22 @@ public class ComputationDispatcherUnit extends AbstractActor {
             this.computation = computations;
         }
 
-        public Computation getComputation() {
+        Computation getComputation() {
             return this.computation;
         }
     }
 
-    private ActorRef driver;
-
     private ComputationContextService computationContextService;
-
-    private Bundle bundle;
 
     private ActorRef router;
 
     public ComputationDispatcherUnit(ActorRef driver, ComputationContextService computationContextService, Bundle bundle) {
-        this.driver = driver;
         this.computationContextService = computationContextService;
-        this.bundle = bundle;
 
         this.router = getContext().actorOf(
-                new SmallestMailboxPool(8).props(
-                        Props.create(ComputationEngineUnit.class, driver, getSelf(), computationContextService, bundle)));
+                new SmallestMailboxPool(8).props(Props
+                                .create(ComputationEngineUnit.class, driver, getSelf(), computationContextService, bundle)
+                                .withDispatcher("my-pinned-dispatcher")), "engine");
     }
 
     @Override

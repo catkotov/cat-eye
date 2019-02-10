@@ -12,15 +12,15 @@ import org.cat.eye.engine.container.unit.crusher.AkkaComputationExecutor;
  */
 public class ComputationEngineUnit extends AbstractActor {
 
-    public static class RunningComputation {
+    static class RunningComputation {
 
         private final Computation computation;
 
-        public RunningComputation(Computation computation) {
+        RunningComputation(Computation computation) {
             this.computation = computation;
         }
 
-        public Computation getComputation() {
+        Computation getComputation() {
             return this.computation;
         }
     }
