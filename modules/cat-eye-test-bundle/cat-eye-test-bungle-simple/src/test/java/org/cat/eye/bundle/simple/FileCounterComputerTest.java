@@ -1,55 +1,23 @@
 package org.cat.eye.bundle.simple;
 
 import akka.actor.ActorRef;
-import akka.pattern.PatternsCS;
 import org.cat.eye.engine.common.crusher.computation.ComputationFactory;
 import org.cat.eye.engine.common.model.Computation;
-import org.cat.eye.engine.common.service.impl.ComputationsQueueActor;
 import org.cat.eye.engine.container.unit.AkkaCatEyeContainerUnit;
-import org.cat.eye.engine.container.unit.CatEyeContainerUnit;
-import org.cat.eye.engine.container.unit.CatEyeContainerUnitConfig;
 import org.cat.eye.engine.container.unit.actors.ComputationDriverUnit;
 import org.cat.eye.test.bundle.simple.StartFileCounterComputer;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
 import java.util.concurrent.CountDownLatch;
 
 /**
  * Created by Kotov on 12.01.2018.
  */
-@ContextConfiguration(classes = CatEyeContainerUnitConfig.class)
-@RunWith(SpringJUnit4ClassRunner.class)
 public class FileCounterComputerTest {
 
-    public static final String PATH_TO_CLASS =
+    private static final String PATH_TO_CLASS =
             "E:\\Projects\\cat-eye\\cat-eye\\modules\\cat-eye-test-bundle\\cat-eye-test-bungle-simple\\target\\classes";
 
-    public static final String DOMAIN = "TEST_DOMAIN";
-
-    @Autowired
-    private CatEyeContainerUnit containerUnit;
-
-    @Test
-    public void fileCounterTest() throws Exception {
-
-        containerUnit.setPathToClasses("E:\\Projects\\cat-eye\\cat-eye\\modules\\cat-eye-test-bundle\\cat-eye-test-bungle-simple\\target\\classes");
-        containerUnit.setBundleDomain("TEST_DOMAIN");
-        ActorRef contextService = containerUnit.getComputationQueue();
-
-        Computation computation =
-                ComputationFactory.create(new StartFileCounterComputer("C:\\Java"), null, "TEST_DOMAIN");
-
-        ComputationsQueueActor.ReadyComputation readyComputation = new ComputationsQueueActor.ReadyComputation(computation);
-
-        PatternsCS.ask(contextService, readyComputation, 1000).toCompletableFuture().join();
-
-        containerUnit.initialize();
-
-    }
+    private static final String DOMAIN = "TEST_DOMAIN";
 
     @Test
     public void fileCounterAkkaTest() throws Exception {
