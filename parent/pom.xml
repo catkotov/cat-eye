@@ -14,7 +14,7 @@
         <spring.version>4.3.10.RELEASE</spring.version>
         <slf4j.version>1.7.21</slf4j.version>
         <logback.version>1.1.7</logback.version>
-        <akka.version>2.5.20</akka.version>
+        <akka.version>2.5.21</akka.version>
         <junit.version>4.12</junit.version>
         <boon.version>0.34</boon.version>
         <compiler.plugin.version>3.7.0</compiler.plugin.version>

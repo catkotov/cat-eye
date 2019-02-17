@@ -6,9 +6,8 @@ import org.cat.eye.engine.common.deployment.management.Bundle;
 import org.cat.eye.engine.common.model.Computation;
 import org.cat.eye.engine.common.model.ComputationState;
 import org.cat.eye.engine.common.model.MethodSpecification;
+import org.cat.eye.engine.common.msg.Message;
 import org.cat.eye.engine.common.service.ComputationContextService;
-import org.cat.eye.engine.common.actors.ComputationDispatcherUnit;
-import org.cat.eye.engine.common.actors.ComputationDriverUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.lang.reflect.InvocationTargetException;
@@ -130,7 +129,7 @@ public class AkkaComputationExecutor {
                 computationContextService.storeComputation(computation);
                 // put new computations to queue
                 childComputations.forEach(c ->
-                        dispatcher.tell(new ComputationDispatcherUnit.RunnableComputation(c), engine));
+                        dispatcher.tell(new Message.RunnableComputation(c), engine));
             } else {
                 // set computation status
                 computation.setState(ComputationState.READY);
@@ -163,11 +162,11 @@ public class AkkaComputationExecutor {
                         parentComputation.setState(ComputationState.READY);
                         computationContextService.storeComputation(parentComputation);
                         // put ready computation to queue
-                        dispatcher.tell(new ComputationDispatcherUnit.RunnableComputation(parentComputation), engine);
+                        dispatcher.tell(new Message.RunnableComputation(parentComputation), engine);
                     }
                 }
             } else {
-                driver.tell(new ComputationDriverUnit.CompletedComputation(computation), engine);
+                driver.tell(new Message.CompletedComputation(computation), engine);
             }
         }
     }
