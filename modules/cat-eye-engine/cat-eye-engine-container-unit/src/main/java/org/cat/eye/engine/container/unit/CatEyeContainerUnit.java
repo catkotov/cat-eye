@@ -17,7 +17,7 @@ import java.util.concurrent.CountDownLatch;
 /**
  * Created by Kotov on 28.10.2018.
  */
-public class AkkaCatEyeContainerUnit {
+public class CatEyeContainerUnit {
 
     private BundleDeployer bundleDeployer;
 
@@ -33,7 +33,7 @@ public class AkkaCatEyeContainerUnit {
 
     private CountDownLatch latch = new CountDownLatch(1);
 
-    public AkkaCatEyeContainerUnit(String pathToClasses, String bundleDomain) {
+    public CatEyeContainerUnit(String pathToClasses, String bundleDomain) {
 
         this.pathToClasses = pathToClasses;
         this.bundleDomain = bundleDomain;

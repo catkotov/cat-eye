@@ -4,7 +4,7 @@ import akka.actor.ActorRef;
 import org.cat.eye.engine.common.crusher.computation.ComputationFactory;
 import org.cat.eye.engine.common.model.Computation;
 import org.cat.eye.engine.common.msg.Message;
-import org.cat.eye.engine.container.unit.AkkaCatEyeContainerUnit;
+import org.cat.eye.engine.container.unit.CatEyeContainerUnit;
 import org.cat.eye.test.bundle.simple.StartFileCounterComputer;
 import org.junit.Test;
 import java.util.concurrent.CountDownLatch;
@@ -21,7 +21,7 @@ public class FileCounterComputerTest {
 
     @Test
     public void fileCounterAkkaTest() throws Exception {
-        AkkaCatEyeContainerUnit containerUnit = new AkkaCatEyeContainerUnit(PATH_TO_CLASS, DOMAIN);
+        CatEyeContainerUnit containerUnit = new CatEyeContainerUnit(PATH_TO_CLASS, DOMAIN);
         CountDownLatch latch = containerUnit.getLatch();
         ActorRef driver = containerUnit.initialize();
 
