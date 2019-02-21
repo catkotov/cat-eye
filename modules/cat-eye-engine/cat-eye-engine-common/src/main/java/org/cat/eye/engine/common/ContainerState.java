@@ -1,6 +1,6 @@
 package org.cat.eye.engine.common;
 
-public enum CatEyeContainerState {
+public enum ContainerState {
     STARTED,
     RUNNING,
     SHUTDOWN,

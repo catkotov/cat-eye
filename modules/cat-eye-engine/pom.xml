@@ -97,6 +97,12 @@
 
             <dependency>
                 <groupId>com.typesafe.akka</groupId>
+                <artifactId>akka-cluster-metrics_2.12</artifactId>
+                <version>${akka.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.typesafe.akka</groupId>
                 <artifactId>akka-testkit_2.12</artifactId>
                 <version>${akka.version}</version>
                 <scope>test</scope>

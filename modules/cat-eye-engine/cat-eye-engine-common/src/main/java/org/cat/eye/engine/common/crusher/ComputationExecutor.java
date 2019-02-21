@@ -18,9 +18,9 @@ import java.util.stream.Collectors;
 /**
  * Created by Kotov on 09.02.2019.
  */
-public class AkkaComputationExecutor {
+public class ComputationExecutor {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(AkkaComputationExecutor.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(ComputationExecutor.class);
 
     private Computation computation;
 
@@ -34,10 +34,10 @@ public class AkkaComputationExecutor {
 
     private ActorRef engine;
 
-    public AkkaComputationExecutor(Computation computation,
-                                   Bundle bundle,
-                                   ComputationContextService computationContextService,
-                                   ActorRef dispatcher, ActorRef driver, ActorRef engine) {
+    public ComputationExecutor(Computation computation,
+                               Bundle bundle,
+                               ComputationContextService computationContextService,
+                               ActorRef dispatcher, ActorRef driver, ActorRef engine) {
 
         this.computation = computation;
         this.bundle = bundle;
