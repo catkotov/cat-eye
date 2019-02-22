@@ -13,13 +13,13 @@ import org.slf4j.LoggerFactory;
 import static org.cat.eye.engine.common.MsgTopic.*;
 
 /**
- * Created by Kotov on 21.02.2019.
+ * Created by Kotov on 22.02.2019.
  */
-public class Driver extends AbstractActor {
+public class Dispatcher extends AbstractActor {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(Driver.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(Dispatcher.class);
 
-    public Driver() {
+    public Dispatcher() {
 
         DistributedPubSubSettings settings = DistributedPubSubSettings
                 .create(getContext().system())
@@ -28,23 +28,17 @@ public class Driver extends AbstractActor {
 
         ActorRef mediator = getContext().system().actorOf(Props.create(DistributedPubSubMediator.class, settings));
 
-        mediator.tell(new DistributedPubSubMediator.Subscribe(NEW_COMPUTATION.getTopicName(), getSelf()), getSelf());
-
-        mediator.tell(new DistributedPubSubMediator.Subscribe(COMPLETED_COMPUTATION.getTopicName(), getSelf()), getSelf());
+        mediator.tell(new DistributedPubSubMediator.Subscribe(RUNNABLE_COMPUTATION.getTopicName(), getSelf()), getSelf());
     }
 
     @Override
     public Receive createReceive() {
-
         return receiveBuilder()
                 .match(DistributedPubSubMediator.SubscribeAck.class, msg ->
                         LOGGER.info("createReceive - was subscribed to topic: " + msg.subscribe().topic()))
-                .match(Message.CompletedComputation.class, comp ->
-                        LOGGER.info("createReceive - computation [" + comp.getComputation().getId() + " was COMPLETED."))
-                .match(Message.NewComputation.class, comp -> {
+                .match(Message.RunnableComputation.class, msg -> {
 
                 })
                 .build();
-
     }
 }

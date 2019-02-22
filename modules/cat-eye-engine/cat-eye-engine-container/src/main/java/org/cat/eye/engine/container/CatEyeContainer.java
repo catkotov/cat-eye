@@ -6,7 +6,9 @@ import akka.cluster.Cluster;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import org.cat.eye.engine.common.ContainerRole;
+import org.cat.eye.engine.container.actors.Dispatcher;
 import org.cat.eye.engine.container.actors.Driver;
+import org.cat.eye.engine.container.actors.Engine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,12 +41,12 @@ public class CatEyeContainer {
             Cluster.get(system).registerOnMemberUp(this::init);
 
         } else {
-            LOGGER.error("CatEyeContainer.CatEyeContainer - you must define role for started container!!!");
+            LOGGER.error("CatEyeContainer - you must define role for started container!!!");
         }
     }
 
     private void init() {
-        LOGGER.info("CatEyeContainer.init - start initialization of container " + role.name() + ".");
+        LOGGER.info("init - start initialization of container " + role.name() + ".");
 
         switch (this.role) {
             case DRIVER:
@@ -58,7 +60,7 @@ public class CatEyeContainer {
                 break;
         }
 
-        LOGGER.info("CatEyeContainer.init - finish initialization of container " + role.name() + ".");
+        LOGGER.info("init - finish initialization of container " + role.name() + ".");
     }
 
     private void driverInit() {
@@ -66,11 +68,11 @@ public class CatEyeContainer {
     }
 
     private void dispatcherInit() {
-
+        this.system.actorOf(Props.create(Dispatcher.class), "dispatcher-actor");
     }
 
     private void engineInit() {
-
+        this.system.actorOf(Props.create(Engine.class), "engine-actor");
     }
 
 }
