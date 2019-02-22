@@ -1,8 +1,10 @@
 package org.cat.eye.engine.container;
 
+import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
 import akka.cluster.Cluster;
+import akka.cluster.client.ClusterClientReceptionist;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import org.cat.eye.engine.common.ContainerRole;
@@ -64,7 +66,9 @@ public class CatEyeContainer {
     }
 
     private void driverInit() {
-        this.system.actorOf(Props.create(Driver.class), "driver-actor");
+        ActorRef driver = this.system.actorOf(Props.create(Driver.class), "driver-actor");
+        ClusterClientReceptionist.get(system).registerService(driver);
+
     }
 
     private void dispatcherInit() {

@@ -6,6 +6,7 @@ import akka.actor.Props;
 import akka.cluster.pubsub.DistributedPubSubMediator;
 import akka.cluster.pubsub.DistributedPubSubSettings;
 import akka.routing.SmallestMailboxRoutingLogic;
+import org.cat.eye.engine.common.ContainerRole;
 import org.cat.eye.engine.common.msg.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +25,7 @@ public class Engine extends AbstractActor {
         DistributedPubSubSettings settings = DistributedPubSubSettings
                 .create(getContext().system())
                 .withRoutingLogic(SmallestMailboxRoutingLogic.apply())
+                .withRole(ContainerRole.ENGINE.getRole())
                 .withSendToDeadLettersWhenNoSubscribers(true);
 
         ActorRef mediator = getContext().system().actorOf(Props.create(DistributedPubSubMediator.class, settings));
