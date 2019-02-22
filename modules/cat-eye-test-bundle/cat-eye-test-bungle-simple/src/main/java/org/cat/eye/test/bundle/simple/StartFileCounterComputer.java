@@ -7,13 +7,14 @@ import org.cat.eye.test.bundle.model.impl.FileCounterStoreImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.io.File;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
 @IsComputable
-public class StartFileCounterComputer {
+public class StartFileCounterComputer implements Serializable {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(StartFileCounterComputer.class);
 

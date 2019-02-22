@@ -40,11 +40,11 @@ public class Driver extends AbstractActor {
 
         return receiveBuilder()
                 .match(DistributedPubSubMediator.SubscribeAck.class, msg ->
-                        LOGGER.info("createReceive - was subscribed to topic: " + msg.subscribe().topic()))
+                    LOGGER.info("createReceive - was subscribed to topic: " + msg.subscribe().topic()))
                 .match(Message.CompletedComputation.class, comp ->
-                        LOGGER.info("createReceive - computation [" + comp.getComputation().getId() + " was COMPLETED."))
+                    LOGGER.info("createReceive - computation [" + comp.getComputation().getId() + " was COMPLETED."))
                 .match(Message.NewComputation.class, comp -> {
-
+                    LOGGER.info("createReceive - NEW computation [" + comp.getComputation().getId() + " was received.");
                 })
                 .build();
 

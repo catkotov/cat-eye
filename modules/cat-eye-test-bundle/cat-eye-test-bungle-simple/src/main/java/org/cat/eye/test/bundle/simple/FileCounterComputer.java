@@ -5,6 +5,7 @@ import org.cat.eye.test.bundle.model.impl.FileCounterStoreImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.io.File;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,7 +13,7 @@ import java.util.List;
  * Created by Kotov on 30.09.2017.
  */
 @IsComputable
-public class FileCounterComputer {
+public class FileCounterComputer implements Serializable {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(FileCounterComputer.class);
 

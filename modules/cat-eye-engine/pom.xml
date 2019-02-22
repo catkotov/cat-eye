@@ -128,6 +128,7 @@
         <module>cat-eye-engine-model</module>
         <module>cat-eye-engine-common</module>
         <module>cat-eye-engine-container-unit</module>
+        <module>cat-eye-engine-client</module>
     </modules>
 
 </project>

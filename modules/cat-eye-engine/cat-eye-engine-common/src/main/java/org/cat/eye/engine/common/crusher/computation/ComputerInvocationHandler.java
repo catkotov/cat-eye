@@ -3,12 +3,13 @@ package org.cat.eye.engine.common.crusher.computation;
 import org.cat.eye.engine.common.model.Computation;
 import org.cat.eye.engine.common.model.ComputationState;
 
+import java.io.Serializable;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArraySet;
 
-public class ComputerInvocationHandler implements InvocationHandler {
+public class ComputerInvocationHandler implements InvocationHandler, Serializable {
 
     private Object computer;
 

@@ -2,9 +2,11 @@ package org.cat.eye.engine.common.msg;
 
 import org.cat.eye.engine.common.model.Computation;
 
+import java.io.Serializable;
+
 public interface Message {
 
-    class NewComputation {
+    class NewComputation implements Serializable {
 
         private final Computation computation;
 
@@ -17,7 +19,7 @@ public interface Message {
         }
     }
 
-    class CompletedComputation {
+    class CompletedComputation implements Serializable {
 
         private Computation computation;
 
@@ -30,7 +32,7 @@ public interface Message {
         }
     }
 
-    class RunnableComputation {
+    class RunnableComputation implements Serializable {
 
         private final Computation computation;
 
@@ -43,7 +45,7 @@ public interface Message {
         }
     }
 
-    class RunningComputation {
+    class RunningComputation implements Serializable {
 
         private final Computation computation;
 
