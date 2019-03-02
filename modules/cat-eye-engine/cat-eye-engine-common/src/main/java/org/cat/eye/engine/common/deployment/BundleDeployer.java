@@ -1,10 +1,11 @@
 package org.cat.eye.engine.common.deployment;
 
+import org.cat.eye.engine.common.deployment.management.Bundle;
 import org.cat.eye.engine.common.deployment.management.BundleManager;
 
 public interface BundleDeployer {
 
-    void deploy(String path, String domain);
+    Bundle deploy(String domain, String path);
 
     void setBundleManager(BundleManager bundleManager);
 }

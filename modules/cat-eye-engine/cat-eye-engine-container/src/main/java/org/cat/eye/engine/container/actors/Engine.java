@@ -20,7 +20,7 @@ public class Engine extends AbstractActor {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(Engine.class);
 
-    public Engine() {
+    public Engine(String domain) {
 
         DistributedPubSubSettings settings = DistributedPubSubSettings
                 .create(getContext().system())
@@ -30,7 +30,7 @@ public class Engine extends AbstractActor {
 
         ActorRef mediator = getContext().system().actorOf(Props.create(DistributedPubSubMediator.class, settings));
 
-        mediator.tell(new DistributedPubSubMediator.Subscribe(RUNNING_COMPUTATION.getTopicName(), getSelf()), getSelf());
+        mediator.tell(new DistributedPubSubMediator.Subscribe(domain + "-" + RUNNING_COMPUTATION.getTopicName(), getSelf()), getSelf());
     }
 
     @Override

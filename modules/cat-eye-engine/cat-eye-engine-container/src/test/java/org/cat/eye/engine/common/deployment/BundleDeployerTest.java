@@ -32,7 +32,7 @@ public class BundleDeployerTest {
         BundleDeployer deployer = new BundleDeployerImpl();
         deployer.setBundleManager(bundleManager);
 
-        deployer.deploy(PATH_TO_JAR, DOMAIN);
+        deployer.deploy(DOMAIN, PATH_TO_JAR);
 
         Bundle bundle = bundleManager.getBundle(DOMAIN);
 

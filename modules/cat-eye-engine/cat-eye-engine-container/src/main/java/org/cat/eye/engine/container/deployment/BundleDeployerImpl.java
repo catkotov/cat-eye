@@ -2,6 +2,7 @@ package org.cat.eye.engine.container.deployment;
 
 import org.cat.eye.engine.common.deployment.BundleClassLoader;
 import org.cat.eye.engine.common.deployment.BundleDeployer;
+import org.cat.eye.engine.common.deployment.management.Bundle;
 import org.cat.eye.engine.common.deployment.management.BundleManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +24,7 @@ public class BundleDeployerImpl implements BundleDeployer {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(BundleDeployerImpl.class);
 
-    public void deploy(String pathToJar, String domain) {
+    public Bundle deploy(String domain, String pathToJar) {
         // get urls of jar's file
         URL[] ursl = getUrlsFromJarFile(pathToJar);
         // create class loader for bundle
@@ -37,6 +38,8 @@ public class BundleDeployerImpl implements BundleDeployer {
         } catch (InterruptedException e) {
             LOGGER.error("BundleDeployer.deploy - can't deploy bundle: " + pathToJar, e);
         }
+
+        return bundleManager.getBundle(domain);
     }
 
     private URL[] getUrlsFromJarFile(String pathToJar) {
@@ -60,7 +63,7 @@ public class BundleDeployerImpl implements BundleDeployer {
                             File lib = new File(file.getParent(), cp);
                             urls.add(lib.toURI().toURL());
                         }
-                        result = urls.toArray(new URL[urls.size()]);
+                        result = urls.toArray(new URL[0]);
                     }
                 }
             } catch (IOException e) {

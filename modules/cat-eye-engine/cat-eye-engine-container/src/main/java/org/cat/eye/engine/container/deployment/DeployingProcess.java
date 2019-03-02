@@ -9,8 +9,6 @@ import java.util.List;
 
 public class DeployingProcess extends AbstractDeployingProcess implements Runnable {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(DeployingProcess.class);
-
     private String jarFilePath;
     private String domain;
     private BundleManager bundleManager;

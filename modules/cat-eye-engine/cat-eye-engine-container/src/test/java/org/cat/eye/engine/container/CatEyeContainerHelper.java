@@ -7,8 +7,8 @@ public class CatEyeContainerHelper {
 
     public static void main(String[] argv) {
 
-        CatEyeContainer driver = new CatEyeContainer("driver", 2551);
-        CatEyeContainer dispatcher = new CatEyeContainer("dispatcher", 2552);
-        CatEyeContainer engine = new CatEyeContainer("engine", 2553);
+        CatEyeContainer driver = new CatEyeContainer("driver");
+        CatEyeContainer dispatcher = new CatEyeContainer("dispatcher");
+        CatEyeContainer engine = new CatEyeContainer("engine");
     }
 }

@@ -46,7 +46,7 @@ public class CatEyeContainerUnit {
 
     public ActorRef initialize() {
         // deploy bundle
-        bundleDeployer.deploy(pathToClasses, bundleDomain);
+        bundleDeployer.deploy(bundleDomain, pathToClasses);
         Bundle bundle = bundleManager.getBundle(bundleDomain);
 
         return actorSystem.actorOf(Props.create(ComputationDriverUnit.class, computationContextService, bundle, latch), "driver");

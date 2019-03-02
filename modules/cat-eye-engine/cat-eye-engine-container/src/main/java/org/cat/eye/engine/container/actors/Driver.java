@@ -20,7 +20,7 @@ public class Driver extends AbstractActor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Driver.class);
 
-    public Driver() {
+    public Driver(String domain) {
 
         DistributedPubSubSettings settings = DistributedPubSubSettings
                 .create(getContext().system())
@@ -30,9 +30,9 @@ public class Driver extends AbstractActor {
 
         ActorRef mediator = getContext().system().actorOf(Props.create(DistributedPubSubMediator.class, settings));
 
-        mediator.tell(new DistributedPubSubMediator.Subscribe(NEW_COMPUTATION.getTopicName(), getSelf()), getSelf());
+        mediator.tell(new DistributedPubSubMediator.Subscribe(domain + "-" + NEW_COMPUTATION.getTopicName(), getSelf()), getSelf());
 
-        mediator.tell(new DistributedPubSubMediator.Subscribe(COMPLETED_COMPUTATION.getTopicName(), getSelf()), getSelf());
+        mediator.tell(new DistributedPubSubMediator.Subscribe(domain + "-" + COMPLETED_COMPUTATION.getTopicName(), getSelf()), getSelf());
     }
 
     @Override
@@ -42,9 +42,9 @@ public class Driver extends AbstractActor {
                 .match(DistributedPubSubMediator.SubscribeAck.class, msg ->
                     LOGGER.info("createReceive - was subscribed to topic: " + msg.subscribe().topic()))
                 .match(Message.CompletedComputation.class, comp ->
-                    LOGGER.info("createReceive - computation [" + comp.getComputation().getId() + " was COMPLETED."))
+                    LOGGER.info("createReceive - computation [" + comp.getComputation().getId() + "] was COMPLETED."))
                 .match(Message.NewComputation.class, comp -> {
-                    LOGGER.info("createReceive - NEW computation [" + comp.getComputation().getId() + " was received.");
+                    LOGGER.info("createReceive - NEW computation [" + comp.getComputation().getId() + "] was received.");
                 })
                 .build();
 

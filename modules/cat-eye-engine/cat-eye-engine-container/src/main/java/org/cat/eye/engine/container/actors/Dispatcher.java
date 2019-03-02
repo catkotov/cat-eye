@@ -20,7 +20,7 @@ public class Dispatcher extends AbstractActor {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(Dispatcher.class);
 
-    public Dispatcher() {
+    public Dispatcher(String domain) {
 
         DistributedPubSubSettings settings = DistributedPubSubSettings
                 .create(getContext().system())
@@ -30,7 +30,7 @@ public class Dispatcher extends AbstractActor {
 
         ActorRef mediator = getContext().system().actorOf(Props.create(DistributedPubSubMediator.class, settings));
 
-        mediator.tell(new DistributedPubSubMediator.Subscribe(RUNNABLE_COMPUTATION.getTopicName(), getSelf()), getSelf());
+        mediator.tell(new DistributedPubSubMediator.Subscribe(domain + "-" + RUNNABLE_COMPUTATION.getTopicName(), getSelf()), getSelf());
     }
 
     @Override

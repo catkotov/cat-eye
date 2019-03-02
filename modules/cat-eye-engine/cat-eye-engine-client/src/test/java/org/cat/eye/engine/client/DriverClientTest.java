@@ -6,6 +6,7 @@ import org.cat.eye.engine.common.msg.Message;
 import org.cat.eye.test.bundle.simple.StartFileCounterComputer;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.concurrent.CountDownLatch;
@@ -23,7 +24,7 @@ public class DriverClientTest {
 
     @Before
     public void setUp() throws Exception {
-        this.client = new DriverClient();
+        this.client = new DriverClient(DOMAIN);
     }
 
     @After
@@ -31,6 +32,7 @@ public class DriverClientTest {
     }
 
     @Test
+//    @Ignore
     public void send() throws InterruptedException {
 
         CountDownLatch latch = new CountDownLatch(1);

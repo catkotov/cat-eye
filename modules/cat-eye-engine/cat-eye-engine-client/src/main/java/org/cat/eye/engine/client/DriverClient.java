@@ -23,23 +23,27 @@ public class DriverClient {
 
     private ActorRef clusterClient;
 
-    public DriverClient() {
+    private String domain;
+
+    public DriverClient(String domain) {
 
         Config config = ConfigFactory.load();
 
-        ActorSystem system = ActorSystem.create("CatEyeEngineClient", config);
+        this.domain = domain;
+
+        ActorSystem system = ActorSystem.create(domain + "-CatEyeEngineClient", config);
 
         this.clusterClient = system.actorOf(
                 ClusterClient.props(ClusterClientSettings.create(system)
                         .withInitialContacts(initialContacts())),
-                "engine-client"
+                domain + "-engine-client"
         );
     }
 
     public void send(Message.NewComputation computation) {
 
         clusterClient.tell(
-                new ClusterClient.Publish(MsgTopic.NEW_COMPUTATION.getTopicName(), computation),
+                new ClusterClient.Send("/user/" + this.domain + "-driver-actor", computation, true),
                 ActorRef.noSender()
         );
     }
@@ -47,7 +51,7 @@ public class DriverClient {
     private Set<ActorPath> initialContacts() {
 
         return new HashSet<>(Collections.singletonList(
-                ActorPaths.fromString("akka.tcp://CatEyeContainer@127.0.0.1:2551/system/receptionist"))
+                ActorPaths.fromString("akka.tcp://TEST_DOMAIN@127.0.0.1:2551/system/receptionist"))
         );
     }
 }

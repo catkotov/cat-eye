@@ -1,6 +1,7 @@
 package org.cat.eye.engine.container.unit.deployment;
 
 import org.cat.eye.engine.common.deployment.BundleDeployer;
+import org.cat.eye.engine.common.deployment.management.Bundle;
 import org.cat.eye.engine.common.deployment.management.BundleManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,7 +16,7 @@ public class UnitBundleDeployerImpl implements BundleDeployer {
     private BundleManager bundleManager;
 
     @Override
-    public void deploy(String classPath, String domain) {
+    public Bundle deploy(String domain, String classPath) {
 
         ClassLoader bundleClassLoader = Thread.currentThread().getContextClassLoader(); // new BundleClassLoader();
 
@@ -28,6 +29,8 @@ public class UnitBundleDeployerImpl implements BundleDeployer {
         } catch (InterruptedException e) {
             LOGGER.error("deploy - can't deploy bundle: " + classPath, e);
         }
+
+        return bundleManager.getBundle(domain);
     }
 
     @Override
