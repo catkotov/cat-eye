@@ -46,4 +46,20 @@ public class DriverClientTest {
 
         latch.await();
     }
+
+    @Test
+//    @Ignore
+    public void publish() throws InterruptedException {
+
+        CountDownLatch latch = new CountDownLatch(1);
+
+        Computation computation =
+                ComputationFactory.create(new StartFileCounterComputer("C:\\Java"), null, DOMAIN);
+
+        Message.NewComputation newComputation = new Message.NewComputation(computation);
+
+        client.publish(newComputation);
+
+        latch.await();
+    }
 }

@@ -8,12 +8,14 @@ import akka.cluster.client.ClusterClientReceptionist;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import org.cat.eye.engine.common.ContainerRole;
+import org.cat.eye.engine.common.MsgTopic;
 import org.cat.eye.engine.common.deployment.BundleDeployer;
 import org.cat.eye.engine.common.deployment.management.Bundle;
 import org.cat.eye.engine.common.deployment.management.BundleManager;
 import org.cat.eye.engine.common.deployment.management.BundleManagerImpl;
 import org.cat.eye.engine.common.service.ComputationContextService;
 import org.cat.eye.engine.common.service.impl.SimpleComputationContextService;
+import org.cat.eye.engine.common.util.CatEyeActorUtil;
 import org.cat.eye.engine.container.actors.Dispatcher;
 import org.cat.eye.engine.container.actors.Driver;
 import org.cat.eye.engine.container.actors.Engine;
@@ -33,6 +35,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class CatEyeContainer {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(CatEyeContainer.class);
+
+    private static final String JAR_EXTENSION = ".jar";
 
     private static String repositoryDirectory = "E:/CatEyeContainer/Repository";
     // only for testing purpose
@@ -90,11 +94,13 @@ public class CatEyeContainer {
         if (role == ContainerRole.DRIVER) {
             domainConfig = ConfigFactory
                     .parseString("akka.cluster.roles = [" + this.role.getRole() + "]")
+                    // TODO get path to config file from properties
                     .withFallback(ConfigFactory.load("test_domain.conf"));
         } else {
             domainConfig = ConfigFactory
                     .parseString("akka.cluster.roles = [" + this.role.getRole() + "]")
                     .withFallback(ConfigFactory.parseString("akka.remote.netty.tcp.port=" + 0))
+                    // TODO get path to config file from properties
                     .withFallback(ConfigFactory.load("test_domain.conf"));
         }
 
@@ -118,7 +124,7 @@ public class CatEyeContainer {
                 File[] domainFiles = file.listFiles();
                 if (domainFiles != null && domainFiles.length != 0)
                     Arrays.stream(domainFiles)
-                            .filter(f -> f.isFile() && f.getName().contains(".jar"))
+                            .filter(f -> f.isFile() && f.getName().contains(JAR_EXTENSION))
                             .findFirst()
                             .ifPresent(bundleJar -> result.put(file.getName(), bundleJar));
 
@@ -140,6 +146,10 @@ public class CatEyeContainer {
 //    }
 
     public static class DomainContextInitializer implements Runnable {
+
+        static final String DRIVER_ACTOR = "-driver-actor";
+        static final String DISPATCHER_ACTOR = "-dispatcher-actor";
+        static final String ENGINE_ACTOR = "-engine-actor";
 
         private ContainerRole role;
 
@@ -166,17 +176,34 @@ public class CatEyeContainer {
         }
 
         private void driverInit(String domain, ActorSystem domainSystem) {
-            ActorRef driver = domainSystem.actorOf(Props.create(Driver.class, domain), domain + "-driver-actor");
+            ActorRef driver = domainSystem.actorOf(Props.create(Driver.class, domain), domain + DRIVER_ACTOR);
             ClusterClientReceptionist.get(domainSystem).registerService(driver);
+            ClusterClientReceptionist.get(domainSystem).registerSubscriber(
+                    CatEyeActorUtil.getTopicName(domain, MsgTopic.NEW_COMPUTATION), driver);
 
         }
 
         private void dispatcherInit(String domain, ActorSystem domainSystem) {
-            domainSystem.actorOf(Props.create(Dispatcher.class, domain, CatEyeContainer.computationContextService), domain + "-dispatcher-actor");
+            domainSystem.actorOf(
+                    Props.create(
+                            Dispatcher.class,
+                            domain,
+                            CatEyeContainer.computationContextService
+                    ),
+                    domain + DISPATCHER_ACTOR
+            );
         }
 
         private void engineInit(String domain, ActorSystem domainSystem, Bundle bundle) {
-            domainSystem.actorOf(Props.create(Engine.class, domain, bundle, CatEyeContainer.computationContextService), domain + "-engine-actor");
+            domainSystem.actorOf(
+                    Props.create(
+                            Engine.class,
+                            domain,
+                            bundle,
+                            CatEyeContainer.computationContextService
+                    ),
+                    domain + ENGINE_ACTOR
+            );
         }
     }
 
