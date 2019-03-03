@@ -6,8 +6,8 @@ import akka.actor.Props;
 import akka.cluster.pubsub.DistributedPubSubMediator;
 import akka.cluster.pubsub.DistributedPubSubSettings;
 import akka.routing.SmallestMailboxRoutingLogic;
-import org.cat.eye.engine.common.ContainerRole;
 import org.cat.eye.engine.common.msg.Message;
+import org.cat.eye.engine.common.util.CatEyeActorUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,19 +20,36 @@ public class Driver extends AbstractActor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Driver.class);
 
+    private ActorRef mediator;
+
+    private String domain;
+
     public Driver(String domain) {
+
+        this.domain = domain;
 
         DistributedPubSubSettings settings = DistributedPubSubSettings
                 .create(getContext().system())
                 .withRoutingLogic(SmallestMailboxRoutingLogic.apply())
-                .withRole(ContainerRole.DRIVER.getRole())
                 .withSendToDeadLettersWhenNoSubscribers(true);
 
-        ActorRef mediator = getContext().system().actorOf(Props.create(DistributedPubSubMediator.class, settings));
+        this.mediator = getContext().system().actorOf(Props.create(DistributedPubSubMediator.class, settings), domain);
 
-        mediator.tell(new DistributedPubSubMediator.Subscribe(domain + "-" + NEW_COMPUTATION.getTopicName(), getSelf()), getSelf());
+        this.mediator.tell(
+                new DistributedPubSubMediator.Subscribe(
+                        CatEyeActorUtil.getTopicName(domain, NEW_COMPUTATION),
+                        getSelf()
+                ),
+                getSelf()
+        );
 
-        mediator.tell(new DistributedPubSubMediator.Subscribe(domain + "-" + COMPLETED_COMPUTATION.getTopicName(), getSelf()), getSelf());
+        this.mediator.tell(
+                new DistributedPubSubMediator.Subscribe(
+                        CatEyeActorUtil.getTopicName(domain, COMPLETED_COMPUTATION),
+                        getSelf()
+                ),
+                getSelf()
+        );
     }
 
     @Override
@@ -45,6 +62,15 @@ public class Driver extends AbstractActor {
                     LOGGER.info("createReceive - computation [" + comp.getComputation().getId() + "] was COMPLETED."))
                 .match(Message.NewComputation.class, comp -> {
                     LOGGER.info("createReceive - NEW computation [" + comp.getComputation().getId() + "] was received.");
+                    this.mediator.tell(
+                            new DistributedPubSubMediator.Publish(
+                                    CatEyeActorUtil.getTopicName(domain, RUNNABLE_COMPUTATION),
+                                    new Message.RunnableComputation(comp.getComputation()),
+                                    true
+                            ),
+                            getSelf()
+                    );
+                    LOGGER.info("createReceive - computation [" + comp.getComputation().getId() + "] was send to dispatcher.");
                 })
                 .build();
 

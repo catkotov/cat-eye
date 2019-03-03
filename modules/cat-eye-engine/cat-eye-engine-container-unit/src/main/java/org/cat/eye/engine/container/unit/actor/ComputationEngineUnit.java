@@ -2,7 +2,7 @@ package org.cat.eye.engine.container.unit.actor;
 
 import akka.actor.AbstractActor;
 import akka.actor.ActorRef;
-import org.cat.eye.engine.common.crusher.ComputationExecutor;
+import org.cat.eye.engine.common.crusher.ComputationExecutorUnit;
 import org.cat.eye.engine.common.deployment.management.Bundle;
 import org.cat.eye.engine.common.msg.Message;
 import org.cat.eye.engine.common.service.ComputationContextService;
@@ -34,8 +34,8 @@ public class ComputationEngineUnit extends AbstractActor {
     public Receive createReceive() {
         return receiveBuilder()
                 .match(Message.RunningComputation.class, runningComputation -> {
-                    ComputationExecutor executor =
-                        new ComputationExecutor(
+                    ComputationExecutorUnit executor =
+                        new ComputationExecutorUnit(
                             runningComputation.getComputation(), bundle, computationContextService, dispatcher, driver, getSelf());
                     executor.run();
                 })

@@ -12,6 +12,8 @@ import org.cat.eye.engine.common.deployment.BundleDeployer;
 import org.cat.eye.engine.common.deployment.management.Bundle;
 import org.cat.eye.engine.common.deployment.management.BundleManager;
 import org.cat.eye.engine.common.deployment.management.BundleManagerImpl;
+import org.cat.eye.engine.common.service.ComputationContextService;
+import org.cat.eye.engine.common.service.impl.SimpleComputationContextService;
 import org.cat.eye.engine.container.actors.Dispatcher;
 import org.cat.eye.engine.container.actors.Driver;
 import org.cat.eye.engine.container.actors.Engine;
@@ -32,23 +34,15 @@ public class CatEyeContainer {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(CatEyeContainer.class);
 
-    private final static String PATH_TO_JAR =
-            "E:/Projects/cat-eye/cat-eye/modules/cat-eye-test-bundle/cat-eye-test-bungle-simple/" +
-                    "target/cat-eye-test-bungle-simple-0.1-SNAPSHOT-simple.jar";
-
-    private final static String DOMAIN = "TEST_DOMAIN";
-
     private static String repositoryDirectory = "E:/CatEyeContainer/Repository";
+    // only for testing purpose
+    private final static ComputationContextService computationContextService = new SimpleComputationContextService();
 
     private ConcurrentHashMap<String, DomainContext> context = new ConcurrentHashMap<>();
-
-//    private Config config;
 
     private BundleManager bundleManager;
 
     private BundleDeployer bundleDeployer;
-
-//    private ActorSystem system;
 
     private ContainerRole role;
 
@@ -64,16 +58,6 @@ public class CatEyeContainer {
 
             this.role = containerRole;
 
-//            this.config = ConfigFactory
-//                    .parseString("akka.cluster.roles = [" + roleName + "]")
-//                    .withFallback(ConfigFactory.parseString("akka.remote.netty.tcp.port=" + port))
-//                    .withFallback(ConfigFactory.load());
-//
-//
-//            this.system = ActorSystem.create("CatEyeContainer", config);
-//
-//            Cluster.get(system).registerOnMemberUp(this::init);
-
             init();
 
         } else {
@@ -87,9 +71,7 @@ public class CatEyeContainer {
         Map<String,File> domainJars = getDomainJarsFromRepository(repositoryDirectory);
         // create context for every domain and init it
         if (!domainJars.isEmpty()) {
-            domainJars.forEach((domain, jar) -> {
-                initBundle(domain, jar);
-            });
+            domainJars.forEach(this::initBundle);
         }
 
         LOGGER.info("init - finish initialization of container " + role.name() + ".");
@@ -103,10 +85,7 @@ public class CatEyeContainer {
 
         ClassLoader bundleClassLoader = bundle.getClassLoader();
 
-        Config domainConfig; //= ConfigFactory
-//                .parseString("akka.cluster.roles = [" + this.role.getRole() + "]")
-//                .withFallback(ConfigFactory.parseString("akka.remote.netty.tcp.port=" + port))
-//                .withFallback(ConfigFactory.load("test_domain.conf"));
+        Config domainConfig;
 
         if (role == ContainerRole.DRIVER) {
             domainConfig = ConfigFactory
@@ -125,19 +104,7 @@ public class CatEyeContainer {
 
         this.context.put(domain, domainContext);
 
-        Cluster.get(domainSystem).registerOnMemberUp(new DomainContextInitializer(domain, domainSystem, role));
-
-//        switch (this.role) {
-//            case DRIVER:
-//                driverInit(domain, domainSystem);
-//                break;
-//            case DISPATCHER:
-//                dispatcherInit(domain, domainSystem);
-//                break;
-//            case ENGINE:
-//                engineInit(domain, domainSystem);
-//                break;
-//        }
+        Cluster.get(domainSystem).registerOnMemberUp(new DomainContextInitializer(role, domainContext));
     }
 
     private Map<String,File> getDomainJarsFromRepository(String pathToRepository) {
@@ -161,56 +128,39 @@ public class CatEyeContainer {
         return result;
     }
 
-    private void driverInit(String domain, ActorSystem domainSystem) {
-        ActorRef driver = domainSystem.actorOf(Props.create(Driver.class, domain), domain + "-driver-actor");
-        ClusterClientReceptionist.get(domainSystem).registerService(driver);
-
-    }
-
-    private void dispatcherInit(String domain, ActorSystem domainSystem) {
-        domainSystem.actorOf(Props.create(Dispatcher.class, domain), domain + "-dispatcher-actor");
-    }
-
-    private void engineInit(String domain, ActorSystem domainSystem) {
-        domainSystem.actorOf(Props.create(Engine.class, domain), domain + "-engine-actor");
-    }
-
-    public void deploy(String domain, String jarName) {
-
-        String pathToJar = CatEyeContainer.repositoryDirectory + "/" + domain + "/" + jarName;
-
-        File jarFile = new File(pathToJar);
-
-        if (jarFile.exists() && jarFile.isFile()) {
-            initBundle(domain, jarFile);
-        }
-    }
+//    public void deploy(String domain, String jarName) {
+//
+//        String pathToJar = CatEyeContainer.repositoryDirectory + "/" + domain + "/" + jarName;
+//
+//        File jarFile = new File(pathToJar);
+//
+//        if (jarFile.exists() && jarFile.isFile()) {
+//            initBundle(domain, jarFile);
+//        }
+//    }
 
     public static class DomainContextInitializer implements Runnable {
 
-        private String domain;
-
-        private ActorSystem domainSystem;
-
         private ContainerRole role;
 
-        public DomainContextInitializer(String domain, ActorSystem domainSystem, ContainerRole role) {
-            this.domain = domain;
-            this.domainSystem = domainSystem;
+        private DomainContext domainContext;
+
+        DomainContextInitializer(ContainerRole role, DomainContext domainContext) {
             this.role = role;
+            this.domainContext = domainContext;
         }
 
         public void run() {
 
             switch (this.role) {
                 case DRIVER:
-                    driverInit(domain, domainSystem);
+                    driverInit(domainContext.getDomain(), domainContext.getSystem());
                     break;
                 case DISPATCHER:
-                    dispatcherInit(domain, domainSystem);
+                    dispatcherInit(domainContext.getDomain(), domainContext.getSystem());
                     break;
                 case ENGINE:
-                    engineInit(domain, domainSystem);
+                    engineInit(domainContext.getDomain(), domainContext.getSystem(), domainContext.getBundle());
                     break;
             }
         }
@@ -222,11 +172,11 @@ public class CatEyeContainer {
         }
 
         private void dispatcherInit(String domain, ActorSystem domainSystem) {
-            domainSystem.actorOf(Props.create(Dispatcher.class, domain), domain + "-dispatcher-actor");
+            domainSystem.actorOf(Props.create(Dispatcher.class, domain, CatEyeContainer.computationContextService), domain + "-dispatcher-actor");
         }
 
-        private void engineInit(String domain, ActorSystem domainSystem) {
-            domainSystem.actorOf(Props.create(Engine.class, domain), domain + "-engine-actor");
+        private void engineInit(String domain, ActorSystem domainSystem, Bundle bundle) {
+            domainSystem.actorOf(Props.create(Engine.class, domain, bundle, CatEyeContainer.computationContextService), domain + "-engine-actor");
         }
     }
 

@@ -1,8 +1,6 @@
 package org.cat.eye.engine.common.crusher;
 
 import akka.actor.ActorRef;
-import akka.cluster.pubsub.DistributedPubSubMediator;
-import org.cat.eye.engine.common.MsgTopic;
 import org.cat.eye.engine.common.crusher.computation.ComputationFactory;
 import org.cat.eye.engine.common.deployment.management.Bundle;
 import org.cat.eye.engine.common.model.Computation;
@@ -10,10 +8,8 @@ import org.cat.eye.engine.common.model.ComputationState;
 import org.cat.eye.engine.common.model.MethodSpecification;
 import org.cat.eye.engine.common.msg.Message;
 import org.cat.eye.engine.common.service.ComputationContextService;
-import org.cat.eye.engine.common.util.CatEyeActorUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Parameter;
 import java.util.*;
@@ -22,9 +18,9 @@ import java.util.stream.Collectors;
 /**
  * Created by Kotov on 09.02.2019.
  */
-public class ComputationExecutor {
+public class ComputationExecutorUnit {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(ComputationExecutor.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(ComputationExecutorUnit.class);
 
     private Computation computation;
 
@@ -32,20 +28,22 @@ public class ComputationExecutor {
 
     private ComputationContextService computationContextService;
 
-    private ActorRef mediator;
+    private ActorRef dispatcher;
+
+    private ActorRef driver;
 
     private ActorRef engine;
 
-    public ComputationExecutor(Computation computation,
-                               Bundle bundle,
-                               ComputationContextService computationContextService,
-                               ActorRef mediator,
-                               ActorRef engine) {
+    public ComputationExecutorUnit(Computation computation,
+                                   Bundle bundle,
+                                   ComputationContextService computationContextService,
+                                   ActorRef dispatcher, ActorRef driver, ActorRef engine) {
 
         this.computation = computation;
         this.bundle = bundle;
         this.computationContextService = computationContextService;
-        this.mediator = mediator;
+        this.dispatcher = dispatcher;
+        this.driver = driver;
         this.engine = engine;
     }
 
@@ -131,15 +129,7 @@ public class ComputationExecutor {
                 computationContextService.storeComputation(computation);
                 // put new computations to queue
                 childComputations.forEach(c ->
-                        mediator.tell(
-                                new DistributedPubSubMediator.Publish(
-                                        CatEyeActorUtil.getTopicName(bundle.getDomain(), MsgTopic.RUNNABLE_COMPUTATION),
-                                        new Message.RunnableComputation(c),
-                                        true
-                                )
-                                , engine
-                        )
-                );
+                        dispatcher.tell(new Message.RunnableComputation(c), engine));
             } else {
                 // set computation status
                 computation.setState(ComputationState.READY);
@@ -172,24 +162,11 @@ public class ComputationExecutor {
                         parentComputation.setState(ComputationState.READY);
                         computationContextService.storeComputation(parentComputation);
                         // put ready computation to queue
-                        mediator.tell(
-                                new DistributedPubSubMediator.Publish(
-                                        CatEyeActorUtil.getTopicName(bundle.getDomain(), MsgTopic.RUNNABLE_COMPUTATION),
-                                        new Message.RunnableComputation(parentComputation),
-                                        true
-                                ),
-                                engine
-                        );
+                        dispatcher.tell(new Message.RunnableComputation(parentComputation), engine);
                     }
                 }
             } else {
-                mediator.tell(
-                        new DistributedPubSubMediator.Publish(
-                                CatEyeActorUtil.getTopicName(bundle.getDomain(), MsgTopic.COMPLETED_COMPUTATION),
-                                new Message.CompletedComputation(computation)
-                        ),
-                        engine
-                );
+                driver.tell(new Message.CompletedComputation(computation), engine);
             }
         }
     }

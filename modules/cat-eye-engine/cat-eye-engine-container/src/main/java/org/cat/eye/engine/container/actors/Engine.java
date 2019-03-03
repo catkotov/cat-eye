@@ -7,7 +7,11 @@ import akka.cluster.pubsub.DistributedPubSubMediator;
 import akka.cluster.pubsub.DistributedPubSubSettings;
 import akka.routing.SmallestMailboxRoutingLogic;
 import org.cat.eye.engine.common.ContainerRole;
+import org.cat.eye.engine.common.crusher.ComputationExecutor;
+import org.cat.eye.engine.common.deployment.management.Bundle;
 import org.cat.eye.engine.common.msg.Message;
+import org.cat.eye.engine.common.service.ComputationContextService;
+import org.cat.eye.engine.common.util.CatEyeActorUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,17 +24,33 @@ public class Engine extends AbstractActor {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(Engine.class);
 
-    public Engine(String domain) {
+    private ActorRef mediator;
+
+    private Bundle bundle;
+
+    private ComputationContextService computationContextService;
+
+    public Engine(String domain, Bundle bundle, ComputationContextService computationContextService) {
+
+        this.computationContextService = computationContextService;
+
+        this.bundle = bundle;
 
         DistributedPubSubSettings settings = DistributedPubSubSettings
                 .create(getContext().system())
                 .withRoutingLogic(SmallestMailboxRoutingLogic.apply())
-                .withRole(ContainerRole.ENGINE.getRole())
                 .withSendToDeadLettersWhenNoSubscribers(true);
 
-        ActorRef mediator = getContext().system().actorOf(Props.create(DistributedPubSubMediator.class, settings));
+        this.mediator = getContext().system().actorOf(Props.create(DistributedPubSubMediator.class, settings), domain);
 
-        mediator.tell(new DistributedPubSubMediator.Subscribe(domain + "-" + RUNNING_COMPUTATION.getTopicName(), getSelf()), getSelf());
+        this.mediator.tell(
+                new DistributedPubSubMediator.Subscribe(
+                        CatEyeActorUtil.getTopicName(domain, RUNNING_COMPUTATION),
+                        ContainerRole.ENGINE.getRole(),
+                        getSelf()
+                ),
+                getSelf()
+        );
     }
 
     @Override
@@ -38,8 +58,12 @@ public class Engine extends AbstractActor {
         return receiveBuilder()
                 .match(DistributedPubSubMediator.SubscribeAck.class, msg ->
                         LOGGER.info("createReceive - was subscribed to topic: " + msg.subscribe().topic()))
-                .match(Message.RunningComputation.class, msg -> {
-
+                .match(Message.RunningComputation.class, comp -> {
+                        LOGGER.info("createReceive - computation [" + comp.getComputation().getId() + "] was received.");
+                    ComputationExecutor executor =
+                            new ComputationExecutor(
+                                    comp.getComputation(), bundle, computationContextService, this.mediator, getSelf());
+                    executor.run();
                 })
                 .build();
     }

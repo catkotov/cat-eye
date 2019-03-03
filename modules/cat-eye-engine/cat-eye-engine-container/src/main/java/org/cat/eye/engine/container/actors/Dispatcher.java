@@ -7,7 +7,11 @@ import akka.cluster.pubsub.DistributedPubSubMediator;
 import akka.cluster.pubsub.DistributedPubSubSettings;
 import akka.routing.SmallestMailboxRoutingLogic;
 import org.cat.eye.engine.common.ContainerRole;
+import org.cat.eye.engine.common.model.Computation;
+import org.cat.eye.engine.common.model.ComputationState;
 import org.cat.eye.engine.common.msg.Message;
+import org.cat.eye.engine.common.service.ComputationContextService;
+import org.cat.eye.engine.common.util.CatEyeActorUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,17 +24,33 @@ public class Dispatcher extends AbstractActor {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(Dispatcher.class);
 
-    public Dispatcher(String domain) {
+    private ActorRef mediator;
+
+    private String domain;
+
+    private ComputationContextService computationContextService;
+
+    public Dispatcher(String domain, ComputationContextService computationContextService) {
+
+        this.computationContextService = computationContextService;
+
+        this.domain = domain;
 
         DistributedPubSubSettings settings = DistributedPubSubSettings
                 .create(getContext().system())
                 .withRoutingLogic(SmallestMailboxRoutingLogic.apply())
-                .withRole(ContainerRole.DISPATCHER.getRole())
                 .withSendToDeadLettersWhenNoSubscribers(true);
 
-        ActorRef mediator = getContext().system().actorOf(Props.create(DistributedPubSubMediator.class, settings));
+        this.mediator = getContext().system().actorOf(Props.create(DistributedPubSubMediator.class, settings), domain);
 
-        mediator.tell(new DistributedPubSubMediator.Subscribe(domain + "-" + RUNNABLE_COMPUTATION.getTopicName(), getSelf()), getSelf());
+        this.mediator.tell(
+                new DistributedPubSubMediator.Subscribe(
+                        CatEyeActorUtil.getTopicName(domain, RUNNABLE_COMPUTATION),
+                        ContainerRole.DISPATCHER.getRole(),
+                        getSelf()
+                ),
+                getSelf()
+        );
     }
 
     @Override
@@ -38,8 +58,25 @@ public class Dispatcher extends AbstractActor {
         return receiveBuilder()
                 .match(DistributedPubSubMediator.SubscribeAck.class, msg ->
                         LOGGER.info("createReceive - was subscribed to topic: " + msg.subscribe().topic()))
-                .match(Message.RunnableComputation.class, msg -> {
-
+                .match(Message.RunnableComputation.class, comp -> {
+                        LOGGER.info("createReceive - RUNNABLE computation [" + comp.getComputation().getId() + "] was received.");
+                        // change state of computation
+                        Computation computation = comp.getComputation();
+                        computation.setState(ComputationState.RUNNING);
+                        // store computation into computation context service
+                        computationContextService.storeComputation(computation);
+                        // put computation into set of running computations
+                        computationContextService.putRunningComputation(computation);
+                        // create new running computation and send it to engine
+                        this.mediator.tell(
+                                new DistributedPubSubMediator.Publish(
+                                        CatEyeActorUtil.getTopicName(domain, RUNNING_COMPUTATION),
+                                        new Message.RunningComputation(comp.getComputation()),
+                                        true
+                                ),
+                                getSelf()
+                        );
+                        LOGGER.info("createReceive - computation [" + comp.getComputation().getId() + "] was send to engine.");
                 })
                 .build();
     }
