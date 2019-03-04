@@ -5,6 +5,9 @@ import akka.actor.ActorSystem;
 import akka.actor.Props;
 import akka.cluster.Cluster;
 import akka.cluster.client.ClusterClientReceptionist;
+import akka.cluster.pubsub.DistributedPubSubMediator;
+import akka.cluster.pubsub.DistributedPubSubSettings;
+import akka.routing.SmallestMailboxRoutingLogic;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import org.cat.eye.engine.common.ContainerRole;
@@ -50,6 +53,7 @@ public class CatEyeContainer {
 
     private ContainerRole role;
 
+    // TODO add capability to combine several roles in one container
     public CatEyeContainer(String roleName) {
 
         ContainerRole containerRole = ContainerRole.defineRole(roleName);
@@ -195,15 +199,26 @@ public class CatEyeContainer {
         }
 
         private void engineInit(String domain, ActorSystem domainSystem, Bundle bundle) {
-            domainSystem.actorOf(
-                    Props.create(
-                            Engine.class,
-                            domain,
-                            bundle,
-                            CatEyeContainer.computationContextService
-                    ),
-                    domain + ENGINE_ACTOR
-            );
+
+            DistributedPubSubSettings settings = DistributedPubSubSettings
+                    .create(domainSystem)
+                    .withRoutingLogic(SmallestMailboxRoutingLogic.apply())
+                    .withSendToDeadLettersWhenNoSubscribers(true);
+
+            ActorRef mediator = domainSystem.actorOf(Props.create(DistributedPubSubMediator.class, settings), domain);
+            // TODO get number of engine actors from config file or from properties
+            for (int i = 0; i < 8; i++) {
+                domainSystem.actorOf(
+                        Props.create(
+                                Engine.class,
+                                domain,
+                                bundle,
+                                CatEyeContainer.computationContextService,
+                                mediator
+                        ),
+                        domain + ENGINE_ACTOR + "-" + i
+                );
+            }
         }
     }
 

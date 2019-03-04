@@ -5,7 +5,7 @@ import org.cat.eye.engine.common.model.Computation;
 import java.io.Serializable;
 
 public interface Message {
-
+    // TODO customise serialisation of messages
     class NewComputation implements Serializable {
 
         private final Computation computation;

@@ -2,10 +2,7 @@ package org.cat.eye.engine.container.actors;
 
 import akka.actor.AbstractActor;
 import akka.actor.ActorRef;
-import akka.actor.Props;
 import akka.cluster.pubsub.DistributedPubSubMediator;
-import akka.cluster.pubsub.DistributedPubSubSettings;
-import akka.routing.SmallestMailboxRoutingLogic;
 import org.cat.eye.engine.common.ContainerRole;
 import org.cat.eye.engine.common.crusher.ComputationExecutor;
 import org.cat.eye.engine.common.deployment.management.Bundle;
@@ -30,18 +27,11 @@ public class Engine extends AbstractActor {
 
     private ComputationContextService computationContextService;
 
-    public Engine(String domain, Bundle bundle, ComputationContextService computationContextService) {
+    public Engine(String domain, Bundle bundle, ComputationContextService computationContextService, ActorRef mediator) {
 
         this.computationContextService = computationContextService;
-
         this.bundle = bundle;
-
-        DistributedPubSubSettings settings = DistributedPubSubSettings
-                .create(getContext().system())
-                .withRoutingLogic(SmallestMailboxRoutingLogic.apply())
-                .withSendToDeadLettersWhenNoSubscribers(true);
-
-        this.mediator = getContext().system().actorOf(Props.create(DistributedPubSubMediator.class, settings), domain);
+        this.mediator = mediator;
 
         this.mediator.tell(
                 new DistributedPubSubMediator.Subscribe(
