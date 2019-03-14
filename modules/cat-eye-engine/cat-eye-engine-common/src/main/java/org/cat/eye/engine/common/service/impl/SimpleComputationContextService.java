@@ -72,13 +72,13 @@ public class SimpleComputationContextService implements ComputationContextServic
 
     @Override
     public Computation addCompletedChildIdAndRefresh(UUID parentId, Computation childComputation) {
-
+        // get parent computation
         Computation parentComputation = this.computationStore.get(parentId);
-
+        // add completed child computation to the parent computation
         parentComputation.addCompletedChildId(childComputation.getId());
-
+        // update parent computation
         this.storeComputation(parentComputation);
-
+        // return refreshed parent computation
         return this.getComputation(parentComputation.getId());
     }
 }
