@@ -1,6 +1,7 @@
 package org.cat.eye.engine.common.service.impl;
 
 import org.cat.eye.engine.common.model.Computation;
+import org.cat.eye.engine.common.model.ComputationState;
 import org.cat.eye.engine.common.service.ComputationContextService;
 import java.lang.reflect.Parameter;
 import java.util.*;
@@ -52,5 +53,32 @@ public class SimpleComputationContextService implements ComputationContextServic
     @Override
     public void removeRunningComputation(Computation computation) {
         this.runningComputationStore.remove(computation.getId());
+    }
+
+    @Override
+    public void updateComputationState(Computation computation, ComputationState newState) {
+        computation.setState(newState);
+    }
+
+    @Override
+    public void setChildrenComputationIds(Computation computation, List<UUID> childIds) {
+        computation.setChildrenIDs(childIds);
+    }
+
+    @Override
+    public void nextComputationStep(Computation computation) {
+        computation.setNextStep(computation.getNextStep() + 1);
+    }
+
+    @Override
+    public Computation addCompletedChildIdAndRefresh(UUID parentId, Computation childComputation) {
+
+        Computation parentComputation = this.computationStore.get(parentId);
+
+        parentComputation.addCompletedChildId(childComputation.getId());
+
+        this.storeComputation(parentComputation);
+
+        return this.getComputation(parentComputation.getId());
     }
 }

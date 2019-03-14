@@ -26,9 +26,9 @@ public abstract class AbstractComputationExecutor {
 
     private ComputationContextService computationContextService;
 
-    public AbstractComputationExecutor(Computation computation,
-                                       Bundle bundle,
-                                       ComputationContextService computationContextService) {
+    AbstractComputationExecutor(Computation computation,
+                                Bundle bundle,
+                                ComputationContextService computationContextService) {
 
         this.computation = computation;
         this.bundle = bundle;
@@ -79,7 +79,7 @@ public abstract class AbstractComputationExecutor {
                         try {
                             arg = parameters[i].getType().newInstance();
                         } catch (InstantiationException e) {
-                            String error = String.format("ComputationExecutionTask.run - " +
+                            String error = String.format("run - " +
                                             "can't create parameter: computable class [%s], method [%s], type [%s].",
                                     computer.getClass().getName(), optional.get().getMethod(), parameters[i].getType());
                             LOGGER.error(error, e);
@@ -98,64 +98,87 @@ public abstract class AbstractComputationExecutor {
             }
 
             if (computers != null && !computers.isEmpty()) {
-                // set computation status
-                computation.setState(ComputationState.WAITING);
-                computationContextService.removeRunningComputation(computation);
+                // set computation status WAITING and remove computation from running set
+                fromRunningToWaiting(computation);
                 // create computations
                 List<Computation> childComputations = computers
                         .parallelStream()
                         .map(c -> ComputationFactory.create(c, computation.getId(), bundle.getDomain()))
                         .collect(Collectors.toList());
                 // register children in computation
-                List<UUID> childIDs = childComputations.stream().map(Computation::getId).collect(Collectors.toList());
-                computation.setChildrenIDs(childIDs);
-                // store computations by service
-                computationContextService.storeComputations(childComputations);
-                // set number of next step
-                computation.setNextStep(computation.getNextStep() + 1);
-                // update current computation state
-                computationContextService.storeComputation(computation);
+                registerChildrenComputations(computation, childComputations);
                 // put new computations to queue
                 childComputations.forEach(this::sendMsgToDispatcher);
             } else {
-                // set computation status
-                computation.setState(ComputationState.READY);
-                // try to execute next step
-                computation.setNextStep(computation.getNextStep() + 1);
-                // update current computation state
-                computationContextService.removeRunningComputation(computation);
-                computationContextService.storeComputation(computation);
+                // move computation from RUNNING state to READY state
+                fromRunningToReady(computation);
                 // call recursively this method
                 executeNextStep(computer, methods);
             }
 
         } else {
-            // mark computations as COMPLETED
-            computation.setState(ComputationState.COMPLETED);
-            // update computation in store
-            computationContextService.storeComputation(computation);
-            computationContextService.removeRunningComputation(computation);
+            // move computation from RUNNING state to COMPLETED state
+            fromRunningToCompleted(computation);
             // try to update state of parent computation
             UUID parentId = computation.getParentId();
             if (parentId != null) {
-                Computation parentComputation = computationContextService.getComputation(parentId);
-                if (parentComputation != null) {
-                    parentComputation.addCompletedChildId(computation.getId());
-                    // update parent computation
-                    computationContextService.storeComputation(parentComputation);
-                    parentComputation = computationContextService.getComputation(parentComputation.getId());
-                    // put parent computation to queue if it is ready (has READY state)
-                    if (parentComputation.isChildrenCompleted() && parentComputation.getState() == ComputationState.WAITING) {
-                        parentComputation.setState(ComputationState.READY);
-                        computationContextService.storeComputation(parentComputation);
-                        // put ready computation to queue
-                        sendMsgToDispatcher(parentComputation);
-                    }
+                // add to parent completed child computation and refresh parent computation
+                Computation parentComputation =
+                        computationContextService.addCompletedChildIdAndRefresh(parentId, computation);
+                // put parent computation to queue if it is ready (has READY state)
+                if (parentComputation.isChildrenCompleted() && parentComputation.getState() == ComputationState.WAITING) {
+                    // move parent computation from WAITING state to READY state
+                    fromWaitingToReady(parentComputation);
+                    // put ready computation to queue
+                    sendMsgToDispatcher(parentComputation);
                 }
+
             } else {
                 sendMsgToDriver(computation);
             }
         }
+    }
+
+    private void fromRunningToWaiting(Computation computation) {
+        // set computation status
+        computationContextService.updateComputationState(computation, ComputationState.WAITING);
+        // remove computation from running set
+        computationContextService.removeRunningComputation(computation);
+    }
+
+    private void registerChildrenComputations(Computation computation, List<Computation> childComputations) {
+        // register children in computation
+        List<UUID> childIDs = childComputations.stream().map(Computation::getId).collect(Collectors.toList());
+        computationContextService.setChildrenComputationIds(computation, childIDs);
+        // store computations by service
+        computationContextService.storeComputations(childComputations);
+        // set number of next step
+        computationContextService.nextComputationStep(computation);
+        // update current computation state
+        computationContextService.storeComputation(computation);
+    }
+
+    private void fromRunningToReady(Computation computation) {
+        // set computation status
+        computationContextService.updateComputationState(computation, ComputationState.READY);
+        // try to execute next step
+        computationContextService.nextComputationStep(computation);
+        // update current computation state
+        computationContextService.removeRunningComputation(computation);
+        computationContextService.storeComputation(computation);
+    }
+
+    private void fromRunningToCompleted(Computation computation) {
+        // mark computations as COMPLETED
+        computationContextService.updateComputationState(computation, ComputationState.COMPLETED);
+        // update computation in store
+        computationContextService.storeComputation(computation);
+        computationContextService.removeRunningComputation(computation);
+    }
+
+    private void fromWaitingToReady(Computation computation) {
+        computationContextService.updateComputationState(computation, ComputationState.READY);
+        computationContextService.storeComputation(computation);
     }
 
     protected abstract void sendMsgToDispatcher(Computation computation);
