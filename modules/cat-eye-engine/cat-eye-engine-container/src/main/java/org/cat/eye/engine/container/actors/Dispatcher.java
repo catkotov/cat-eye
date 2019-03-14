@@ -66,17 +66,18 @@ public class Dispatcher extends AbstractActor {
                         // store computation into computation context service
                         computationContextService.storeComputation(computation);
                         // put computation into set of running computations
-                        computationContextService.putRunningComputation(computation);
-                        // create new running computation and send it to engine
-                        this.mediator.tell(
-                                new DistributedPubSubMediator.Publish(
-                                        CatEyeActorUtil.getTopicName(domain, RUNNING_COMPUTATION),
-                                        new Message.RunningComputation(comp.getComputation()),
-                                        true
-                                ),
-                                getSelf()
-                        );
-                        LOGGER.info("createReceive - computation [" + comp.getComputation().getId() + "] was send to engine.");
+                        if (computationContextService.tryToRunComputation(computation)) {
+                            // create new running computation and send it to engine
+                            this.mediator.tell(
+                                    new DistributedPubSubMediator.Publish(
+                                            CatEyeActorUtil.getTopicName(domain, RUNNING_COMPUTATION),
+                                            new Message.RunningComputation(comp.getComputation()),
+                                            true
+                                    ),
+                                    getSelf()
+                            );
+                            LOGGER.info("createReceive - computation [" + comp.getComputation().getId() + "] was send to engine.");
+                        }
                 })
                 .build();
     }

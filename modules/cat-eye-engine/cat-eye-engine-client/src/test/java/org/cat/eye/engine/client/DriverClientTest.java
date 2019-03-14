@@ -15,9 +15,6 @@ import static org.junit.Assert.*;
 
 public class DriverClientTest {
 
-    private static final String PATH_TO_CLASS =
-            "E:\\Projects\\cat-eye\\cat-eye\\modules\\cat-eye-test-bundle\\cat-eye-test-bungle-simple\\target\\classes";
-
     private static final String DOMAIN = "TEST_DOMAIN";
 
     private DriverClient client;

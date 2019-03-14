@@ -35,8 +35,9 @@ public class ComputationDispatcherUnit extends AbstractActor {
                     Computation computation = runnableComputation.getComputation();
                     computation.setState(ComputationState.RUNNING);
                     computationContextService.storeComputation(computation);
-                    computationContextService.putRunningComputation(computation);
-                    router.tell(new Message.RunningComputation(computation), getSelf());
+                    if (computationContextService.tryToRunComputation(computation)) {
+                        router.tell(new Message.RunningComputation(computation), getSelf());
+                    }
                 })
                 .build();
     }

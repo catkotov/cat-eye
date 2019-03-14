@@ -6,6 +6,8 @@ import org.cat.eye.engine.common.service.ComputationContextService;
 import java.lang.reflect.Parameter;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Created by Kotov on 10.11.2017.
@@ -17,6 +19,8 @@ public class SimpleComputationContextService implements ComputationContextServic
     private Map<String, Object> argumentStore = new ConcurrentHashMap<>();
 
     private Map<UUID, Computation> runningComputationStore = new ConcurrentHashMap<>();
+
+    private Lock lock = new ReentrantLock();
 
     @Override
     public void storeComputations(List<Computation> computations) {
@@ -46,8 +50,23 @@ public class SimpleComputationContextService implements ComputationContextServic
     }
 
     @Override
-    public void putRunningComputation(Computation computation) {
-        this.runningComputationStore.put(computation.getId(), computation);
+    public boolean tryToRunComputation(Computation computation) {
+
+        boolean result = false;
+
+        try {
+            lock.lock();
+
+            if (!runningComputationStore.containsKey(computation.getId())) {
+                this.runningComputationStore.put(computation.getId(), computation);
+                result = true;
+            }
+
+        } finally {
+            lock.unlock();
+        }
+
+        return result;
     }
 
     @Override

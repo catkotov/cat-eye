@@ -19,7 +19,7 @@ public interface ComputationContextService {
 
     void storeArguments(Object[] args, String domain);
 
-    void putRunningComputation(Computation computation);
+    boolean tryToRunComputation(Computation computation);
 
     void removeRunningComputation(Computation computation);
 
