@@ -24,18 +24,8 @@ public class SimpleComputationContextService implements ComputationContextServic
     private Lock lock = new ReentrantLock();
 
     @Override
-    public void storeComputations(List<Computation> computations) {
-        computations.forEach(this::storeComputation);
-    }
-
-    @Override
     public void storeComputation(Computation computation) {
         this.computationStore.put(computation.getId(), computation);
-    }
-
-    @Override
-    public Computation getComputation(UUID id) {
-        return this.computationStore.get(id);
     }
 
     @Override
@@ -56,40 +46,17 @@ public class SimpleComputationContextService implements ComputationContextServic
         boolean result = false;
 
         try {
-            lock.lock();
+            lock.lock(); // distributed storage imitation
 
             if (!this.runningComputationStore.containsKey(computation.getId())) {
                 this.runningComputationStore.put(computation.getId(), computation);
                 result = true;
             }
-
         } finally {
             lock.unlock();
         }
 
         return result;
-    }
-
-    @Override
-    public void removeRunningComputation(Computation computation) {
-        this.runningComputationStore.remove(computation.getId());
-    }
-
-
-
-    @Override
-    public void updateComputationState(Computation computation, ComputationState newState) {
-        computation.setState(newState);
-    }
-
-    @Override
-    public void setChildrenComputationIds(Computation computation, List<UUID> childIds) {
-        computation.setChildrenIDs(childIds);
-    }
-
-    @Override
-    public void nextComputationStep(Computation computation) {
-        computation.setNextStep(computation.getNextStep() + 1);
     }
 
     @Override
@@ -104,12 +71,24 @@ public class SimpleComputationContextService implements ComputationContextServic
         return getComputation(parentComputation.getId());
     }
 
+    private Computation getComputation(UUID id) {
+        return this.computationStore.get(id);
+    }
+
     @Override
     public void fromRunningToWaiting(Computation computation) {
         // set computation status
         updateComputationState(computation, ComputationState.WAITING);
         // remove computation from running set
         removeRunningComputation(computation);
+    }
+
+    private void updateComputationState(Computation computation, ComputationState newState) {
+        computation.setState(newState);
+    }
+
+    private void removeRunningComputation(Computation computation) {
+        this.runningComputationStore.remove(computation.getId());
     }
 
     @Override
@@ -123,6 +102,18 @@ public class SimpleComputationContextService implements ComputationContextServic
         nextComputationStep(computation);
         // update current computation state
         storeComputation(computation);
+    }
+
+    private void setChildrenComputationIds(Computation computation, List<UUID> childIds) {
+        computation.setChildrenIDs(childIds);
+    }
+
+    private void storeComputations(List<Computation> computations) {
+        computations.forEach(this::storeComputation);
+    }
+
+    private void nextComputationStep(Computation computation) {
+        computation.setNextStep(computation.getNextStep() + 1);
     }
 
     @Override
@@ -149,5 +140,10 @@ public class SimpleComputationContextService implements ComputationContextServic
     public void fromWaitingToReady(Computation computation) {
         updateComputationState(computation, ComputationState.READY);
         storeComputation(computation);
+    }
+
+    @Override
+    public void close() {
+
     }
 }

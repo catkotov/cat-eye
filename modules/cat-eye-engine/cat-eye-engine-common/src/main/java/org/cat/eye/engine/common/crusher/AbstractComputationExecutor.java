@@ -139,48 +139,6 @@ public abstract class AbstractComputationExecutor {
         }
     }
 
-//    private void fromRunningToWaiting(Computation computation) {
-//        // set computation status
-//        computationContextService.updateComputationState(computation, ComputationState.WAITING);
-//        // remove computation from running set
-//        computationContextService.removeRunningComputation(computation);
-//    }
-
-//    private void registerChildrenComputations(Computation computation, List<Computation> childComputations) {
-//        // register children in computation
-//        List<UUID> childIDs = childComputations.stream().map(Computation::getId).collect(Collectors.toList());
-//        computationContextService.setChildrenComputationIds(computation, childIDs);
-//        // store computations by service
-//        computationContextService.storeComputations(childComputations);
-//        // set number of next step
-//        computationContextService.nextComputationStep(computation);
-//        // update current computation state
-//        computationContextService.storeComputation(computation);
-//    }
-//
-//    private void fromRunningToReady(Computation computation) {
-//        // set computation status
-//        computationContextService.updateComputationState(computation, ComputationState.READY);
-//        // try to execute next step
-//        computationContextService.nextComputationStep(computation);
-//        // update current computation state
-//        computationContextService.removeRunningComputation(computation);
-//        computationContextService.storeComputation(computation);
-//    }
-//
-//    private void fromRunningToCompleted(Computation computation) {
-//        // mark computations as COMPLETED
-//        computationContextService.updateComputationState(computation, ComputationState.COMPLETED);
-//        // update computation in store
-//        computationContextService.storeComputation(computation);
-//        computationContextService.removeRunningComputation(computation);
-//    }
-//
-//    private void fromWaitingToReady(Computation computation) {
-//        computationContextService.updateComputationState(computation, ComputationState.READY);
-//        computationContextService.storeComputation(computation);
-//    }
-
     protected abstract void sendMsgToDispatcher(Computation computation);
 
     protected abstract void sendMsgToDriver(Computation computation);
