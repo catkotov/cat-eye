@@ -42,17 +42,17 @@
                 <version>${cat.eye.version}</version>
             </dependency>
 
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-context</artifactId>
-                <version>${spring.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>commons-logging</groupId>
-                        <artifactId>commons-logging</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
+            <!--<dependency>-->
+                <!--<groupId>org.springframework</groupId>-->
+                <!--<artifactId>spring-context</artifactId>-->
+                <!--<version>${spring.version}</version>-->
+                <!--<exclusions>-->
+                    <!--<exclusion>-->
+                        <!--<groupId>commons-logging</groupId>-->
+                        <!--<artifactId>commons-logging</artifactId>-->
+                    <!--</exclusion>-->
+                <!--</exclusions>-->
+            <!--</dependency>-->
 
             <dependency>
                 <groupId>org.slf4j</groupId>
@@ -129,6 +129,7 @@
         <module>cat-eye-engine-common</module>
         <module>cat-eye-engine-container-unit</module>
         <module>cat-eye-engine-client</module>
+        <module>cat-eye-engine-services</module>
     </modules>
 
     <build>
