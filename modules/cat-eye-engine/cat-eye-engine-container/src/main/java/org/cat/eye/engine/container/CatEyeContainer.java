@@ -35,7 +35,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Created by Kotov on 18.02.2019.
  */
-public class CatEyeContainer {
+public class CatEyeContainer implements AutoCloseable {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(CatEyeContainer.class);
 
@@ -220,6 +220,33 @@ public class CatEyeContainer {
                 );
             }
         }
+    }
+
+    @Override
+    public void close() throws Exception {
+
+        computationContextService.close();
+
+        context.entrySet().forEach((entry) -> entry.getValue().getSystem().terminate());
+
+        LOGGER.info("close - container with role " + this.role.getRole().toUpperCase() + " was closed.");
+    }
+
+    public static void start(String roleName) {
+
+        CatEyeContainer container = new CatEyeContainer(roleName);
+
+        final Thread mainThread = Thread.currentThread();
+
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            try {
+                container.close();
+            } catch (Exception e) {
+                LOGGER.error("ShutdownHook - cannot close container.", e);
+            } finally {
+                mainThread.interrupt();
+            }
+        }));
     }
 
 }
