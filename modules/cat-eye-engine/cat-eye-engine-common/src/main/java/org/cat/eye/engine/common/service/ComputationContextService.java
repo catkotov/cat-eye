@@ -23,6 +23,8 @@ public interface ComputationContextService {
 
     void removeRunningComputation(Computation computation);
 
+
+
     void updateComputationState(Computation computation, ComputationState newState);
 
     void setChildrenComputationIds(Computation computation, List<UUID> childIds);
@@ -30,4 +32,15 @@ public interface ComputationContextService {
     void nextComputationStep(Computation computation);
 
     Computation addCompletedChildIdAndRefresh(UUID parentId, Computation childComputation);
+
+    void fromRunningToWaiting(Computation computation);
+
+    void registerChildrenComputations(Computation computation, List<Computation> childComputations);
+
+    void fromRunningToReady(Computation computation);
+
+    void fromRunningToCompleted(Computation computation);
+
+    void fromWaitingToReady(Computation computation);
+
 }

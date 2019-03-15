@@ -8,6 +8,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.stream.Collectors;
 
 /**
  * Created by Kotov on 10.11.2017.
@@ -29,23 +30,23 @@ public class SimpleComputationContextService implements ComputationContextServic
 
     @Override
     public void storeComputation(Computation computation) {
-        computationStore.put(computation.getId(), computation);
+        this.computationStore.put(computation.getId(), computation);
     }
 
     @Override
     public Computation getComputation(UUID id) {
-        return computationStore.get(id);
+        return this.computationStore.get(id);
     }
 
     @Override
     public Object getArgument(Parameter parameter, String domain) {
-        return argumentStore.get(domain + "-" + parameter.getType().getName());
+        return this.argumentStore.get(domain + "-" + parameter.getType().getName());
     }
 
     @Override
     public void storeArguments(Object[] args, String domain) {
         for (Object arg : args) {
-            argumentStore.put(domain + "-" + arg.getClass().getName(), arg);
+            this.argumentStore.put(domain + "-" + arg.getClass().getName(), arg);
         }
     }
 
@@ -57,7 +58,7 @@ public class SimpleComputationContextService implements ComputationContextServic
         try {
             lock.lock();
 
-            if (!runningComputationStore.containsKey(computation.getId())) {
+            if (!this.runningComputationStore.containsKey(computation.getId())) {
                 this.runningComputationStore.put(computation.getId(), computation);
                 result = true;
             }
@@ -73,6 +74,8 @@ public class SimpleComputationContextService implements ComputationContextServic
     public void removeRunningComputation(Computation computation) {
         this.runningComputationStore.remove(computation.getId());
     }
+
+
 
     @Override
     public void updateComputationState(Computation computation, ComputationState newState) {
@@ -96,8 +99,55 @@ public class SimpleComputationContextService implements ComputationContextServic
         // add completed child computation to the parent computation
         parentComputation.addCompletedChildId(childComputation.getId());
         // update parent computation
-        this.storeComputation(parentComputation);
+        storeComputation(parentComputation);
         // return refreshed parent computation
-        return this.getComputation(parentComputation.getId());
+        return getComputation(parentComputation.getId());
+    }
+
+    @Override
+    public void fromRunningToWaiting(Computation computation) {
+        // set computation status
+        updateComputationState(computation, ComputationState.WAITING);
+        // remove computation from running set
+        removeRunningComputation(computation);
+    }
+
+    @Override
+    public void registerChildrenComputations(Computation computation, List<Computation> childComputations) {
+        // register children in computation
+        List<UUID> childIDs = childComputations.stream().map(Computation::getId).collect(Collectors.toList());
+        setChildrenComputationIds(computation, childIDs);
+        // store computations by service
+        storeComputations(childComputations);
+        // set number of next step
+        nextComputationStep(computation);
+        // update current computation state
+        storeComputation(computation);
+    }
+
+    @Override
+    public void fromRunningToReady(Computation computation) {
+        // set computation status
+        updateComputationState(computation, ComputationState.READY);
+        // try to execute next step
+        nextComputationStep(computation);
+        // update current computation state
+        removeRunningComputation(computation);
+        storeComputation(computation);
+    }
+
+    @Override
+    public void fromRunningToCompleted(Computation computation) {
+        // mark computations as COMPLETED
+        updateComputationState(computation, ComputationState.COMPLETED);
+        // update computation in store
+        storeComputation(computation);
+        removeRunningComputation(computation);
+    }
+
+    @Override
+    public void fromWaitingToReady(Computation computation) {
+        updateComputationState(computation, ComputationState.READY);
+        storeComputation(computation);
     }
 }
