@@ -60,14 +60,10 @@ public class Dispatcher extends AbstractActor {
                         LOGGER.info("createReceive - was subscribed to topic: " + msg.subscribe().topic()))
                 .match(Message.RunnableComputation.class, comp -> {
                         LOGGER.info("createReceive - RUNNABLE computation [" + comp.getComputation().getId() + "] was received.");
-                        // change state of computation
                         Computation computation = comp.getComputation();
-                        computation.setState(ComputationState.RUNNING);
-                        // store computation into computation context service
-                        computationContextService.storeComputation(computation);
-                        // put computation into set of running computations
+
                         if (computationContextService.tryToRunComputation(computation)) {
-                            // create new running computation and send it to engine
+                            // create new running computation message and send it to engine
                             this.mediator.tell(
                                     new DistributedPubSubMediator.Publish(
                                             CatEyeActorUtil.getTopicName(domain, RUNNING_COMPUTATION),

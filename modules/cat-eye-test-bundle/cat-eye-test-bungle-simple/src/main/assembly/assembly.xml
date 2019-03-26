@@ -18,6 +18,13 @@
         <dependencySet>
             <outputDirectory>lib</outputDirectory>
             <useTransitiveFiltering>true</useTransitiveFiltering>
+            <excludes>
+                <exclude>*:akka*</exclude>
+                <exclude>*:netty*</exclude>
+                <exclude>*:scala*</exclude>
+                <exclude>*:hamcrest*</exclude>
+                <exclude>*:junit*</exclude>
+            </excludes>
         </dependencySet>
     </dependencySets>
 

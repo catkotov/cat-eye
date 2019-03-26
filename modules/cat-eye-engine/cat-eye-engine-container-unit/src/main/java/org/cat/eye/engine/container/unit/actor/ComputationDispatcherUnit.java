@@ -33,8 +33,7 @@ public class ComputationDispatcherUnit extends AbstractActor {
         return receiveBuilder()
                 .match(Message.RunnableComputation.class, runnableComputation -> {
                     Computation computation = runnableComputation.getComputation();
-                    computation.setState(ComputationState.RUNNING);
-                    computationContextService.storeComputation(computation);
+
                     if (computationContextService.tryToRunComputation(computation)) {
                         router.tell(new Message.RunningComputation(computation), getSelf());
                     }

@@ -49,6 +49,8 @@ public class SimpleComputationContextService implements ComputationContextServic
             lock.lock(); // distributed storage imitation
 
             if (!this.runningComputationStore.containsKey(computation.getId())) {
+                updateComputationState(computation, ComputationState.RUNNING);
+                this.computationStore.put(computation.getId(), computation);
                 this.runningComputationStore.put(computation.getId(), computation);
                 result = true;
             }

@@ -1,12 +1,13 @@
 package org.cat.eye.engine.common.model;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.UUID;
 
 /**
  * Created by Kotov on 15.09.2017.
  */
-public interface Computation {
+public interface Computation extends Serializable {
 
     UUID getId();
 
