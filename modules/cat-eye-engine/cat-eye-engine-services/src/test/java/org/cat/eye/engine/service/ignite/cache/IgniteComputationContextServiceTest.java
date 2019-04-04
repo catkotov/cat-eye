@@ -5,7 +5,6 @@ import org.cat.eye.engine.common.model.Computation;
 import org.cat.eye.engine.common.model.ComputationState;
 import org.cat.eye.test.bundle.simple.StartFileCounterComputer;
 import org.junit.*;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,6 +47,10 @@ public class IgniteComputationContextServiceTest {
         result = computationContextService.tryToRunComputation(computation);
 
         assertFalse(result);
+
+        Computation running = computationContextService.getRunningComputation(computation.getId());
+
+        assertEquals(computation, running);
     }
 
     @Test
@@ -76,4 +79,106 @@ public class IgniteComputationContextServiceTest {
 
         assertTrue(parentComputation.isChildrenCompleted());
     }
+
+    @Test
+    public void fromRunningToWaiting() {
+
+        Computation computation = ComputationFactory.create(new StartFileCounterComputer("C:\\Java"), null, "DOMAIN");
+
+        computationContextService.tryToRunComputation(computation);
+
+        Computation test = computationContextService.getComputation(computation.getId());
+
+        assertEquals(computation, test);
+        assertEquals(ComputationState.RUNNING, test.getState());
+
+        test = computationContextService.getRunningComputation(computation.getId());
+
+        assertEquals(computation, test);
+        assertEquals(ComputationState.RUNNING, test.getState());
+
+        computation = computationContextService.getRunningComputation(computation.getId());
+
+        computationContextService.fromRunningToWaiting(computation);
+
+        test = computationContextService.getComputation(computation.getId());
+        assertEquals(ComputationState.WAITING, test.getState());
+
+        test = computationContextService.getRunningComputation(computation.getId());
+
+        assertNull(test);
+    }
+
+    @Test
+    public void fromRunningToReady() {
+
+        Computation computation = ComputationFactory.create(new StartFileCounterComputer("C:\\Java"), null, "DOMAIN");
+
+        computationContextService.tryToRunComputation(computation);
+
+        Computation test = computationContextService.getComputation(computation.getId());
+
+        assertEquals(computation, test);
+        assertEquals(ComputationState.RUNNING, test.getState());
+
+        test = computationContextService.getRunningComputation(computation.getId());
+
+        assertEquals(computation, test);
+        assertEquals(ComputationState.RUNNING, test.getState());
+
+        computation = computationContextService.getRunningComputation(computation.getId());
+
+        computationContextService.fromRunningToReady(computation);
+
+        test = computationContextService.getComputation(computation.getId());
+        assertEquals(ComputationState.READY, test.getState());
+
+        test = computationContextService.getRunningComputation(computation.getId());
+
+        assertNull(test);
+    }
+
+    @Test
+    public void fromRunningToCompleted() {
+
+        Computation computation = ComputationFactory.create(new StartFileCounterComputer("C:\\Java"), null, "DOMAIN");
+
+        computationContextService.tryToRunComputation(computation);
+
+        Computation test = computationContextService.getComputation(computation.getId());
+
+        assertEquals(computation, test);
+        assertEquals(ComputationState.RUNNING, test.getState());
+
+        test = computationContextService.getRunningComputation(computation.getId());
+
+        assertEquals(computation, test);
+        assertEquals(ComputationState.RUNNING, test.getState());
+
+        computation = computationContextService.getRunningComputation(computation.getId());
+
+        computationContextService.fromRunningToCompleted(computation);
+
+        test = computationContextService.getComputation(computation.getId());
+        assertEquals(ComputationState.COMPLETED, test.getState());
+
+        test = computationContextService.getRunningComputation(computation.getId());
+
+        assertNull(test);
+    }
+
+    @Test
+    public void fromWaitingToReady() {
+
+        Computation computation = ComputationFactory.create(new StartFileCounterComputer("C:\\Java"), null, "DOMAIN");
+        computation.setState(ComputationState.WAITING);
+        computationContextService.storeComputation(computation);
+
+        computationContextService.fromWaitingToReady(computation);
+
+        Computation test = computationContextService.getComputation(computation.getId());
+
+        assertEquals(ComputationState.READY, test.getState());
+    }
+
 }

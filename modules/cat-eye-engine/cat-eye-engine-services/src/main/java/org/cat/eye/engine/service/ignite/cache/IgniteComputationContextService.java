@@ -188,10 +188,6 @@ public class IgniteComputationContextService implements ComputationContextServic
         updateComputationState(computation, ComputationState.READY);
     }
 
-    public Computation getComputation(UUID id) {
-        return computationCache.get(id);
-    }
-
     @Override
     public void close() {
 
@@ -206,6 +202,14 @@ public class IgniteComputationContextService implements ComputationContextServic
         if (this.ignite != null) {
             this.ignite.close();
         }
+    }
+
+    public Computation getComputation(UUID id) {
+        return computationCache.get(id);
+    }
+
+    public Computation getRunningComputation(UUID id) {
+        return runningComputationCache.get(id);
     }
 
 }
