@@ -30,7 +30,7 @@ public class IgniteComputationContextService implements ComputationContextServic
 
     private IgniteCache<UUID, Computation> runningComputationCache;
 
-    public IgniteComputationContextService(String connectionPoints) {
+    IgniteComputationContextService(String connectionPoints) {
 
         String[] addresses = connectionPoints.split(",");
 
@@ -63,6 +63,11 @@ public class IgniteComputationContextService implements ComputationContextServic
     @Override
     public Object getArgument(Parameter parameter, String domain) {
         return null;
+    }
+
+    @Override
+    public void setArgument(Parameter parameter, String domain, Object argument) {
+
     }
 
     @Override
@@ -204,11 +209,11 @@ public class IgniteComputationContextService implements ComputationContextServic
         }
     }
 
-    public Computation getComputation(UUID id) {
+    Computation getComputation(UUID id) {
         return computationCache.get(id);
     }
 
-    public Computation getRunningComputation(UUID id) {
+    Computation getRunningComputation(UUID id) {
         return runningComputationCache.get(id);
     }
 

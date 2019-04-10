@@ -63,6 +63,7 @@ public class CatEyeContainer implements AutoCloseable {
             this.bundleManager = new BundleManagerImpl();
             this.bundleDeployer = new BundleDeployerImpl();
             this.bundleDeployer.setBundleManager(this.bundleManager);
+            this.bundleDeployer.setComputationContextService(computationContextService);
 
             this.role = containerRole;
 

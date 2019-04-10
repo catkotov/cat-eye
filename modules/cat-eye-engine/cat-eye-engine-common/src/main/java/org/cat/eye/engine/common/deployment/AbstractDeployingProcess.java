@@ -4,6 +4,7 @@ import org.cat.eye.engine.common.deployment.management.Bundle;
 import org.cat.eye.engine.common.deployment.management.BundleImpl;
 import org.cat.eye.engine.common.deployment.management.BundleManager;
 import org.cat.eye.engine.common.model.MethodSpecification;
+import org.cat.eye.engine.common.service.ComputationContextService;
 import org.cat.eye.engine.model.annotation.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +23,15 @@ public class AbstractDeployingProcess {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(AbstractDeployingProcess.class);
 
-    protected void deployBundle(List<String> classNameLst, String domain, BundleManager bundleManager) {
+    private String domain;
+    private ComputationContextService computationContextService;
+
+    public AbstractDeployingProcess(String domain, ComputationContextService computationContextService) {
+        this.domain = domain;
+        this.computationContextService = computationContextService;
+    }
+
+    protected void deployBundle(List<String> classNameLst, BundleManager bundleManager) {
 
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 
@@ -59,7 +68,8 @@ public class AbstractDeployingProcess {
         Set<MethodSpecification> methodSpecificationSet = null;
 
         Method[] methods = bundleClass.getMethods();
-        if (methods != null && methods.length != 0) {
+        // TODO simplify
+        if (methods.length != 0) {
 
             methodSpecificationSet = new TreeSet<>();
 
@@ -70,11 +80,30 @@ public class AbstractDeployingProcess {
                     if (parameters != null && parameters.length != 0) {
 
                         for (Parameter parameter : parameters) {
-                            if (!parameter.isAnnotationPresent(In.class)
-                                    && !parameter.isAnnotationPresent(Out.class)
-                                    && !parameter.isAnnotationPresent(InOut.class)) {
+                            if (parameter.isAnnotationPresent(In.class)
+                                    || parameter.isAnnotationPresent(Out.class)
+                                    || parameter.isAnnotationPresent(InOut.class)) {
 
-                                String errorMsg = String.format("Parameter [%s] of method [%s] in class [%s] is not annotated!!!",
+                                try {
+                                    if (computationContextService.getArgument(parameter, domain) == null) {
+
+                                        computationContextService.setArgument(
+                                                parameter,
+                                                domain,
+                                                parameter.getType().newInstance()
+                                        );
+
+                                        LOGGER.info("getMethodSpecifications - parameter ["
+                                                + parameter.getType().getSimpleName() + "] was instantiated.");
+                                    }
+                                } catch (InstantiationException | IllegalAccessException e) {
+                                    // TODO maybe we need to throw exception to upper catcher
+                                    LOGGER.error("getMethodSpecifications - can't create argument for parameter "
+                                            + parameter.getName(), e);
+                                }
+                            } else {
+                                String errorMsg =
+                                        String.format("Parameter [%s] of method [%s] in class [%s] is not annotated!!!",
                                         parameter.getName(), method.getName(), bundleClass.getName());
                                 throw new RuntimeException(errorMsg);
                             }

@@ -13,6 +13,8 @@ public interface ComputationContextService {
 
     Object getArgument(Parameter parameter, String domain);
 
+    void setArgument(Parameter parameter, String domain, Object argument);
+
     void storeArguments(Object[] args, String domain);
 
     boolean tryToRunComputation(Computation computation);

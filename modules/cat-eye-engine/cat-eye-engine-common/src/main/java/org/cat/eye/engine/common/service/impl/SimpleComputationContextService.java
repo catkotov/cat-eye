@@ -34,6 +34,11 @@ public class SimpleComputationContextService implements ComputationContextServic
     }
 
     @Override
+    public void setArgument(Parameter parameter, String domain, Object argument) {
+        this.argumentStore.put(domain + "-" + parameter.getType().getName(), argument);
+    }
+
+    @Override
     public void storeArguments(Object[] args, String domain) {
         for (Object arg : args) {
             this.argumentStore.put(domain + "-" + arg.getClass().getName(), arg);
