@@ -42,6 +42,12 @@
             <version>${project.parent.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.cat.eye.engine</groupId>
+            <artifactId>cat-eye-engine-services</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+
         <!--<dependency>-->
             <!--<groupId>org.springframework</groupId>-->
             <!--<artifactId>spring-context</artifactId>-->

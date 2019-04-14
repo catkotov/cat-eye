@@ -4,10 +4,8 @@ import org.cat.eye.engine.common.deployment.BundleClassLoader;
 import org.cat.eye.engine.common.deployment.BundleDeployer;
 import org.cat.eye.engine.common.deployment.management.Bundle;
 import org.cat.eye.engine.common.deployment.management.BundleManager;
-import org.cat.eye.engine.common.service.ComputationContextService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -25,8 +23,6 @@ public class BundleDeployerImpl implements BundleDeployer {
 
     private BundleManager bundleManager;
 
-    private ComputationContextService computationContextService;
-
     @Override
     public Bundle deploy(String domain, String pathToJar) {
         // get urls of jar's file
@@ -34,7 +30,7 @@ public class BundleDeployerImpl implements BundleDeployer {
         // create class loader for bundle
         URLBundleClassLoader bundleClassLoader = new URLBundleClassLoader(ursl, new BundleClassLoader());
         // create and start thread for bundle deploying
-        Thread deployingThread = new Thread(new DeployingProcess(pathToJar, domain, bundleManager, computationContextService));
+        Thread deployingThread = new Thread(new DeployingProcess(pathToJar, domain, bundleManager));
         deployingThread.setContextClassLoader(bundleClassLoader);
         deployingThread.start();
         try {
@@ -83,11 +79,6 @@ public class BundleDeployerImpl implements BundleDeployer {
     @Override
     public void setBundleManager(BundleManager bundleManager) {
         this.bundleManager = bundleManager;
-    }
-
-    @Override
-    public void setComputationContextService(ComputationContextService computationContextService) {
-        this.computationContextService = computationContextService;
     }
 
 }

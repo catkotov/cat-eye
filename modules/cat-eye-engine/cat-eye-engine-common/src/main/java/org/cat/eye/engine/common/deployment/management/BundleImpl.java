@@ -1,6 +1,7 @@
 package org.cat.eye.engine.common.deployment.management;
 
 import org.cat.eye.engine.common.model.MethodSpecification;
+import org.cat.eye.engine.common.service.BundleService;
 
 import java.util.Map;
 import java.util.Set;
@@ -16,10 +17,13 @@ public class BundleImpl implements Bundle {
 
     private Map<Class<?>, Set<MethodSpecification>> computables;
 
-    public BundleImpl(String domain, Map<Class<?>, Set<MethodSpecification>> computables, ClassLoader classLoader) {
+    private BundleService bundleService;
+
+    public BundleImpl(String domain, Map<Class<?>, Set<MethodSpecification>> computables, ClassLoader classLoader, BundleService bundleService) {
         this.domain = domain;
         this.computables = computables;
         this.classLoader = classLoader;
+        this.bundleService = bundleService;
     }
 
     @Override
@@ -35,5 +39,10 @@ public class BundleImpl implements Bundle {
     @Override
     public Map<Class<?>, Set<MethodSpecification>> getComputables() {
         return computables;
+    }
+
+    @Override
+    public BundleService getBundleService() {
+        return bundleService;
     }
 }

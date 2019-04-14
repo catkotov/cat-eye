@@ -17,8 +17,6 @@ public class SimpleComputationContextService implements ComputationContextServic
 
     private Map<UUID, Computation> computationStore = new ConcurrentHashMap<>();
 
-    private Map<String, Object> argumentStore = new ConcurrentHashMap<>();
-
     private Map<UUID, Computation> runningComputationStore = new ConcurrentHashMap<>();
 
     private Lock lock = new ReentrantLock();
@@ -26,23 +24,6 @@ public class SimpleComputationContextService implements ComputationContextServic
     @Override
     public void storeComputation(Computation computation) {
         this.computationStore.put(computation.getId(), computation);
-    }
-
-    @Override
-    public Object getArgument(Parameter parameter, String domain) {
-        return this.argumentStore.get(domain + "-" + parameter.getType().getName());
-    }
-
-    @Override
-    public void setArgument(Parameter parameter, String domain, Object argument) {
-        this.argumentStore.put(domain + "-" + parameter.getType().getName(), argument);
-    }
-
-    @Override
-    public void storeArguments(Object[] args, String domain) {
-        for (Object arg : args) {
-            this.argumentStore.put(domain + "-" + arg.getClass().getName(), arg);
-        }
     }
 
     @Override

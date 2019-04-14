@@ -40,7 +40,6 @@ public class CatEyeContainerUnit {
         this.bundleDeployer = new UnitBundleDeployerImpl();
         this.bundleManager = new BundleManagerImpl();
         this.bundleDeployer.setBundleManager(bundleManager);
-        this.bundleDeployer.setComputationContextService(computationContextService);
 
         actorSystem = ActorSystem.create("cat-eye-container-unit-actor-system", ConfigFactory.load().getConfig("AkkaContainerUnit"));
     }

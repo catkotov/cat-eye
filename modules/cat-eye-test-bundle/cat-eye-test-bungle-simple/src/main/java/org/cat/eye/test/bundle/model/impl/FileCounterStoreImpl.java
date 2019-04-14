@@ -36,6 +36,8 @@ public class FileCounterStoreImpl implements FileCounterStore {
 
         IgniteConfiguration cfg = new IgniteConfiguration();
 
+        cfg.setIgniteInstanceName("test");
+
         cfg.setDiscoverySpi(spi);
 
         cfg.setPeerClassLoadingEnabled(true);

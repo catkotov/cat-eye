@@ -4,7 +4,7 @@ import org.cat.eye.engine.common.deployment.management.Bundle;
 import org.cat.eye.engine.common.deployment.management.BundleImpl;
 import org.cat.eye.engine.common.deployment.management.BundleManager;
 import org.cat.eye.engine.common.model.MethodSpecification;
-import org.cat.eye.engine.common.service.ComputationContextService;
+import org.cat.eye.engine.common.service.BundleService;
 import org.cat.eye.engine.model.annotation.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,11 +24,10 @@ public class AbstractDeployingProcess {
     private final static Logger LOGGER = LoggerFactory.getLogger(AbstractDeployingProcess.class);
 
     private String domain;
-    private ComputationContextService computationContextService;
+    private BundleService bundleService;
 
-    public AbstractDeployingProcess(String domain, ComputationContextService computationContextService) {
+    public AbstractDeployingProcess(String domain) {
         this.domain = domain;
-        this.computationContextService = computationContextService;
     }
 
     protected void deployBundle(List<String> classNameLst, BundleManager bundleManager) {
@@ -57,7 +56,7 @@ public class AbstractDeployingProcess {
         }
         // create and store bundle context
         if (!computables.isEmpty()) {
-            Bundle bundle = new BundleImpl(domain, computables, classLoader);
+            Bundle bundle = new BundleImpl(domain, computables, classLoader, bundleService);
             bundleManager.putBundle(bundle);
             LOGGER.info("deployBundle - bundle " + bundle.getDomain() + " was deployed.");
         }
@@ -85,9 +84,9 @@ public class AbstractDeployingProcess {
                                     || parameter.isAnnotationPresent(InOut.class)) {
 
                                 try {
-                                    if (computationContextService.getArgument(parameter, domain) == null) {
+                                    if (bundleService.getArgument(parameter, domain) == null) {
 
-                                        computationContextService.setArgument(
+                                        bundleService.setArgument(
                                                 parameter,
                                                 domain,
                                                 parameter.getType().newInstance()
@@ -115,5 +114,9 @@ public class AbstractDeployingProcess {
             }
         }
         return methodSpecificationSet;
+    }
+
+    public void setBundleService(BundleService bundleService) {
+        this.bundleService = bundleService;
     }
 }

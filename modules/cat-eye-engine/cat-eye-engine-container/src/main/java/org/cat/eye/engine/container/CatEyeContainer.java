@@ -24,6 +24,7 @@ import org.cat.eye.engine.container.actors.Driver;
 import org.cat.eye.engine.container.actors.Engine;
 import org.cat.eye.engine.container.context.DomainContext;
 import org.cat.eye.engine.container.deployment.BundleDeployerImpl;
+import org.cat.eye.engine.service.ignite.cache.IgniteComputationContextService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.io.File;
@@ -42,8 +43,9 @@ public class CatEyeContainer implements AutoCloseable {
     private static final String JAR_EXTENSION = ".jar";
 
     private static String repositoryDirectory = "E:/CatEyeContainer/Repository";
-    // only for testing purpose
-    private final static ComputationContextService computationContextService = new SimpleComputationContextService();
+    // TODO get address list from outside
+    private final static ComputationContextService computationContextService =
+            new IgniteComputationContextService("127.0.0.1:47500..47509"); //new SimpleComputationContextService();
 
     private ConcurrentHashMap<String, DomainContext> context = new ConcurrentHashMap<>();
 

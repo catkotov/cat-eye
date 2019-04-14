@@ -16,8 +16,6 @@ public class UnitBundleDeployerImpl implements BundleDeployer {
 
     private BundleManager bundleManager;
 
-    private ComputationContextService computationContextService;
-
     @Override
     public Bundle deploy(String domain, String classPath) {
 
@@ -25,7 +23,7 @@ public class UnitBundleDeployerImpl implements BundleDeployer {
 
         // create and start thread for bundle deploying
         Thread deployingThread =
-                new Thread(new UnitDeployingProcess(classPath, domain, bundleManager, computationContextService));
+                new Thread(new UnitDeployingProcess(classPath, domain, bundleManager));
         deployingThread.setContextClassLoader(bundleClassLoader);
         deployingThread.start();
         try {
@@ -40,11 +38,6 @@ public class UnitBundleDeployerImpl implements BundleDeployer {
     @Override
     public void setBundleManager(BundleManager bundleManager) {
         this.bundleManager = bundleManager;
-    }
-
-    @Override
-    public void setComputationContextService(ComputationContextService computationContextService) {
-        this.computationContextService = computationContextService;
     }
 
 }

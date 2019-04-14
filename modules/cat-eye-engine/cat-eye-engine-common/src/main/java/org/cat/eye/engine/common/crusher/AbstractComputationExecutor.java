@@ -74,7 +74,7 @@ public abstract class AbstractComputationExecutor {
                 // get parameters from service
                 Object[] args = new Object[parameters.length];
                 for (int i = 0; i < parameters.length; i++) {
-                    Object arg = computationContextService.getArgument(parameters[i], bundle.getDomain());
+                    Object arg = bundle.getBundleService().getArgument(parameters[i], bundle.getDomain());
                     if (arg == null) {
                         try {
                             arg = parameters[i].getType().newInstance();
@@ -91,7 +91,7 @@ public abstract class AbstractComputationExecutor {
                 // invoke method with parameters
                 computers = (List<?>) optional.get().getMethod().invoke(computer, args);
                 // store output parameters by service
-                computationContextService.storeArguments(args, bundle.getDomain());
+                bundle.getBundleService().storeArguments(args, bundle.getDomain());
             } else {
                 // invoke method without parameters
                 computers = (List<?>) optional.get().getMethod().invoke(computer);

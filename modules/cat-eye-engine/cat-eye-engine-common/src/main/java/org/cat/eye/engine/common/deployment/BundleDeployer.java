@@ -9,6 +9,4 @@ public interface BundleDeployer {
     Bundle deploy(String domain, String path);
 
     void setBundleManager(BundleManager bundleManager);
-
-    void setComputationContextService(ComputationContextService computationContextService);
 }

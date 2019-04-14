@@ -30,7 +30,9 @@ public class IgniteComputationContextService implements ComputationContextServic
 
     private IgniteCache<UUID, Computation> runningComputationCache;
 
-    IgniteComputationContextService(String connectionPoints) {
+    private IgniteCache<String, Object> argumentCache;
+
+    public IgniteComputationContextService(String connectionPoints) {
 
         String[] addresses = connectionPoints.split(",");
 
@@ -53,6 +55,8 @@ public class IgniteComputationContextService implements ComputationContextServic
         this.computationCache = ignite.cache("computation");
 
         this.runningComputationCache = ignite.cache("runningComputation");
+
+        this.argumentCache = ignite.cache("argument");
     }
 
     @Override
@@ -62,17 +66,19 @@ public class IgniteComputationContextService implements ComputationContextServic
 
     @Override
     public Object getArgument(Parameter parameter, String domain) {
-        return null;
+        return this.argumentCache.get(domain + "-" + parameter.getType().getName());
     }
 
     @Override
     public void setArgument(Parameter parameter, String domain, Object argument) {
-
+        this.argumentCache.put(domain + "-" + parameter.getType().getName(), argument);
     }
 
     @Override
     public void storeArguments(Object[] args, String domain) {
-
+        for (Object arg : args) {
+            this.argumentCache.put(domain + "-" + arg.getClass().getName(), arg);
+        }
     }
 
     @Override
