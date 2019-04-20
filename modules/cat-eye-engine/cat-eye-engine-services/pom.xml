@@ -37,13 +37,6 @@
             <version>RELEASE</version>
         </dependency>
 
-        <dependency>
-            <groupId>org.cat.eye.bundle</groupId>
-            <artifactId>cat-eye-test-bungle-simple</artifactId>
-            <version>0.1-SNAPSHOT</version>
-            <scope>test</scope>
-        </dependency>
-
     </dependencies>
 
     <build>

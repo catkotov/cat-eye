@@ -116,7 +116,7 @@ public class AbstractDeployingProcess {
         return methodSpecificationSet;
     }
 
-    public void setBundleService(BundleService bundleService) {
+    protected void setBundleService(BundleService bundleService) {
         this.bundleService = bundleService;
     }
 }

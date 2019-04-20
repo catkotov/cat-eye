@@ -64,22 +64,22 @@ public class IgniteComputationContextService implements ComputationContextServic
         this.computationCache.put(computation.getId(), computation);
     }
 
-    @Override
-    public Object getArgument(Parameter parameter, String domain) {
-        return this.argumentCache.get(domain + "-" + parameter.getType().getName());
-    }
+//    @Override
+//    public Object getArgument(Parameter parameter, String domain) {
+//        return this.argumentCache.get(domain + "-" + parameter.getType().getName());
+//    }
+//
+//    @Override
+//    public void setArgument(Parameter parameter, String domain, Object argument) {
+//        this.argumentCache.put(domain + "-" + parameter.getType().getName(), argument);
+//    }
 
-    @Override
-    public void setArgument(Parameter parameter, String domain, Object argument) {
-        this.argumentCache.put(domain + "-" + parameter.getType().getName(), argument);
-    }
-
-    @Override
-    public void storeArguments(Object[] args, String domain) {
-        for (Object arg : args) {
-            this.argumentCache.put(domain + "-" + arg.getClass().getName(), arg);
-        }
-    }
+//    @Override
+//    public void storeArguments(Object[] args, String domain) {
+//        for (Object arg : args) {
+//            this.argumentCache.put(domain + "-" + arg.getClass().getName(), arg);
+//        }
+//    }
 
     @Override
     public boolean tryToRunComputation(Computation computation) {

@@ -3,7 +3,6 @@ package org.cat.eye.engine.service.ignite.cache;
 import org.cat.eye.engine.common.crusher.computation.ComputationFactory;
 import org.cat.eye.engine.common.model.Computation;
 import org.cat.eye.engine.common.model.ComputationState;
-import org.cat.eye.test.bundle.simple.StartFileCounterComputer;
 import org.junit.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +26,7 @@ public class IgniteComputationContextServiceTest {
     @Test
     public void storeComputation() {
 
-        Computation computation = ComputationFactory.create(new StartFileCounterComputer("C:\\Java"), null, "DOMAIN");
+        Computation computation = ComputationFactory.create(new MockEmptyComputer(), null, "DOMAIN");
 
         computationContextService.storeComputation(computation);
         Computation result = computationContextService.getComputation(computation.getId());
@@ -38,7 +37,7 @@ public class IgniteComputationContextServiceTest {
     @Test
     public void tryToRunComputation() {
 
-        Computation computation = ComputationFactory.create(new StartFileCounterComputer("C:\\Java"), null, "DOMAIN");
+        Computation computation = ComputationFactory.create(new MockEmptyComputer(), null, "DOMAIN");
 
         boolean result = computationContextService.tryToRunComputation(computation);
 
@@ -56,10 +55,10 @@ public class IgniteComputationContextServiceTest {
     @Test
     public void addCompletedChildIdAndRefresh() {
 
-        Computation parentComputation = ComputationFactory.create(new StartFileCounterComputer("C:\\Java"), null, "DOMAIN");
+        Computation parentComputation = ComputationFactory.create(new MockEmptyComputer(), null, "DOMAIN");
 
-        Computation child_1 = ComputationFactory.create(new StartFileCounterComputer("Child_1"), parentComputation.getId(), "DOMAIN");
-        Computation child_2 = ComputationFactory.create(new StartFileCounterComputer("Child_2"), parentComputation.getId(), "DOMAIN");
+        Computation child_1 = ComputationFactory.create(new MockEmptyComputer(), parentComputation.getId(), "DOMAIN");
+        Computation child_2 = ComputationFactory.create(new MockEmptyComputer(), parentComputation.getId(), "DOMAIN");
 
         List<Computation> childrenComputations = new ArrayList<>();
         childrenComputations.add(child_1);
@@ -83,7 +82,7 @@ public class IgniteComputationContextServiceTest {
     @Test
     public void fromRunningToWaiting() {
 
-        Computation computation = ComputationFactory.create(new StartFileCounterComputer("C:\\Java"), null, "DOMAIN");
+        Computation computation = ComputationFactory.create(new MockEmptyComputer(), null, "DOMAIN");
 
         computationContextService.tryToRunComputation(computation);
 
@@ -112,7 +111,7 @@ public class IgniteComputationContextServiceTest {
     @Test
     public void fromRunningToReady() {
 
-        Computation computation = ComputationFactory.create(new StartFileCounterComputer("C:\\Java"), null, "DOMAIN");
+        Computation computation = ComputationFactory.create(new MockEmptyComputer(), null, "DOMAIN");
 
         computationContextService.tryToRunComputation(computation);
 
@@ -141,7 +140,7 @@ public class IgniteComputationContextServiceTest {
     @Test
     public void fromRunningToCompleted() {
 
-        Computation computation = ComputationFactory.create(new StartFileCounterComputer("C:\\Java"), null, "DOMAIN");
+        Computation computation = ComputationFactory.create(new MockEmptyComputer(), null, "DOMAIN");
 
         computationContextService.tryToRunComputation(computation);
 
@@ -170,7 +169,7 @@ public class IgniteComputationContextServiceTest {
     @Test
     public void fromWaitingToReady() {
 
-        Computation computation = ComputationFactory.create(new StartFileCounterComputer("C:\\Java"), null, "DOMAIN");
+        Computation computation = ComputationFactory.create(new MockEmptyComputer(), null, "DOMAIN");
         computation.setState(ComputationState.WAITING);
         computationContextService.storeComputation(computation);
 
