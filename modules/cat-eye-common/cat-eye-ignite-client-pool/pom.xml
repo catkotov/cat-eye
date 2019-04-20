@@ -3,31 +3,26 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>cat-eye-engine</artifactId>
-        <groupId>org.cat.eye.engine</groupId>
+        <artifactId>cat-eye-common</artifactId>
+        <groupId>org.cat.eye.common</groupId>
         <version>0.1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>cat-eye-engine-services</artifactId>
+    <artifactId>cat-eye-ignite-client-pool</artifactId>
     <version>${project.parent.version}</version>
 
     <dependencies>
-
-        <dependency>
-            <groupId>org.cat.eye.engine</groupId>
-            <artifactId>cat-eye-engine-common</artifactId>
-        </dependency>
 
         <dependency>
             <groupId>org.apache.ignite</groupId>
             <artifactId>ignite-core</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>org.apache.ignite</groupId>
-            <artifactId>ignite-spring</artifactId>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.apache.ignite</groupId>-->
+<!--            <artifactId>ignite-spring</artifactId>-->
+<!--        </dependency>-->
 
         <dependency>
             <groupId>junit</groupId>

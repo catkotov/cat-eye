@@ -11,7 +11,8 @@
 
     <properties>
         <cat.eye.version>0.1-SNAPSHOT</cat.eye.version>
-        <spring.version>4.3.10.RELEASE</spring.version>
+        <ignite.version>2.7.0</ignite.version>
+        <spring.version>4.3.17.RELEASE</spring.version>
         <slf4j.version>1.7.21</slf4j.version>
         <logback.version>1.1.7</logback.version>
         <akka.version>2.5.21</akka.version>

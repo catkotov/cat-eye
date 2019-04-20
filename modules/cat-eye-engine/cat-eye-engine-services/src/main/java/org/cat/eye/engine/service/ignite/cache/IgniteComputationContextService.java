@@ -52,11 +52,11 @@ public class IgniteComputationContextService implements ComputationContextServic
 
         this.ignite = Ignition.start(cfg);
 
-        this.computationCache = ignite.cache("computation");
+        this.computationCache = ignite.getOrCreateCache("computation");
 
-        this.runningComputationCache = ignite.cache("runningComputation");
+        this.runningComputationCache = ignite.getOrCreateCache("runningComputation");
 
-        this.argumentCache = ignite.cache("argument");
+        this.argumentCache = ignite.getOrCreateCache("argument");
     }
 
     @Override

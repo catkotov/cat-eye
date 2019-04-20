@@ -26,11 +26,24 @@
                 <artifactId>cat-eye-engine-model</artifactId>
                 <version>${cat.eye.version}</version>
             </dependency>
+
             <dependency>
                 <groupId>org.cat.eye.engine</groupId>
                 <artifactId>cat-eye-engine-container-unit</artifactId>
                 <version>${cat.eye.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.apache.ignite</groupId>
+                <artifactId>ignite-core</artifactId>
+                <version>${ignite.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.ignite</groupId>
+                <artifactId>ignite-spring</artifactId>
+                <version>${ignite.version}</version>
+            </dependency>
+
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>jcl-over-slf4j</artifactId>
@@ -53,6 +66,14 @@
                 <artifactId>logback-core</artifactId>
                 <version>${logback.version}</version>
             </dependency>
+
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>${junit.version}</version>
+                <scope>test</scope>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 
