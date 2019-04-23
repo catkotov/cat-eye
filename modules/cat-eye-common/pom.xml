@@ -70,6 +70,13 @@
                 <artifactId>akka-actor_2.12</artifactId>
                 <version>${akka.version}</version>
             </dependency>
+
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-pool2</artifactId>
+                <version>${apache.commons.poolversion}</version>
+            </dependency>
+
             <dependency>
                 <groupId>com.typesafe.akka</groupId>
                 <artifactId>akka-testkit_2.12</artifactId>

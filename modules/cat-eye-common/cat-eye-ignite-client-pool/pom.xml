@@ -19,10 +19,15 @@
             <artifactId>ignite-core</artifactId>
         </dependency>
 
-<!--        <dependency>-->
-<!--            <groupId>org.apache.ignite</groupId>-->
-<!--            <artifactId>ignite-spring</artifactId>-->
-<!--        </dependency>-->
+        <dependency>
+            <groupId>org.apache.ignite</groupId>
+            <artifactId>ignite-spring</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-pool2</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>junit</groupId>
