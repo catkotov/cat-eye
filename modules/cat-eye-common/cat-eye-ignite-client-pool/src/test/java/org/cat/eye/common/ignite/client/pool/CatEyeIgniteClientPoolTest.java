@@ -2,9 +2,15 @@ package org.cat.eye.common.ignite.client.pool;
 
 import org.apache.ignite.Ignite;
 import org.apache.ignite.Ignition;
+import org.apache.ignite.cache.query.QueryCursor;
+import org.apache.ignite.cache.query.ScanQuery;
 import org.apache.ignite.client.ClientCache;
 import org.apache.ignite.client.IgniteClient;
 import org.junit.*;
+
+import javax.cache.Cache;
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.junit.Assert.*;
 
@@ -92,5 +98,33 @@ public class CatEyeIgniteClientPoolTest {
         pool.releaseClient(client_5);
         pool.releaseClient(client_7);
         pool.releaseClient(client_9);
+    }
+
+    @Test
+    public void queryClientTest() throws Exception {
+
+        assertNotNull(ignite);
+        assertNotNull(pool);
+
+        IgniteClient client = pool.getClient();
+        ClientCache<String, Long> testCache = client.getOrCreateCache("queryCache");
+
+        testCache.put("111", 111L);
+        testCache.put("222", 222L);
+        testCache.put("000", 0L);
+        testCache.put("444", 444L);
+
+        Set<String> result = new HashSet<>();
+
+        try (QueryCursor<Cache.Entry<String, Long>> cursor =
+                     testCache.query(new ScanQuery<>((k, v) -> v > 0))) {
+            for (Cache.Entry<String, Long> entry : cursor)
+                result.add(entry.getKey());
+        }
+
+        pool.releaseClient(client);
+
+        assertFalse(result.isEmpty());
+        assertEquals(result.size(), 3);
     }
 }
