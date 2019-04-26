@@ -20,6 +20,11 @@
         </dependency>
 
         <dependency>
+            <groupId>org.cat.eye.common</groupId>
+            <artifactId>cat-eye-ignite-client-pool</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>org.apache.ignite</groupId>
             <artifactId>ignite-core</artifactId>
         </dependency>

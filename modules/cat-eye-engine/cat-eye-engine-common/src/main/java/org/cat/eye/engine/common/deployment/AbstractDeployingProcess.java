@@ -50,7 +50,7 @@ public class AbstractDeployingProcess {
 
                 computables.put(bundleClass, methodSpecificationSet);
 
-            } catch (ClassNotFoundException e) {
+            } catch (Exception e) {
                 LOGGER.error("deployBundle - can't process class <" + className + ">.", e);
             }
         }
@@ -95,7 +95,7 @@ public class AbstractDeployingProcess {
                                         LOGGER.info("getMethodSpecifications - parameter ["
                                                 + parameter.getType().getSimpleName() + "] was instantiated.");
                                     }
-                                } catch (InstantiationException | IllegalAccessException e) {
+                                } catch (Exception e) {
                                     // TODO maybe we need to throw exception to upper catcher
                                     LOGGER.error("getMethodSpecifications - can't create argument for parameter "
                                             + parameter.getName(), e);

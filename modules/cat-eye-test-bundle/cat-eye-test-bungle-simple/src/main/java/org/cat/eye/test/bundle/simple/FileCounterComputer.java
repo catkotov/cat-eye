@@ -34,7 +34,7 @@ public class FileCounterComputer implements Serializable {
     }
 
     @Compute
-    public List<FileCounterComputer> getDirectoriesAndFileCounter(@In FileCounterStoreImpl store) {
+    public List<FileCounterComputer> getDirectoriesAndFileCounter(@In FileCounterStoreImpl store) throws Exception {
 
         int fileCount = 0;
 

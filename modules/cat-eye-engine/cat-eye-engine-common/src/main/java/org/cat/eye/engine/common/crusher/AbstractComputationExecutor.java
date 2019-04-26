@@ -60,7 +60,7 @@ public abstract class AbstractComputationExecutor {
     }
 
     private void executeNextStep(Object computer, Set<MethodSpecification> methods)
-            throws IllegalAccessException, InvocationTargetException {
+            throws Exception {
         // get computation next step method
         Optional<MethodSpecification> optional =
                 methods.stream().filter(spec -> spec.getStep() == computation.getNextStep()).findFirst();

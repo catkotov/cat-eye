@@ -26,9 +26,9 @@ public class BundleDeployerImpl implements BundleDeployer {
     @Override
     public Bundle deploy(String domain, String pathToJar) {
         // get urls of jar's file
-        URL[] ursl = getUrlsFromJarFile(pathToJar);
+        URL[] urls = getUrlsFromJarFile(pathToJar);
         // create class loader for bundle
-        URLBundleClassLoader bundleClassLoader = new URLBundleClassLoader(ursl, new BundleClassLoader());
+        URLBundleClassLoader bundleClassLoader = new URLBundleClassLoader(urls, new BundleClassLoader());
         // create and start thread for bundle deploying
         Thread deployingThread = new Thread(new DeployingProcess(pathToJar, domain, bundleManager));
         deployingThread.setContextClassLoader(bundleClassLoader);

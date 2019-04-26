@@ -4,9 +4,9 @@ import java.util.Set;
 
 public interface FileCounterStore {
 
-    long getFileNumber(String directoryName);
+    long getFileNumber(String directoryName) throws Exception;
 
-    void putFileNumber(String directoryName, long fileNumber);
+    void putFileNumber(String directoryName, long fileNumber) throws Exception;
 
-    Set<String> getDirectoryNames();
+    Set<String> getDirectoryNames() throws Exception;
 }

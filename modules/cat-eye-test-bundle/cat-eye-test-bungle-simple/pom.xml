@@ -24,6 +24,11 @@
         <dependency>
             <groupId>org.cat.eye.engine</groupId>
             <artifactId>cat-eye-engine-container-unit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.cat.eye.common</groupId>
+            <artifactId>cat-eye-ignite-client-pool</artifactId>
         </dependency>
 
         <dependency>

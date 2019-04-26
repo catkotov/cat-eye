@@ -42,16 +42,16 @@ public class StartFileCounterComputer implements Serializable {
     }
 
     @Compute(step = 2)
-    public List getNumberFilesInDirectory(@Out FileCounterStoreImpl store) {
+    public List getNumberFilesInDirectory(@Out FileCounterStoreImpl store) throws Exception {
 
         if (store != null) {
             Set<String> dirSet = store.getDirectoryNames();
             if (dirSet != null && !dirSet.isEmpty()) {
-                dirSet.forEach(dir -> {
+                for (String dir : dirSet) {
                     long fileNumber = store.getFileNumber(dir);
                     filesTotalNumber += fileNumber;
                     LOGGER.info("getNumberFilesInDirectory - STEP-2: Directory [{}] contains [{}] files", dir, fileNumber);
-                });
+                }
             }
 
             LOGGER.info("getNumberFilesInDirectory - STEP-2: Total number of files in directory [{}] is [{}].", path, filesTotalNumber);

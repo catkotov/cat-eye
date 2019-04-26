@@ -25,6 +25,12 @@
             </dependency>
 
             <dependency>
+                <groupId>org.cat.eye.common</groupId>
+                <artifactId>cat-eye-ignite-client-pool</artifactId>
+                <version>${cat.eye.version}</version>
+            </dependency>
+
+            <dependency>
                 <groupId>org.cat.eye.engine</groupId>
                 <artifactId>cat-eye-engine-common</artifactId>
                 <version>${cat.eye.version}</version>
