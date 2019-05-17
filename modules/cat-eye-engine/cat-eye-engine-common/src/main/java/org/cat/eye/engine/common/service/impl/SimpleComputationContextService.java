@@ -59,7 +59,8 @@ public class SimpleComputationContextService implements ComputationContextServic
         return getComputation(parentComputation.getId());
     }
 
-    private Computation getComputation(UUID id) {
+    @Override
+    public Computation getComputation(UUID id) {
         return this.computationStore.get(id);
     }
 

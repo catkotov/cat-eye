@@ -38,6 +38,11 @@
                 <version>${cat.eye.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.cat.eye.engine</groupId>
+                <artifactId>cat-eye-engine-common</artifactId>
+                <version>${cat.eye.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.apache.ignite</groupId>
                 <artifactId>ignite-core</artifactId>
                 <version>${ignite.version}</version>

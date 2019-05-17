@@ -8,7 +8,6 @@ import org.cat.eye.engine.common.model.MethodSpecification;
 import org.cat.eye.engine.common.service.ComputationContextService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Parameter;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -112,6 +111,8 @@ public abstract class AbstractComputationExecutor {
             } else {
                 // move computation from RUNNING state to READY state
                 computationContextService.fromRunningToReady(computation);
+                // update local value of computation
+                computation = computationContextService.getComputation(computation.getId());
                 // call recursively this method
                 executeNextStep(computer, methods);
             }

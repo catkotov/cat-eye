@@ -42,7 +42,9 @@ public class StartFileCounterComputer implements Serializable {
     }
 
     @Compute(step = 2)
-    public List getNumberFilesInDirectory(@Out FileCounterStoreImpl store) throws Exception {
+    public List getNumberFilesInDirectory() throws Exception {
+
+        FileCounterStoreImpl store = new FileCounterStoreImpl();
 
         if (store != null) {
             Set<String> dirSet = store.getDirectoryNames();

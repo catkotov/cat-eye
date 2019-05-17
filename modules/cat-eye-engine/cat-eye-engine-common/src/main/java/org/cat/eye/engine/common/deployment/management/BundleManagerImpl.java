@@ -1,5 +1,6 @@
 package org.cat.eye.engine.common.deployment.management;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -18,5 +19,10 @@ public class BundleManagerImpl implements BundleManager {
     @Override
     public void putBundle(Bundle bundle) {
         bundles.put(bundle.getDomain(), bundle);
+    }
+
+    @Override
+    public Collection<Bundle> getBundles() {
+        return bundles.values();
     }
 }

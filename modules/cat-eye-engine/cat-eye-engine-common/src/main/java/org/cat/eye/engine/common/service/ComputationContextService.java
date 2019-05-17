@@ -6,7 +6,9 @@ import java.util.UUID;
 
 public interface ComputationContextService {
 
-    void storeComputation(Computation computation);
+    void storeComputation(Computation computation) throws Exception;
+
+    Computation getComputation(UUID id);
 
     boolean tryToRunComputation(Computation computation);
 

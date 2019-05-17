@@ -3,7 +3,6 @@ package org.cat.eye.engine.container.unit.deployment;
 import org.cat.eye.common.util.file.ClassFileUtil;
 import org.cat.eye.engine.common.deployment.AbstractDeployingProcess;
 import org.cat.eye.engine.common.deployment.management.BundleManager;
-import org.cat.eye.engine.common.service.impl.SimpleBundleService;
 
 import java.util.List;
 
@@ -27,7 +26,7 @@ public class UnitDeployingProcess extends AbstractDeployingProcess implements Ru
 
     @Override
     public void run() {
-        super.setBundleService(new SimpleBundleService());
+//        super.setBundleService(new SimpleBundleService());
         List<String> classNameLst = ClassFileUtil.getClassNamesFromPath(classPath);
         deployBundle(classNameLst, bundleManager);
     }

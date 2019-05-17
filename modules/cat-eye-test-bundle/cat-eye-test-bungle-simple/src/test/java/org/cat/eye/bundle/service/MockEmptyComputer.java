@@ -1,4 +1,4 @@
-package org.cat.eye.engine.service.ignite.cache;
+package org.cat.eye.bundle.service;
 
 import java.io.Serializable;
 

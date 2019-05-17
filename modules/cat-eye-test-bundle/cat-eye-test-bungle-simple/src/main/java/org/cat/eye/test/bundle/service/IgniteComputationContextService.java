@@ -1,4 +1,4 @@
-package org.cat.eye.engine.service.ignite.cache;
+package org.cat.eye.test.bundle.service;
 
 import org.apache.ignite.Ignite;
 import org.apache.ignite.IgniteCache;
@@ -13,7 +13,6 @@ import org.apache.ignite.transactions.TransactionIsolation;
 import org.cat.eye.engine.common.model.Computation;
 import org.cat.eye.engine.common.model.ComputationState;
 import org.cat.eye.engine.common.service.ComputationContextService;
-import java.lang.reflect.Parameter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -30,11 +29,41 @@ public class IgniteComputationContextService implements ComputationContextServic
 
     private IgniteCache<UUID, Computation> runningComputationCache;
 
-    private IgniteCache<String, Object> argumentCache;
+//    private IgniteCache<String, Object> argumentCache;
 
-    public IgniteComputationContextService(String connectionPoints) {
+//    public IgniteComputationContextService(String connectionPoints) {
+//
+//        String[] addresses = connectionPoints.split(",");
+//
+//        TcpDiscoveryVmIpFinder ipFinder = new TcpDiscoveryVmIpFinder();
+//        ipFinder.setAddresses(Arrays.asList(addresses));
+//
+//        TcpDiscoverySpi spi = new TcpDiscoverySpi();
+//        spi.setIpFinder(ipFinder);
+//
+//        IgniteConfiguration cfg = new IgniteConfiguration();
+//
+//        cfg.setDiscoverySpi(spi);
+//
+//        cfg.setPeerClassLoadingEnabled(true);
+//        //Client mode is ON
+//        cfg.setClientMode(true);
+//
+//        this.ignite = Ignition.start(cfg);
+//
+//        this.computationCache = ignite.getOrCreateCache("computation");
+//
+//        this.runningComputationCache = ignite.getOrCreateCache("runningComputation");
+//
+//        this.argumentCache = ignite.getOrCreateCache("argument");
+//    }
 
-        String[] addresses = connectionPoints.split(",");
+    public IgniteComputationContextService() {
+        init();
+    }
+
+    public void init() {
+        String[] addresses = "127.0.0.1:47500..47509".split(",");
 
         TcpDiscoveryVmIpFinder ipFinder = new TcpDiscoveryVmIpFinder();
         ipFinder.setAddresses(Arrays.asList(addresses));
@@ -43,6 +72,7 @@ public class IgniteComputationContextService implements ComputationContextServic
         spi.setIpFinder(ipFinder);
 
         IgniteConfiguration cfg = new IgniteConfiguration();
+        cfg.setIgniteInstanceName(UUID.randomUUID().toString());
 
         cfg.setDiscoverySpi(spi);
 
@@ -56,7 +86,7 @@ public class IgniteComputationContextService implements ComputationContextServic
 
         this.runningComputationCache = ignite.getOrCreateCache("runningComputation");
 
-        this.argumentCache = ignite.getOrCreateCache("argument");
+//        this.argumentCache = ignite.getOrCreateCache("argument");
     }
 
     @Override
@@ -215,11 +245,12 @@ public class IgniteComputationContextService implements ComputationContextServic
         }
     }
 
-    Computation getComputation(UUID id) {
+    @Override
+    public Computation getComputation(UUID id) {
         return computationCache.get(id);
     }
 
-    Computation getRunningComputation(UUID id) {
+    public Computation getRunningComputation(UUID id) {
         return runningComputationCache.get(id);
     }
 

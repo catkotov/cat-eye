@@ -2,6 +2,7 @@ package org.cat.eye.engine.common.deployment.management;
 
 import org.cat.eye.engine.common.model.MethodSpecification;
 import org.cat.eye.engine.common.service.BundleService;
+import org.cat.eye.engine.common.service.ComputationContextService;
 
 import java.util.Map;
 import java.util.Set;
@@ -18,4 +19,6 @@ public interface Bundle {
     Map<Class<?>, Set<MethodSpecification>> getComputables();
 
     BundleService getBundleService();
+
+    ComputationContextService getComputationContextService();
 }

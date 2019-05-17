@@ -16,15 +16,13 @@ import org.cat.eye.engine.common.deployment.BundleDeployer;
 import org.cat.eye.engine.common.deployment.management.Bundle;
 import org.cat.eye.engine.common.deployment.management.BundleManager;
 import org.cat.eye.engine.common.deployment.management.BundleManagerImpl;
-import org.cat.eye.engine.common.service.ComputationContextService;
-import org.cat.eye.engine.common.service.impl.SimpleComputationContextService;
 import org.cat.eye.engine.common.util.CatEyeActorUtil;
 import org.cat.eye.engine.container.actors.Dispatcher;
 import org.cat.eye.engine.container.actors.Driver;
 import org.cat.eye.engine.container.actors.Engine;
 import org.cat.eye.engine.container.context.DomainContext;
 import org.cat.eye.engine.container.deployment.BundleDeployerImpl;
-import org.cat.eye.engine.service.ignite.cache.IgniteComputationContextService;
+//import org.cat.eye.engine.service.ignite.cache.IgniteComputationContextService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.io.File;
@@ -44,8 +42,8 @@ public class CatEyeContainer implements AutoCloseable {
 
     private static String repositoryDirectory = "E:/CatEyeContainer/Repository";
     // TODO get address list from outside
-    private final static ComputationContextService computationContextService =
-            new IgniteComputationContextService("127.0.0.1:47500..47509"); //new SimpleComputationContextService();
+//    private final static ComputationContextService computationContextService =
+//            new IgniteComputationContextService("127.0.0.1:47500..47509"); //new SimpleComputationContextService();
 
     private ConcurrentHashMap<String, DomainContext> context = new ConcurrentHashMap<>();
 
@@ -174,7 +172,7 @@ public class CatEyeContainer implements AutoCloseable {
                     driverInit(domainContext.getDomain(), domainContext.getSystem());
                     break;
                 case DISPATCHER:
-                    dispatcherInit(domainContext.getDomain(), domainContext.getSystem());
+                    dispatcherInit(domainContext.getDomain(), domainContext.getSystem(), domainContext.getBundle());
                     break;
                 case ENGINE:
                     engineInit(domainContext.getDomain(), domainContext.getSystem(), domainContext.getBundle());
@@ -190,12 +188,12 @@ public class CatEyeContainer implements AutoCloseable {
 
         }
 
-        private void dispatcherInit(String domain, ActorSystem domainSystem) {
+        private void dispatcherInit(String domain, ActorSystem domainSystem, Bundle bundle) {
             domainSystem.actorOf(
                     Props.create(
                             Dispatcher.class,
                             domain,
-                            CatEyeContainer.computationContextService
+                            bundle.getComputationContextService()
                     ),
                     domain + DISPATCHER_ACTOR
             );
@@ -216,7 +214,7 @@ public class CatEyeContainer implements AutoCloseable {
                                 Engine.class,
                                 domain,
                                 bundle,
-                                CatEyeContainer.computationContextService,
+                                bundle.getComputationContextService(),
                                 mediator
                         ),
                         domain + ENGINE_ACTOR + "-" + i
@@ -228,7 +226,7 @@ public class CatEyeContainer implements AutoCloseable {
     @Override
     public void close() throws Exception {
 
-        computationContextService.close();
+        bundleManager.getBundles().forEach(bundle -> bundle.getComputationContextService().close());
 
         context.entrySet().forEach((entry) -> entry.getValue().getSystem().terminate());
 

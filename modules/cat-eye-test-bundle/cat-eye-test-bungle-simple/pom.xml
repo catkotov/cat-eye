@@ -23,6 +23,10 @@
         </dependency>
         <dependency>
             <groupId>org.cat.eye.engine</groupId>
+            <artifactId>cat-eye-engine-common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.cat.eye.engine</groupId>
             <artifactId>cat-eye-engine-container-unit</artifactId>
             <scope>test</scope>
         </dependency>

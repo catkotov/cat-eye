@@ -5,6 +5,7 @@ import org.cat.eye.engine.common.deployment.management.BundleImpl;
 import org.cat.eye.engine.common.deployment.management.BundleManager;
 import org.cat.eye.engine.common.model.MethodSpecification;
 import org.cat.eye.engine.common.service.BundleService;
+import org.cat.eye.engine.common.service.ComputationContextService;
 import org.cat.eye.engine.model.annotation.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +25,7 @@ public class AbstractDeployingProcess {
     private final static Logger LOGGER = LoggerFactory.getLogger(AbstractDeployingProcess.class);
 
     private String domain;
-    private BundleService bundleService;
+//    private BundleService bundleService;
 
     public AbstractDeployingProcess(String domain) {
         this.domain = domain;
@@ -34,8 +35,36 @@ public class AbstractDeployingProcess {
 
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 
-        Map<Class<?>, Set<MethodSpecification>> computables = new ConcurrentHashMap<>();
+        String bundleServiceName = System.getProperty("bundleService");
+
+        String computationContextServiceName = System.getProperty("computationContextService");
+
+        BundleService bundleService = null;
+
+        ComputationContextService computationContextService = null;
+
+        try {
+            Class<? extends BundleService> bundleServiceClass =
+                    (Class<? extends BundleService>) classLoader.loadClass(bundleServiceName);
+            bundleService = bundleServiceClass.newInstance();
+
+            Class<? extends ComputationContextService> computationContextServiceClass =
+                    (Class<? extends ComputationContextService>) classLoader.loadClass(computationContextServiceName);
+            computationContextService = computationContextServiceClass.newInstance();
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
+
+        Map<Class<?>, Set<MethodSpecification>> computabls = new ConcurrentHashMap<>();
         // search of annotated classes
+        for (String className : classNameLst) {
+            try {
+                Class<?> bundleClass = classLoader.loadClass(className);
+            } catch (Exception e) {
+                LOGGER.error("deployBundle - can't load class <" + className + ">.", e);
+            }
+        }
+
         for (String className : classNameLst) {
             try {
                 Class<?> bundleClass = classLoader.loadClass(className);
@@ -46,23 +75,24 @@ public class AbstractDeployingProcess {
 
                 LOGGER.info("deployBundle - class <" + className + "> is computable!");
 
-                Set<MethodSpecification> methodSpecificationSet = getMethodSpecifications(bundleClass);
+                Set<MethodSpecification> methodSpecificationSet = getMethodSpecifications(bundleClass, bundleService);
 
-                computables.put(bundleClass, methodSpecificationSet);
+                computabls.put(bundleClass, methodSpecificationSet);
 
             } catch (Exception e) {
                 LOGGER.error("deployBundle - can't process class <" + className + ">.", e);
             }
         }
+
         // create and store bundle context
-        if (!computables.isEmpty()) {
-            Bundle bundle = new BundleImpl(domain, computables, classLoader, bundleService);
+        if (!computabls.isEmpty()) {
+            Bundle bundle = new BundleImpl(domain, computabls, classLoader, bundleService, computationContextService);
             bundleManager.putBundle(bundle);
             LOGGER.info("deployBundle - bundle " + bundle.getDomain() + " was deployed.");
         }
     }
 
-    private Set<MethodSpecification> getMethodSpecifications(Class<?> bundleClass) {
+    private Set<MethodSpecification> getMethodSpecifications(Class<?> bundleClass, BundleService bundleService) {
 
         Set<MethodSpecification> methodSpecificationSet = null;
 
@@ -76,38 +106,38 @@ public class AbstractDeployingProcess {
                 if (method.isAnnotationPresent(Compute.class)) {
                     int step = method.getAnnotation(Compute.class).step();
                     Parameter[] parameters = method.getParameters();
-                    if (parameters != null && parameters.length != 0) {
-
-                        for (Parameter parameter : parameters) {
-                            if (parameter.isAnnotationPresent(In.class)
-                                    || parameter.isAnnotationPresent(Out.class)
-                                    || parameter.isAnnotationPresent(InOut.class)) {
-
-                                try {
-                                    if (bundleService.getArgument(parameter, domain) == null) {
-
-                                        bundleService.setArgument(
-                                                parameter,
-                                                domain,
-                                                parameter.getType().newInstance()
-                                        );
-
-                                        LOGGER.info("getMethodSpecifications - parameter ["
-                                                + parameter.getType().getSimpleName() + "] was instantiated.");
-                                    }
-                                } catch (Exception e) {
-                                    // TODO maybe we need to throw exception to upper catcher
-                                    LOGGER.error("getMethodSpecifications - can't create argument for parameter "
-                                            + parameter.getName(), e);
-                                }
-                            } else {
-                                String errorMsg =
-                                        String.format("Parameter [%s] of method [%s] in class [%s] is not annotated!!!",
-                                        parameter.getName(), method.getName(), bundleClass.getName());
-                                throw new RuntimeException(errorMsg);
-                            }
-                        }
-                    }
+//                    if (parameters != null && parameters.length != 0) {
+//
+//                        for (Parameter parameter : parameters) {
+//                            if (parameter.isAnnotationPresent(In.class)
+//                                    || parameter.isAnnotationPresent(Out.class)
+//                                    || parameter.isAnnotationPresent(InOut.class)) {
+//
+//                                try {
+//                                    if (bundleService.getArgument(parameter, domain) == null) {
+//
+//                                        bundleService.setArgument(
+//                                                parameter,
+//                                                domain,
+//                                                parameter.getType().newInstance()
+//                                        );
+//
+//                                        LOGGER.info("getMethodSpecifications - parameter ["
+//                                                + parameter.getType().getSimpleName() + "] was instantiated.");
+//                                    }
+//                                } catch (Exception e) {
+//                                    // TODO maybe we need to throw exception to upper catcher
+//                                    LOGGER.error("getMethodSpecifications - can't create argument for parameter "
+//                                            + parameter.getName(), e);
+//                                }
+//                            } else {
+//                                String errorMsg =
+//                                        String.format("Parameter [%s] of method [%s] in class [%s] is not annotated!!!",
+//                                        parameter.getName(), method.getName(), bundleClass.getName());
+//                                throw new RuntimeException(errorMsg);
+//                            }
+//                        }
+//                    }
 
                     methodSpecificationSet.add(new MethodSpecification(method, step, parameters));
                 }
@@ -116,7 +146,7 @@ public class AbstractDeployingProcess {
         return methodSpecificationSet;
     }
 
-    protected void setBundleService(BundleService bundleService) {
-        this.bundleService = bundleService;
-    }
+//    protected void setBundleService(BundleService bundleService) {
+//        this.bundleService = bundleService;
+//    }
 }

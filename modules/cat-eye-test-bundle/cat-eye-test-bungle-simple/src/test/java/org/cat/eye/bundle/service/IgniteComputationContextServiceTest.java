@@ -1,10 +1,11 @@
-package org.cat.eye.engine.service.ignite.cache;
+package org.cat.eye.bundle.service;
 
 import org.apache.ignite.Ignite;
 import org.apache.ignite.Ignition;
 import org.cat.eye.engine.common.crusher.computation.ComputationFactory;
 import org.cat.eye.engine.common.model.Computation;
 import org.cat.eye.engine.common.model.ComputationState;
+import org.cat.eye.test.bundle.service.IgniteComputationContextService;
 import org.junit.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +22,7 @@ public class IgniteComputationContextServiceTest {
     public static void init() {
         ignite = Ignition.start("default-config.xml");
 
-        computationContextService = new IgniteComputationContextService("127.0.0.1:47500..47509");
+        computationContextService = new IgniteComputationContextService();
     }
 
     @AfterClass

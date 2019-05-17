@@ -29,7 +29,7 @@ public class DriverClientTest {
     }
 
     @Test
-    @Ignore
+//    @Ignore
     public void send() throws InterruptedException {
 
         CountDownLatch latch = new CountDownLatch(1);

@@ -1,4 +1,4 @@
-package org.cat.eye.engine.service.ignite.cache;
+package org.cat.eye.test.bundle.service;
 
 import org.apache.ignite.client.IgniteClient;
 import org.cat.eye.common.ignite.client.pool.CatEyeIgniteClientPool;
@@ -11,10 +11,14 @@ import java.lang.reflect.Parameter;
  */
 public class IgniteBundleService implements BundleService {
 
-    CatEyeIgniteClientPool igniteClientPool;
+    private CatEyeIgniteClientPool igniteClientPool;
 
-    public IgniteBundleService(String[] addresses, int maxTotal, int maxIdle, int minIdle) {
-        this.igniteClientPool = new CatEyeIgniteClientPool(addresses, maxTotal, maxIdle, minIdle);
+    public IgniteBundleService() {
+        init();
+    }
+
+    private void init() {
+        this.igniteClientPool = new CatEyeIgniteClientPool(new String[] {"127.0.0.1:10800"}, 10 , 10, 10);
     }
 
     @Override
