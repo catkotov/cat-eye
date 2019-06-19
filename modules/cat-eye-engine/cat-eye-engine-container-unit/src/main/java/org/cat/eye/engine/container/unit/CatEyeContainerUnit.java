@@ -36,6 +36,7 @@ public class CatEyeContainerUnit {
     public CatEyeContainerUnit(String pathToClasses, String bundleDomain) {
 
         System.setProperty("bundleService", "org.cat.eye.engine.common.service.impl.SimpleBundleService");
+        System.setProperty("computationContextService", "org.cat.eye.engine.common.service.impl.SimpleComputationContextService");
 
         this.pathToClasses = pathToClasses;
         this.bundleDomain = bundleDomain;
