@@ -1,2 +1,3 @@
 # cat-eye
-Some computation application
+Some computation application (for calculator jar files)
+
